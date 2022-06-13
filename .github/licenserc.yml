@@ -1,0 +1,15 @@
+header:
+  license:
+    spdx-id: Apache-2.0
+    copyright-owner: FeatureProbe
+
+  paths:
+    - 'featureprobe/**/*.py'
+    - 'tests/**/*.py'
+
+  paths-ignore:
+    - '**/*.md'
+    - 'LICENSE'
+    - '.github/**'
+
+  comment: on-failure
