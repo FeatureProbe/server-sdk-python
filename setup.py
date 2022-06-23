@@ -31,11 +31,8 @@ setup(
         #   4 - Beta
         #   5 - Production/Stable
         'Development Status :: 3 - Alpha',
-
         'License :: OSI Approved :: Apache-2.0',
-
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.8',
     ],
 
     keywords='feature management, server sdk',
@@ -43,7 +40,7 @@ setup(
     package_dir={'': 'featureprobe'},
     packages=find_packages(where='featureprobe'),
 
-    python_requires='>=3.8, <4',
+    python_requires='>=3.5, <4',
 
     install_requires=[],
     # If there are data files included in your packages that need to be

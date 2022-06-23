@@ -2,9 +2,7 @@
 
 > ⚠️ This SDK is **WIP** and not ready for use yet, thanks for your patience and please wait for the release.
 
-<!--
-[![codecov](https://codecov.io/gh/FeatureProbe/server-sdk-java/branch/main/graph/badge.svg?token=WZC3ZS6NNL)](https://codecov.io/gh/FeatureProbe/server-sdk-java)
--->
+[![codecov](https://codecov.io/gh/FeatureProbe/server-sdk-python/branch/main/graph/badge.svg)](https://codecov.io/gh/FeatureProbe/server-sdk-python)
 [![GitHub Star](https://img.shields.io/github/stars/FeatureProbe/server-sdk-python)](https://github.com/FeatureProbe/server-sdk-python/stargazers)
 [![License](https://img.shields.io/github/license/FeatureProbe/server-sdk-python)](https://github.com/FeatureProbe/server-sdk-python/blob/main/LICENSE)
 
@@ -24,21 +22,18 @@ In this guide we explain how to use feature toggles in a Python application usin
 
 First, install the FeatureProbe SDK as a dependency in your application.
 
-#### Apache Maven
+#### pip
 
-```xml
-
-<dependency>
-    <groupId>com.featureprobe</groupId>
-    <artifactId>server-sdk-java</artifactId>
-    <version>xx.xx.release</version>
-</dependency>
+```bash
+pip install featureprobe-server
 ```
 
-#### Gradle Groovy DSL
+#### conda
 
-```text
-implementation 'com.featureprobe:server-sdk-java:xx.xx.release'
+Will be supported later.
+
+```bash
+conda install featureprobe-server
 ```
 
 ### Step 2. Create a FeatureProbe instance
