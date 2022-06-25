@@ -9,7 +9,5 @@ header:
 
   paths-ignore:
     - '**/*.md'
-    - 'LICENSE'
-    - '.github/**'
 
   comment: on-failure
