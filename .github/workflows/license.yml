@@ -1,0 +1,55 @@
+name: Check license header
+
+on:
+  push:
+    branches: [ main ]
+  pull_request_target:
+    types: [ opened, synchronize, edited ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout commit
+      if: github.event_name == 'push'
+      uses: actions/checkout@v3
+
+    - name: Checkout pull request
+      if: github.event_name == 'pull_request_target'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.event.pull_request.head.ref }}
+
+
+    - name: Check license headers
+      uses: apache/skywalking-eyes@v0.3.0
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          config: .github/licenserc.yml
+          mode: fix
+
+
+    - name: Create pull request
+      if: github.event_name == 'push'
+      uses: peter-evans/create-pull-request@v3
+      with:
+        author: GitHub Actions <41898282+github-actions[bot]@users.noreply.github.com>
+        commit-message: "chore: add license header(s)"
+        title: "chore: add license header(s)"
+        body: Add missing license header(s) in source and test code.
+        branch: add-license
+
+    - name: Commit licensed files
+      if: github.event_name == 'pull_request_target'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: EndBug/add-and-commit@v8.0.2
+      with:
+        default_author: github_actions
+        message: "chore: add license header(s)"
