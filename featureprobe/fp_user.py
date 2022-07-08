@@ -14,8 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'FeatureProbe'
-__license__ = 'Apache 2.0'
+from typing import Dict
 
-__version__ = '0.0.1a1'
 
+class FPUser:
+    def __init__(self, key: str):
+        self._key = key
+        self._attrs = {}
+
+    def with_attr(self, key: str, value: str):
+        self._attrs[key] = value
+
+    def has_attr(self, attr: str):
+        return attr in self._attrs
+
+    @property
+    def key(self) -> str:
+        return self._key
+
+    @property
+    def attrs(self) -> Dict[str, str]:
+        return self._attrs
+
+    @attrs.setter
+    def attrs(self, attrs: Dict[str, str]):
+        self._attrs = attrs

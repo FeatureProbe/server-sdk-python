@@ -14,8 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'FeatureProbe'
-__license__ = 'Apache 2.0'
+from abc import ABC, abstractmethod
 
-__version__ = '0.0.1a1'
+from data_repository import DataRepository
+from fp_context import FPContext
+from synchronizer import Synchronizer
 
+
+class SynchronizerFactory(ABC):
+
+    @abstractmethod
+    def create(self, context: FPContext, data_repo: DataRepository) -> Synchronizer:
+        pass

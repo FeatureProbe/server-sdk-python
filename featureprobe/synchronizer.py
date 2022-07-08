@@ -14,8 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'FeatureProbe'
-__license__ = 'Apache 2.0'
+from abc import ABC, abstractmethod
 
-__version__ = '0.0.1a1'
 
+class Synchronizer(ABC):
+
+    @abstractmethod
+    def sync(self):
+        pass
+
+    @abstractmethod
+    def close(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()

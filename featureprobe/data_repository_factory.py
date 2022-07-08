@@ -14,8 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'FeatureProbe'
-__license__ = 'Apache 2.0'
+from abc import ABCMeta, abstractmethod
 
-__version__ = '0.0.1a1'
 
+class DataRepositoryFactory(metaclass=ABCMeta):
+
+    @abstractmethod
+    def create(self, context: FPContext):
+        pass

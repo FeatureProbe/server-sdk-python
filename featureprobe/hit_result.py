@@ -14,8 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'FeatureProbe'
-__license__ = 'Apache 2.0'
+from typing import Dict, Optional
 
-__version__ = '0.0.1a1'
 
+class HitResult:
+
+    def __init__(self, hit: bool, index=0, reason: Optional[str] = None):
+        self._hit = hit
+        self._index = index
+        self._reason = reason
+
+    @property
+    def hit(self):
+        return self._hit
+
+    @property
+    def index(self):
+        return self._index
+
+    @property
+    def reason(self):
+        return self._reason
