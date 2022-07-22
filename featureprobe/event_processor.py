@@ -14,12 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from abc import ABC, abstractmethod
 
-from event import Event
+from featureprobe.context import Context
+from featureprobe.event import Event
 
 
 class EventProcessor(ABC):
+
+    @classmethod
+    @abstractmethod
+    def from_context(cls, context: Context):
+        pass
 
     @abstractmethod
     def push(self, event: Event):

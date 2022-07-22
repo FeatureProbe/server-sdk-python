@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fp_user import FPUser
-from hit_result import HitResult
-from split import Split
+
+from featureprobe.hit_result import HitResult
+from featureprobe.model.split import Split
+from featureprobe.user import User
 
 
 class Serve:
@@ -31,18 +32,18 @@ class Serve:
         return self._select
 
     @select.setter
-    def select(self, select: int):
-        self._select = select
+    def select(self, value: int):
+        self._select = value
 
     @property
     def split(self) -> Split:
         return self._split
 
     @split.setter
-    def split(self, split: Split):
-        self._split = split
+    def split(self, value: Split):
+        self._split = value
 
-    def eval_index(self, user: FPUser, toggle_key: str) -> HitResult:
+    def eval_index(self, user: User, toggle_key: str) -> HitResult:
         if self._select:
             return HitResult(True, self._select)
 

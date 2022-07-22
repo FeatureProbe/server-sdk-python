@@ -1,6 +1,6 @@
 import aiohttp
 
-from internal.wrapper_default import defaultable
+from internal.defaultable import defaultable
 
 
 @defaultable

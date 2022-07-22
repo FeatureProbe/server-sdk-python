@@ -14,14 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from abc import ABCMeta, abstractmethod
 from typing import Dict
 
-from model.repository import Repository
-from model.toggle import Toggle
+from featureprobe.context import Context
+from featureprobe.model.repository import Repository
+from featureprobe.model.toggle import Toggle
 
 
 class DataRepository(metaclass=ABCMeta):
+
+    @classmethod
+    @abstractmethod
+    def from_context(cls, context: Context):
+        pass
 
     @abstractmethod
     def refresh(self, repo: Repository):

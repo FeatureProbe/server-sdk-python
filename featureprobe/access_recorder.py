@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from time import time
+
 import copy
+from time import time
 
 from featureprobe.event import AccessEvent
 
 
 class AccessCounter:
-
     def __init__(self, value: str, version: int, index: int):
         self._VALUE = value
         self._VERSION = version
@@ -44,11 +44,12 @@ class AccessCounter:
         self._count += 1
 
     def is_group(self, _event: AccessEvent):
-        return self._VALUE == _event.value and self._VERSION == _event.version and self._INDEX == _event.index
+        return self._VALUE == _event.value \
+               and self._VERSION == _event.version \
+               and self._INDEX == _event.index
 
 
 class AccessRecorder:
-
     def __init__(self):
         self._counters = {}  # Dict[str, List[AccessCounter]]
         self._start_time = 0
@@ -66,7 +67,7 @@ class AccessRecorder:
     def end_time(self):
         return self._end_time
 
-    def add(self, _event: AccessEvent):
+    def add(self, _event: AccessEvent):  # sourcery skip: use-named-expression
         if not self._counters:
             self._start_time = int(time() * 1000)
         counters = self._counters[_event.key]

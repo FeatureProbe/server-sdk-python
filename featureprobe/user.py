@@ -14,19 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from typing import Dict
 
 
-class FPUser:
+class User:
+
     def __init__(self, key: str):
         self._key = key
         self._attrs = {}
 
-    def with_attr(self, key: str, value: str):
+    def __setitem__(self, key, value):
         self._attrs[key] = value
 
-    def has_attr(self, attr: str):
-        return attr in self._attrs
+    def __getitem__(self, item):
+        return self._attrs[item]
 
     @property
     def key(self) -> str:
@@ -39,3 +41,9 @@ class FPUser:
     @attrs.setter
     def attrs(self, attrs: Dict[str, str]):
         self._attrs = attrs
+
+    def with_attr(self, key: str, value: str):
+        self._attrs[key] = value
+
+    def has_attr(self, attr: str):
+        return attr in self._attrs

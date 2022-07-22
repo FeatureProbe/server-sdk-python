@@ -14,32 +14,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Optional
 
-import toggle
-import segment
+from typing import Dict
+
+from featureprobe.model.segment import Segment
+from featureprobe.model.toggle import Toggle
 
 
 class Repository:
     def __init__(self,
-                 toggles: Optional[Dict[str, toggle.Toggle]] = None,
-                 segments: Optional[Dict[str, segment.Segment]] = None):
+                 toggles: Dict[str, Toggle] = None,
+                 segments: Dict[str, Segment] = None):
         self._toggles = toggles or {}
         self._segments = segments or {}
 
     @property
-    def toggles(self) -> Dict[str, toggle.Toggle]:
+    def toggles(self) -> Dict[str, Toggle]:
         return self._toggles
 
     @toggles.setter
-    def toggles(self, toggles: Dict[str, toggle.Toggle]):
-        self._toggles = toggles
+    def toggles(self, value: Dict[str, Toggle]):
+        self._toggles = value or {}
 
     @property
-    def segments(self) -> Dict[str, segment.Segment]:
+    def segments(self) -> Dict[str, Segment]:
         return self._segments
 
     @segments.setter
-    def segments(self, segments: Dict[str, segment.Segment]):
-        self._segments = segments
-
+    def segments(self, value: Dict[str, Segment]):
+        self._segments = value or {}

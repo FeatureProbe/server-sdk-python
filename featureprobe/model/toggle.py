@@ -14,18 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from typing import List, Optional, Dict
 
-from evaluation_result import EvaluationResult
-from featureprobe.fp_user import FPUser
-from model.rule import Rule
-from model.segment import Segment
-from serve import Serve
-from hit_result import HitResult
+from featureprobe.evaluation_result import EvaluationResult
+from featureprobe.user import User
+from featureprobe.model.rule import Rule
+from featureprobe.model.segment import Segment
+from featureprobe.model.serve import Serve
+from featureprobe.hit_result import HitResult
 
 
 class Toggle:
-
     def __init__(self):
         self._key = ''
         self._enabled = False
@@ -41,90 +41,91 @@ class Toggle:
         return self._key
 
     @key.setter
-    def key(self, key: str):
-        self._key = key
+    def key(self, value: str):
+        self._key = value
 
     @property
     def enabled(self) -> bool:
         return self._enabled
 
     @enabled.setter
-    def enabled(self, enabled: bool):
-        self._enabled = enabled
+    def enabled(self, value: bool):
+        self._enabled = value
 
     @property
     def version(self) -> int:
         return self._version
 
     @version.setter
-    def version(self, version: int):
-        self._version = version
+    def version(self, value: int):
+        self._version = value
 
     @property
     def disabled_serve(self) -> Serve:
         return self._disabled_serve
 
     @disabled_serve.setter
-    def disabled_serve(self, disabled_serve: Serve):
-        self._disabled_serve = disabled_serve
+    def disabled_serve(self, value: Serve):
+        self._disabled_serve = value
 
     @property
     def default_serve(self) -> Serve:
         return self._default_serve
 
     @default_serve.setter
-    def default_serve(self, default_serve: Serve):
-        self._default_serve = default_serve
+    def default_serve(self, value: Serve):
+        self._default_serve = value
 
     @property
     def rules(self) -> List[Rule]:
         return self._rules
 
     @rules.setter
-    def rules(self, rules: List[Rule]):
-        self._rules = rules
+    def rules(self, value: List[Rule]):
+        self._rules = value or []
 
     @property
     def variations(self) -> List[str]:
         return self._variations
 
     @variations.setter
-    def variations(self, variations: List[str]):
-        self._variations = variations
+    def variations(self, value: List[str]):
+        self._variations = value or []
 
     @property
     def for_client(self) -> bool:
         return self._for_client
 
     @for_client.setter
-    def for_client(self, for_client: bool):
-        self._for_client = for_client
+    def for_client(self, value: bool):
+        self._for_client = value
 
-    def eval(self, user: FPUser, segments: Dict[str, Segment], default_value) -> EvaluationResult:
+    def eval(self, user: User, segments: Dict[str, Segment], default_value) -> EvaluationResult:
         if not self._enabled:
-            return self.__create_disabled_result(user, self._key, default_value)
+            return self._create_disabled_result(user, self._key, default_value)
 
         warning = None
 
         for index, rule in enumerate(self._rules or []):
             hit_result = rule.hit(user, segments, self._key)
             if hit_result.hit:
-                return self.__hit_value(hit_result, default_value, index)
+                return self._hit_value(hit_result, default_value, index)
             warning = hit_result.reason or ''
 
-        return self.__create_default_result(user, self._key, default_value, warning)
+        return self._create_default_result(user, self._key, default_value, warning)
 
-    def __create_disabled_result(self, user: FPUser, toggle_key: str, default_value):
-        disabled_result = self.__hit_value(self._disabled_serve.eval_index(user, toggle_key), default_value)
+    def _create_disabled_result(self, user: User, toggle_key: str, default_value):
+        disabled_result = self._hit_value(self._disabled_serve.eval_index(user, toggle_key), default_value)
         disabled_result.reason = 'Toggle disabled'
         return disabled_result
 
-    def __create_default_result(self, user: FPUser, toggle_key: str, default_value, warning: str) -> EvaluationResult:
-        default_result = self.__hit_value(self._default_serve.eval_index(user, toggle_key), default_value)
+    def _create_default_result(self, user: User, toggle_key: str, default_value, warning: str) -> EvaluationResult:
+        # sourcery skip: replace-interpolation-with-fstring
+        default_result = self._hit_value(self._default_serve.eval_index(user, toggle_key), default_value)
         default_result.reason = 'Default rule hit. %s' % warning
         return default_result
 
-    def __hit_value(self, hit_result: HitResult, default_value, rule_index: Optional[int] = None) -> EvaluationResult:
+    def _hit_value(self, hit_result: HitResult, default_value, rule_index: Optional[int] = None) -> EvaluationResult:
         res = EvaluationResult(default_value, rule_index, hit_result.index, self._version, hit_result.reason or '')
         if hit_result.index:
             variation = self._variations[hit_result.index]

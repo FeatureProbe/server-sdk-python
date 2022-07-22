@@ -27,7 +27,7 @@ from event import Event, AccessEvent
 from event_processor import EventProcessor
 from concurrent.futures import ThreadPoolExecutor
 
-from fp_context import FPContext
+from featureprobe.context import Context
 import sched
 
 
@@ -125,7 +125,7 @@ class DefaultEventProcessor(EventProcessor):
     __LOG_SENDER_ERROR = 'Unexpected error from event sender'
     __LOG_BUSY_EVENT = 'Event processing is busy, some will be dropped'
 
-    def __init__(self, context: FPContext):
+    def __init__(self, context: Context):
         self._closed = False
         self._events = Queue(DefaultEventProcessor.__CAPACITY)
         self._executor = ThreadPoolExecutor(max_workers=5, thread_name_prefix='FeatureProbe_event_handle')
@@ -136,6 +136,11 @@ class DefaultEventProcessor(EventProcessor):
 
         self._scheduler = sched.scheduler()
         threading.Thread(target=self.__schedule_flush, name='FeatureProbe_scheduled_flush', daemon=True).start()
+
+    @classmethod
+    def from_context(cls, context: Context):
+        return cls(context)
+
 
     async def push(self, event: Event):
         if not self._closed:

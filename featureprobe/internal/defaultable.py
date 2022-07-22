@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # Copyright 2022 FeatureProbe
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABCMeta, abstractmethod
 
+def defaultable(cls):
+    _defaults = {}
 
-class DataRepositoryFactory(metaclass=ABCMeta):
+    def check_or_create(*args, **kwargs):
+        if args or kwargs:
+            return cls(*args, **kwargs)
+        if cls not in _defaults:
+            default = cls()
+            _defaults[cls] = default
+            return default
+        return _defaults[cls]
 
-    @abstractmethod
-    def create(self, context: FPContext):
-        pass
+    return check_or_create

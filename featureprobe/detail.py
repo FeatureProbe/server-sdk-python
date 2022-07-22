@@ -17,7 +17,7 @@
 from typing import Dict, Optional
 
 
-class FPDetail:
+class Detail:
     def __init__(self, value=None, reason: Optional[str] = None,
                  rule_index: Optional[int] = None, version: Optional[int] = None):
         self._value = value

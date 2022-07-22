@@ -14,10 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from abc import ABC, abstractmethod
+
+from featureprobe.context import Context
+from featureprobe.data_repository import DataRepository
 
 
 class Synchronizer(ABC):
+
+    @classmethod
+    @abstractmethod
+    def from_context(cls, context: Context, data_repo: DataRepository):
+        pass
 
     @abstractmethod
     def sync(self):

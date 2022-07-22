@@ -14,13 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from typing import List, Dict
 
-from model.condition import Condition, ConditionType
-from featureprobe.fp_user import FPUser
-from serve import Serve
-from hit_result import HitResult
-from segment import Segment
+from featureprobe.hit_result import HitResult
+from featureprobe.model.condition import Condition, ConditionType
+from featureprobe.model.segment import Segment
+from featureprobe.model.serve import Serve
+from featureprobe.user import User
 
 
 class Rule:
@@ -35,23 +36,23 @@ class Rule:
         return self._serve
 
     @serve.setter
-    def serve(self, serve: Serve):
-        self._serve = serve
+    def serve(self, value: Serve):
+        self._serve = value
 
     @property
     def conditions(self) -> List[Condition]:
         return self._conditions
 
     @conditions.setter
-    def conditions(self, conditions: List[Condition]):
-        self._conditions = conditions
+    def conditions(self, value: List[Condition]):
+        self._conditions = value or []
 
-    def hit(self, user: FPUser, segments: Dict[str, Segment], toggle_key: str) -> HitResult:
+    def hit(self, user: User, segments: Dict[str, Segment], toggle_key: str) -> HitResult:
         for condition in self._conditions:
             if condition.type not in (ConditionType.SEGMENT, ConditionType.DATETIME) \
                     and not user.has_attr(condition.subject):
                 return HitResult(False,
-                                 reason='Warning: User with key \'%s\' does not have attribute name \'%s\''
+                                 reason="Warning: User with key '%s' does not have attribute name '%s'"
                                         % (user.key, condition.subject))
             if not condition.match_objects(user, segments):
                 return HitResult(False)

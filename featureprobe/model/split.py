@@ -14,16 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional
-from hashlib import sha1
 
-from featureprobe.fp_user import FPUser
-from hit_result import HitResult
+from hashlib import sha1
+from typing import List, Optional
+
+from featureprobe.hit_result import HitResult
+from featureprobe.user import User
 
 
 class Split:
-    __BUCKET_SIZE = 10000
-    __INVALID_INDEX = -1
+    _BUCKET_SIZE = 10000
+    _INVALID_INDEX = -1
 
     def __init__(self, distribution: List[List[List[int]]] = None):
         self._distribution = distribution or []
@@ -35,26 +36,26 @@ class Split:
         return self._distribution
 
     @distribution.setter
-    def distribution(self, distribution: List[List[List[int]]]):
-        self._distribution = distribution
+    def distribution(self, value: List[List[List[int]]]):
+        self._distribution = value or []
 
     @property
     def bucket_by(self) -> str:
         return self._bucket_by
 
     @bucket_by.setter
-    def bucket_by(self, bucket_by: str):
-        self._bucket_by = bucket_by
+    def bucket_by(self, value: str):
+        self._bucket_by = value
 
     @property
     def salt(self) -> str:
         return self._salt
 
     @salt.setter
-    def salt(self, salt: str):
-        self._salt = salt
+    def salt(self, value: str):
+        self._salt = value
 
-    def find_index(self, user: FPUser, toggle_key: str) -> HitResult:
+    def find_index(self, user: User, toggle_key: str) -> HitResult:
         hash_key = user.key
         if self._bucket_by:
             if user.has_attr(self._bucket_by):
@@ -63,11 +64,11 @@ class Split:
                 return HitResult(False,
                                  reason='Warning: User with key \'%s\' does not have attribute name \'%s\''
                                         % (user.key, self._bucket_by))
-        group_index = self.__get_group(self.__hash(hash_key, self._salt or toggle_key, self.__BUCKET_SIZE))
+        group_index = self._get_group(self._hash(hash_key, self._salt or toggle_key, self._BUCKET_SIZE))
         return HitResult(True, index=group_index,
                          reason='selected %d percentage group' % group_index)
 
-    def __get_group(self, hash_value) -> Optional[int]:
+    def _get_group(self, hash_value) -> Optional[int]:
         for index, groups in enumerate(self._distribution):
             for rng in groups:
                 if rng[0] <= hash_value < rng[1]:
@@ -75,7 +76,7 @@ class Split:
         return None
 
     @staticmethod
-    def __hash(hash_key, hash_salt, bucket_size):
+    def _hash(hash_key, hash_salt, bucket_size):
         value = (hash_key + hash_salt).encode('utf-8')
         sha = sha1(value)
         _bytes = sha.digest()[-4:]

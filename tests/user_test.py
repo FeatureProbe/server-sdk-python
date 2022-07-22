@@ -14,15 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
-
-from data_repository import DataRepository
-from fp_context import FPContext
-from synchronizer import Synchronizer
+import featureprobe as fp
 
 
-class SynchronizerFactory(ABC):
-
-    @abstractmethod
-    def create(self, context: FPContext, data_repo: DataRepository) -> Synchronizer:
-        pass
+def test_create():
+    usr = fp.User('usr1')
+    usr['addr'] = 'sustc'
+    assert usr.attrs['addr'] == 'sustc'

@@ -13,13 +13,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
 from enum import Enum
-from typing import Dict, Optional
+from datetime import timedelta
+from typing import Optional, Union
 
 from default_event_processor_factory import DefaultEventProcessorFactory
 from file_synchronizer_facrory import FileSynchronizerFactory
 from http_configuration import HttpConfiguration
-from internal.wrapper_default import defaultable
+from internal.defaultable import defaultable
 from memory_data_repository_factory import MemoryDataRepositoryFactory
 from pooling_synchronizer_factory import PoolingSynchronizerFactory
 
@@ -30,22 +33,27 @@ class SyncMode(Enum, str):
 
 
 @defaultable
-class FPConfig:
+class Config:
 
     def __init__(self,
                  location: str,
                  sync_mode: SyncMode,
-                 http_configuration: Optional[HttpConfiguration] = None,
-                 remote_uri='http://127.0.0.1:4007',
-                 synchronizer_url: str = None,
-                 event_url: str = None,
-                 refresh_interval: int = 5,  # sec
+                 synchronizer_url: str,
+                 event_url: str,
+                 remote_uri: str = 'http://127.0.0.1:4007',
+                 http_configuration: HttpConfiguration = HttpConfiguration(),
+                 refresh_interval: Union[timedelta, int] = timedelta(seconds=5),
                  ):
         self._data_repository_factory = MemoryDataRepositoryFactory()
-        self._remote_uri = remote_uri or 'http://127.0.0.1:4007'
+        self._remote_uri = remote_uri
         self._synchronizer_url = synchronizer_url
         self._event_url = event_url
-        self._refresh_interval = refresh_interval
+
+        if isinstance(refresh_interval, timedelta):
+            self._refresh_interval = refresh_interval
+        else:
+            self._refresh_interval = timedelta(seconds=refresh_interval)
+
         self._location = location
         self._synchronizer_factory = FileSynchronizerFactory() if sync_mode is SyncMode.FILE \
             else PoolingSynchronizerFactory()

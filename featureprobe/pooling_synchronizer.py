@@ -4,9 +4,9 @@ import threading
 
 import aiohttp
 
-from data_repository import DataRepository
-from fp_context import FPContext
-from synchronizer import Synchronizer
+from featureprobe.context import Context
+from featureprobe.data_repository import DataRepository
+from featureprobe.synchronizer import Synchronizer
 
 
 class PoolingSynchronizer(Synchronizer):
@@ -14,7 +14,7 @@ class PoolingSynchronizer(Synchronizer):
     __GET_SDK_KEY_HEADER = 'Authorization'
     __lock = threading.RLock()
 
-    def __init__(self, context: FPContext, data_repo: DataRepository):
+    def __init__(self, context: Context, data_repo: DataRepository):
         self._refresh_interval = context.refresh_interval
         self._api_url = context.synchronizer_url
         self._data_repository = data_repo
@@ -25,6 +25,10 @@ class PoolingSynchronizer(Synchronizer):
             read_timeout=context.http_configuration.read_timeout
         )
         self._scheduler = sched.scheduler()
+
+    @classmethod
+    def from_context(cls, context: Context, data_repo: DataRepository):
+        return cls(context, data_repo)
 
     def sync(self):
         PoolingSynchronizer.__logger.info(
@@ -42,4 +46,3 @@ class PoolingSynchronizer(Synchronizer):
     async def __poll(self):  # async
         async with self.http_client.get(self._api_url, headers=self.headers) as req:
             resp = await req.json()
-            

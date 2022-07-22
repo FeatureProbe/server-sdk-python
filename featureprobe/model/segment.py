@@ -14,10 +14,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from typing import List
 
-from featureprobe.fp_user import FPUser
-import segment_rule
+from featureprobe.hit_result import HitResult
+from featureprobe.model.condition import Condition
+from featureprobe.user import User
+
+
+class SegmentRule:
+    def __init__(self, conditions: List[Condition] = None):
+        self._conditions = conditions or []
+
+    @property
+    def conditions(self) -> List[Condition]:
+        return self._conditions
+
+    @conditions.setter
+    def conditions(self, value: List[Condition]):
+        self._conditions = value or []
+
+    def hit(self,
+            user: User,
+            segments  # Dict[str, Segment]
+            ) -> HitResult:
+        for condition in self._conditions:
+            if condition.type != condition.ConditionType.SEGMENT and not user.has_attr(condition.subject):
+                return HitResult(False,
+                                 reason='Warning: User with key \'%s\' does not have attribute name \'%s\''
+                                        % (user.key, condition.subject))
+            if not condition.match_objects(user, segments):
+                return HitResult(False)
+
+        return HitResult(True)
 
 
 class Segment:
@@ -31,26 +60,26 @@ class Segment:
         return self._unique_id
 
     @unique_id.setter
-    def unique_id(self, uid: str):
-        self._unique_id = uid
+    def unique_id(self, value: str):
+        self._unique_id = value
 
     @property
     def version(self) -> int:
         return self._version
 
     @version.setter
-    def version(self, version: int):
-        self._version = version
+    def version(self, value: int):
+        self._version = value
 
     @property
-    def rules(self) -> List[segment_rule.SegmentRule]:
+    def rules(self) -> List[SegmentRule]:
         return self._rules
 
     @rules.setter
-    def rules(self, rules: List[segment_rule.SegmentRule]):
-        self._rules = rules
+    def rules(self, value: List[SegmentRule]):
+        self._rules = value or []
 
-    def contain(self, user: FPUser, segments):
+    def contain(self, user: User, segments):
         for rule in self._rules:
             hit_result = rule.hit(user, segments)
             if hit_result.hit:

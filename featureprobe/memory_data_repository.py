@@ -1,6 +1,7 @@
 import time
 from typing import Dict
 
+from context import Context
 from data_repository import DataRepository
 from model.repository import Repository
 from model.toggle import Toggle
@@ -11,6 +12,10 @@ class MemoryDataRepository(DataRepository):
         self._data = None  # Repository
         self._initialized = False
         self._updated_timestamp = 0
+
+    @classmethod
+    def from_context(cls, context: Context):
+        return cls()
 
     def refresh(self, repo: Repository):
         if repo and repo.toggles and repo.segments:
