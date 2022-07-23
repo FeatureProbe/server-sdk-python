@@ -30,12 +30,15 @@ class Condition:
 
     def __init__(self,
                  subject: str,
-                 type_: ConditionType,
-                 predicate: Predicate,
+                 type_: Union[ConditionType, str],
+                 predicate: Union[Predicate, str],
                  objects: List[str]):
         self._subject = subject
-        self._type = type_
-        self._predicate = predicate
+        self._type = ConditionType(type_)
+        if isinstance(predicate, Predicate):
+            self._predicate = predicate
+        else:
+            self._predicate = self._type.predicates(predicate)
         self._objects = objects or []
 
     def match_objects(self, user: User, segments: Dict[str, Segment]) -> bool:

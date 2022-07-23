@@ -16,3 +16,19 @@
 
 
 import featureprobe as fp
+
+condition = None
+user = None
+segments = None
+
+
+def setup_function():
+    global condition, user, segments
+    condition = fp.Condition(subject='userId',
+                             type_='string',
+                             predicate='None',
+                             objects=[])
+
+
+def test_b():
+    assert 3 == 3
