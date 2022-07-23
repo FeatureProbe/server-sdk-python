@@ -15,39 +15,42 @@
 # limitations under the License.
 
 
-from typing import List, Dict
+from typing import List, Dict, TYPE_CHECKING
 
 from featureprobe.hit_result import HitResult
-from featureprobe.model.condition import Condition, ConditionType
-from featureprobe.model.segment import Segment
-from featureprobe.model.serve import Serve
-from featureprobe.user import User
+from featureprobe.model.condition import ConditionType
+
+if TYPE_CHECKING:
+    from featureprobe.model.condition import Condition
+    from featureprobe.model.segment import Segment
+    from featureprobe.model.serve import Serve
+    from featureprobe.user import User
 
 
 class Rule:
     def __init__(self,
-                 serve: Serve = None,
-                 conditions: List[Condition] = None):
+                 serve: "Serve" = None,
+                 conditions: List["Condition"] = None):
         self._serve = serve
         self._conditions = conditions or []
 
     @property
-    def serve(self) -> Serve:
+    def serve(self) -> "Serve":
         return self._serve
 
     @serve.setter
-    def serve(self, value: Serve):
+    def serve(self, value: "Serve"):
         self._serve = value
 
     @property
-    def conditions(self) -> List[Condition]:
+    def conditions(self) -> List["Condition"]:
         return self._conditions
 
     @conditions.setter
-    def conditions(self, value: List[Condition]):
+    def conditions(self, value: List["Condition"]):
         self._conditions = value or []
 
-    def hit(self, user: User, segments: Dict[str, Segment], toggle_key: str) -> HitResult:
+    def hit(self, user: "User", segments: Dict[str, "Segment"], toggle_key: str) -> HitResult:
         for condition in self._conditions:
             if condition.type not in (ConditionType.SEGMENT, ConditionType.DATETIME) \
                     and not user.has_attr(condition.subject):

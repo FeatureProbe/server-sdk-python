@@ -42,31 +42,31 @@ class StringPredicate(Predicate):
         target in objects
 
     ENDS_WITH = 'ends with', lambda target, objects: \
-        any(o.endswith(target) for o in objects)
+        any(target.endswith(o) for o in objects)
 
     STARTS_WITH = 'starts with', lambda target, objects: \
-        any(o.srartswith(target) for o in objects)
+        any(target.startswith(o) for o in objects)
 
     CONTAINS = 'contains', lambda target, objects: \
-        any(target in o for o in objects)
+        any(o in target for o in objects)
 
     MATCHES_REGEX = 'matches regex', lambda target, objects: \
-        any(re.match(target, o) for o in objects)
+        any(re.match(pattern=o, string=target) for o in objects)
 
     IS_NOT_ANY_OF = 'is not any of', lambda target, objects: \
         target not in objects
 
     DOES_NOT_END_WITH = 'does not end with', lambda target, objects: \
-        all(not o.endswith(target) for o in objects)
+        all(not target.endswith(o) for o in objects)
 
     DOES_NOT_START_WITH = 'does not start with', lambda target, objects: \
-        all(not o.startswith(target) for o in objects)
+        all(not target.startswith(o) for o in objects)
 
     DOES_NOT_CONTAIN = 'does not contain', lambda target, objects: \
-        all(target not in o for o in objects)
+        all(o not in target for o in objects)
 
     DOES_NOT_MATCH_REGEX = 'does not match regex', lambda target, objects: \
-        all(not re.match(target, o) for o in objects)
+        all(not re.match(pattern=o, string=target) for o in objects)
 
 
 class SegmentPredicate(Predicate):

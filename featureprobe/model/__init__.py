@@ -18,7 +18,6 @@ from featureprobe.model.distribution import Distribution
 
 from featureprobe.model.predicate import (
     ConditionType,
-    Predicate,
     StringPredicate,
     SegmentPredicate,
     DatetimePredicate,
@@ -52,5 +51,6 @@ __all__ = [
     'Segment',
     'SegmentRule',
     'Serve',
+    'Split',
     'Toggle',
 ]

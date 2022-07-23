@@ -15,31 +15,32 @@
 # limitations under the License.
 
 
-from typing import Dict
+from typing import Dict, TYPE_CHECKING
 
-from featureprobe.model.segment import Segment
-from featureprobe.model.toggle import Toggle
+if TYPE_CHECKING:
+    from featureprobe.model.segment import Segment
+    from featureprobe.model.toggle import Toggle
 
 
 class Repository:
     def __init__(self,
-                 toggles: Dict[str, Toggle] = None,
-                 segments: Dict[str, Segment] = None):
+                 toggles: Dict[str, "Toggle"] = None,
+                 segments: Dict[str, "Segment"] = None):
         self._toggles = toggles or {}
         self._segments = segments or {}
 
     @property
-    def toggles(self) -> Dict[str, Toggle]:
+    def toggles(self) -> Dict[str, "Toggle"]:
         return self._toggles
 
     @toggles.setter
-    def toggles(self, value: Dict[str, Toggle]):
+    def toggles(self, value: Dict[str, "Toggle"]):
         self._toggles = value or {}
 
     @property
-    def segments(self) -> Dict[str, Segment]:
+    def segments(self) -> Dict[str, "Segment"]:
         return self._segments
 
     @segments.setter
-    def segments(self, value: Dict[str, Segment]):
+    def segments(self, value: Dict[str, "Segment"]):
         self._segments = value or {}

@@ -15,14 +15,16 @@
 # limitations under the License.
 
 
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, TYPE_CHECKING
 
 from featureprobe.evaluation_result import EvaluationResult
-from featureprobe.user import User
-from featureprobe.model.rule import Rule
-from featureprobe.model.segment import Segment
-from featureprobe.model.serve import Serve
-from featureprobe.hit_result import HitResult
+
+if TYPE_CHECKING:
+    from featureprobe.hit_result import HitResult
+    from featureprobe.model.rule import Rule
+    from featureprobe.model.segment import Segment
+    from featureprobe.model.serve import Serve
+    from featureprobe.user import User
 
 
 class Toggle:
@@ -61,27 +63,27 @@ class Toggle:
         self._version = value
 
     @property
-    def disabled_serve(self) -> Serve:
+    def disabled_serve(self) -> "Serve":
         return self._disabled_serve
 
     @disabled_serve.setter
-    def disabled_serve(self, value: Serve):
+    def disabled_serve(self, value: "Serve"):
         self._disabled_serve = value
 
     @property
-    def default_serve(self) -> Serve:
+    def default_serve(self) -> "Serve":
         return self._default_serve
 
     @default_serve.setter
-    def default_serve(self, value: Serve):
+    def default_serve(self, value: "Serve"):
         self._default_serve = value
 
     @property
-    def rules(self) -> List[Rule]:
+    def rules(self) -> List["Rule"]:
         return self._rules
 
     @rules.setter
-    def rules(self, value: List[Rule]):
+    def rules(self, value: List["Rule"]):
         self._rules = value or []
 
     @property
@@ -100,7 +102,7 @@ class Toggle:
     def for_client(self, value: bool):
         self._for_client = value
 
-    def eval(self, user: User, segments: Dict[str, Segment], default_value) -> EvaluationResult:
+    def eval(self, user: "User", segments: Dict[str, "Segment"], default_value) -> EvaluationResult:
         if not self._enabled:
             return self._create_disabled_result(user, self._key, default_value)
 
@@ -114,18 +116,18 @@ class Toggle:
 
         return self._create_default_result(user, self._key, default_value, warning)
 
-    def _create_disabled_result(self, user: User, toggle_key: str, default_value):
+    def _create_disabled_result(self, user: "User", toggle_key: str, default_value):
         disabled_result = self._hit_value(self._disabled_serve.eval_index(user, toggle_key), default_value)
         disabled_result.reason = 'Toggle disabled'
         return disabled_result
 
-    def _create_default_result(self, user: User, toggle_key: str, default_value, warning: str) -> EvaluationResult:
+    def _create_default_result(self, user: "User", toggle_key: str, default_value, warning: str) -> EvaluationResult:
         # sourcery skip: replace-interpolation-with-fstring
         default_result = self._hit_value(self._default_serve.eval_index(user, toggle_key), default_value)
         default_result.reason = 'Default rule hit. %s' % warning
         return default_result
 
-    def _hit_value(self, hit_result: HitResult, default_value, rule_index: Optional[int] = None) -> EvaluationResult:
+    def _hit_value(self, hit_result: "HitResult", default_value, rule_index: Optional[int] = None) -> EvaluationResult:
         res = EvaluationResult(default_value, rule_index, hit_result.index, self._version, hit_result.reason or '')
         if hit_result.index is not None:
             variation = self._variations[hit_result.index]

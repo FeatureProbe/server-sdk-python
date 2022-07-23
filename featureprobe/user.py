@@ -28,7 +28,13 @@ class User:
         self._attrs[key] = value
 
     def __getitem__(self, item: str):
-        return self._attrs[item]
+        try:
+            return self._attrs[item]
+        except KeyError:
+            return None
+
+    def __delitem__(self, key: str):
+        self._attrs.pop(key, None)
 
     @property
     def key(self) -> str:

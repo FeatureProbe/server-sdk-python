@@ -15,28 +15,30 @@
 # limitations under the License.
 
 
-from typing import List
+from typing import List, TYPE_CHECKING
 
 from featureprobe.hit_result import HitResult
-from featureprobe.model.condition import Condition
 from featureprobe.model.predicate import ConditionType
-from featureprobe.user import User
+
+if TYPE_CHECKING:
+    from featureprobe.model.condition import Condition
+    from featureprobe.user import User
 
 
 class SegmentRule:
-    def __init__(self, conditions: List[Condition] = None):
+    def __init__(self, conditions: List["Condition"] = None):
         self._conditions = conditions or []
 
     @property
-    def conditions(self) -> List[Condition]:
+    def conditions(self) -> List["Condition"]:
         return self._conditions
 
     @conditions.setter
-    def conditions(self, value: List[Condition]):
+    def conditions(self, value: List["Condition"]):
         self._conditions = value or []
 
     def hit(self,
-            user: User,
+            user: "User",
             segments  # Dict[str, Segment]
             ) -> HitResult:
         for condition in self._conditions:
@@ -51,18 +53,21 @@ class SegmentRule:
 
 
 class Segment:
-    def __init__(self):
-        self._unique_id = ''
-        self._version = 0
-        self._rules = []  # List[SegmentRule]
+    def __init__(self,
+                 uid='',
+                 version=1,
+                 rules: List[SegmentRule] = None):
+        self._uid = uid
+        self._version = version
+        self._rules = rules or []
 
     @property
-    def unique_id(self):
-        return self._unique_id
+    def uid(self):
+        return self._uid
 
-    @unique_id.setter
-    def unique_id(self, value: str):
-        self._unique_id = value
+    @uid.setter
+    def uid(self, value: str):
+        self._uid = value
 
     @property
     def version(self) -> int:
@@ -80,7 +85,7 @@ class Segment:
     def rules(self, value: List[SegmentRule]):
         self._rules = value or []
 
-    def contains(self, user: User, segments):
+    def contains(self, user: "User", segments):
         for rule in self._rules:
             hit_result = rule.hit(user, segments)
             if hit_result.hit:

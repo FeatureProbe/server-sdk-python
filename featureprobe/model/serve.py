@@ -15,15 +15,19 @@
 # limitations under the License.
 
 
+from typing import TYPE_CHECKING
+
 from featureprobe.hit_result import HitResult
-from featureprobe.model.split import Split
-from featureprobe.user import User
+
+if TYPE_CHECKING:
+    from featureprobe.model.split import Split
+    from featureprobe.user import User
 
 
 class Serve:
     def __init__(self,
                  select: int = 0,
-                 split: Split = None):
+                 split: "Split" = None):
         self._select = select
         self._split = split
 
@@ -36,14 +40,14 @@ class Serve:
         self._select = value
 
     @property
-    def split(self) -> Split:
+    def split(self) -> "Split":
         return self._split
 
     @split.setter
-    def split(self, value: Split):
+    def split(self, value: "Split"):
         self._split = value
 
-    def eval_index(self, user: User, toggle_key: str) -> HitResult:
+    def eval_index(self, user: "User", toggle_key: str) -> HitResult:
         if self._select:
             return HitResult(hit=True, index=self._select)
 

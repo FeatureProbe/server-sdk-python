@@ -15,22 +15,24 @@
 # limitations under the License.
 
 
-# basic metadata
+import featureprobe as fp
 
-__author__ = 'FeatureProbe'
-__license__ = 'Apache 2.0'
 
-__version__ = '0.1.0'
+def setup_function():
+    global split, user  # noqa
+    split = fp.Split([
+        [[0, 5000]],
+        [[5000, 10000]],
+    ])
+    user = fp.User('test_user_key')
 
-# expose API
 
-from featureprobe.model import *
+def test_get_user_group():
+    common_index = split.find_index(user, 'test_toggle_key')
+    assert 0 == common_index.index
 
-from featureprobe.access_recorder import (
-    AccessCounter,
-    AccessRecorder,
-)
-
-from featureprobe.event import AccessEvent
-
-from featureprobe.user import User
+    split.bucket_by = 'email'
+    split.salt = 'abcddeafasde'
+    user['email'] = 'test@gmail.com'
+    custom_index = split.find_index(user, 'test_toggle_key')
+    assert 1 == custom_index.index

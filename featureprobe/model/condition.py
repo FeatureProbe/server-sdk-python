@@ -17,12 +17,14 @@
 
 import logging
 import time
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional, TYPE_CHECKING
 
 from featureprobe.internal.semver import SemVer
 from featureprobe.model.predicate import ConditionType, Predicate
-from featureprobe.model.segment import Segment
-from featureprobe.user import User
+
+if TYPE_CHECKING:
+    from featureprobe.model.segment import Segment
+    from featureprobe.user import User
 
 
 class Condition:
@@ -30,18 +32,20 @@ class Condition:
 
     def __init__(self,
                  subject: str,
-                 type_: Union[ConditionType, str],
-                 predicate: Union[Predicate, str],
-                 objects: List[str]):
+                 type_: Union[ConditionType, str, None],
+                 predicate: Union[Predicate, str, None],
+                 objects: Optional[List[str]]):
         self._subject = subject
-        self._type = ConditionType(type_)
+        self._type = ConditionType(type_) if type_ is not None else None
         if isinstance(predicate, Predicate):
             self._predicate = predicate
-        else:
+        elif self._type is not None and predicate is not None:
             self._predicate = self._type.predicates(predicate)
+        else:
+            self._predicate = None
         self._objects = objects or []
 
-    def match_objects(self, user: User, segments: Dict[str, Segment]) -> bool:
+    def match_objects(self, user: "User", segments: Optional[Dict[str, "Segment"]]) -> bool:
         if self._type is None or self._predicate is None:
             return False
 
@@ -53,19 +57,19 @@ class Condition:
             ConditionType.SEMVER: self._match_semver_condition,
         }
 
-        match = matcher_proc.get(self._type, default=Condition._match_dummy_condition)
+        match = matcher_proc.get(self._type, Condition._match_dummy_condition)
         return match(user=user, segments=segments)
 
-    def _match_string_condition(self, user: User, **_) -> bool:
+    def _match_string_condition(self, user: "User", **_) -> bool:
         subject_val = user[self._subject]
         if not subject_val:
             return False
         return self._predicate.matcher(subject_val, self._objects)
 
-    def _match_segment_condition(self, user: User, segments: Dict[str, Segment], **_) -> bool:
-        return self._predicate.matcher(user, segments, self._objects)
+    def _match_segment_condition(self, user: "User", segments: Dict[str, "Segment"], **_) -> bool:
+        return self._predicate.matcher(user, segments or {}, self._objects)
 
-    def _match_datetime_condition(self, user: User, **_):  # sourcery skip: replace-interpolation-with-fstring
+    def _match_datetime_condition(self, user: "User", **_):  # sourcery skip: replace-interpolation-with-fstring
         cv = user[self._subject] or time.time()
         try:
             cv = int(cv)
@@ -79,7 +83,7 @@ class Condition:
             self.__logger.error('Met a string that cannot be parsed to int in Condition.objects: %s' % str(e))
             return False
 
-    def _match_number_condition(self, user: User, **_):  # sourcery skip: replace-interpolation-with-fstring
+    def _match_number_condition(self, user: "User", **_):  # sourcery skip: replace-interpolation-with-fstring
         cv = user[self._subject]
         if not cv:
             return False
@@ -95,7 +99,7 @@ class Condition:
             self.__logger.error('Met a string that cannot be parsed to float in Condition.objects: %s' % str(e))
             return False
 
-    def _match_semver_condition(self, user: User, **_):
+    def _match_semver_condition(self, user: "User", **_):
         cv = user[self._subject]
         try:
             cv = SemVer(cv)
@@ -129,8 +133,11 @@ class Condition:
         return self._predicate
 
     @predicate.setter
-    def predicate(self, value: Predicate):
-        self._predicate = value
+    def predicate(self, value: Union[Predicate, str]):
+        if isinstance(value, Predicate):
+            self._predicate = value
+        elif isinstance(value, str) and self._type is not None:
+            self._predicate = self._type.predicates(value)
 
     @property
     def objects(self) -> List[str]:

@@ -16,10 +16,12 @@
 
 
 from hashlib import sha1
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
 from featureprobe.hit_result import HitResult
-from featureprobe.user import User
+
+if TYPE_CHECKING:
+    from featureprobe.user import User
 
 
 class Split:
@@ -54,7 +56,7 @@ class Split:
     def salt(self, value: str):
         self._salt = value
 
-    def find_index(self, user: User, toggle_key: str) -> HitResult:
+    def find_index(self, user: "User", toggle_key: str) -> HitResult:
         hash_key = user.key
         if self._bucket_by:
             if user.has_attr(self._bucket_by):

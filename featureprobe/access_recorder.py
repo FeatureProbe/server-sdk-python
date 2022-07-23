@@ -17,8 +17,10 @@
 
 import copy
 from time import time
+from typing import TYPE_CHECKING
 
-from featureprobe.event import AccessEvent
+if TYPE_CHECKING:
+    from featureprobe.event import AccessEvent
 
 
 class AccessCounter:
@@ -27,6 +29,10 @@ class AccessCounter:
         self._VERSION = version
         self._INDEX = index
         self._count = 1
+
+    def __str__(self):
+        return "AccessCounter(value='%s', version=%d, index=%d, count=%d)" \
+               % (self._VALUE, self._VERSION, self._INDEX, self._count)
 
     @property
     def value(self):
@@ -43,7 +49,7 @@ class AccessCounter:
     def increment(self):
         self._count += 1
 
-    def is_group(self, _event: AccessEvent):
+    def is_group(self, _event: "AccessEvent"):
         return self._VALUE == _event.value \
                and self._VERSION == _event.version \
                and self._INDEX == _event.index
@@ -67,7 +73,7 @@ class AccessRecorder:
     def end_time(self):
         return self._end_time
 
-    def add(self, _event: AccessEvent):  # sourcery skip: use-named-expression
+    def add(self, _event: "AccessEvent"):  # sourcery skip: use-named-expression
         if not self._counters:
             self._start_time = int(time() * 1000)
         counters = self._counters[_event.key]

@@ -2,21 +2,40 @@
 
 > ⚠️ This SDK is **WIP** and not ready for use yet, thanks for your patience and please wait for the release.
 
-[![codecov](https://codecov.io/gh/FeatureProbe/server-sdk-python/branch/main/graph/badge.svg)](https://codecov.io/gh/FeatureProbe/server-sdk-python)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/featureprobe-server)
 [![GitHub Star](https://img.shields.io/github/stars/FeatureProbe/server-sdk-python)](https://github.com/FeatureProbe/server-sdk-python/stargazers)
+[![codecov](https://codecov.io/gh/FeatureProbe/server-sdk-python/branch/main/graph/badge.svg)](https://codecov.io/gh/FeatureProbe/server-sdk-python)
 [![License](https://img.shields.io/github/license/FeatureProbe/server-sdk-python)](https://github.com/FeatureProbe/server-sdk-python/blob/main/LICENSE)
 
 
 Feature Probe is an open source feature management service. This SDK is used to control features in Python programs. This
 SDK is designed primarily for use in multi-user systems such as web servers and applications.
 
-## Getting started
+## Basic Terms
+
+Reading the short [Basic Terms](https://github.com/FeatureProbe/FeatureProbe/blob/main/BASIC_TERMS.md) will help to understand the code blow more easily.  [中文](https://github.com/FeatureProbe/FeatureProbe/blob/main/BASIC_TERMS_CN.md)
+
+## Try Out Demo Code
+
+We provide a runnable demo code for you to understand how FeatureProbe SDK is used.
+
+1. Start FeatureProbe Service with docker composer. [How to](https://github.com/FeatureProbe/FeatureProbe#1-starting-featureprobe-service-with-docker-compose)
+2. Download this repo and run the demo program:
+```bash
+git clone https://github.com/FeatureProbe/server-sdk-python.git
+cd server-sdk-python
+pip install -r requirements.txt
+python3 demo.py
+```
+3. Find the Demo code in [example](https://github.com/FeatureProbe/server-sdk-python/blob/main/demo.py), 
+do some change and run the program again.
+```bash
+python3 demo.py
+```
+
+## Step-by-Step Guide
 
 In this guide we explain how to use feature toggles in a Python application using FeatureProbe.
-
-> WIP
-
-<!--
 
 ### Step 1. Install the Python SDK
 
@@ -28,6 +47,8 @@ First, install the FeatureProbe SDK as a dependency in your application.
 pip install featureprobe-server
 ```
 
+<!-- WIP
+
 #### conda
 
 Will be supported later.
@@ -36,9 +57,16 @@ Will be supported later.
 conda install featureprobe-server
 ```
 
+-->
+
+> Rest docs are working in process.
+
+<!-- TODO
+
 ### Step 2. Create a FeatureProbe instance
 
 After you install and import the SDK, create a single, shared instance of the FeatureProbe sdk.
+
 
 ```java
 public class Demo {
