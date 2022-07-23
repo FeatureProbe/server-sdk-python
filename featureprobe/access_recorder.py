@@ -46,6 +46,10 @@ class AccessCounter:
     def index(self):
         return self._INDEX
 
+    @property
+    def count(self):
+        return self._count
+
     def increment(self):
         self._count += 1
 
@@ -76,7 +80,7 @@ class AccessRecorder:
     def add(self, _event: "AccessEvent"):  # sourcery skip: use-named-expression
         if not self._counters:
             self._start_time = int(time() * 1000)
-        counters = self._counters[_event.key]
+        counters = self._counters.get(_event.key, None)
         if counters:
             for counter in counters:
                 if counter.is_group(_event):
