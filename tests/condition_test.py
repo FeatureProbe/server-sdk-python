@@ -14,10 +14,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import featureprobe as fp
-
-
-def test_create():
-    usr = fp.User('usr1')
-    usr['addr'] = 'sustc'
-    assert usr.attrs['addr'] == 'sustc'

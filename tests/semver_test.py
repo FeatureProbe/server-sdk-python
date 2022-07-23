@@ -28,13 +28,13 @@ def test_create():
 
 
 def test_bad_create():
-    with pytest.raises(ValueError) as e:
-        SemVer(None)
-    with pytest.raises(ValueError) as e:
-        SemVer(1)
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
+        SemVer(None)  # noqa
+    with pytest.raises(ValueError):
+        SemVer(1)  # noqa
+    with pytest.raises(ValueError):
         SemVer('1.0')
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         SemVer('1.0.0-??!!')
 
 
@@ -49,7 +49,7 @@ def test_simple_1():
 def test_simple_2():
     assert SemVer('1.0.1') < SemVer('2.0.1')
     assert SemVer('1.0.1') > SemVer('1.0.1-alpha')
-    assert SemVer('1.0.1-1') < SemVer('1.0.1-alpha')
+    assert SemVer('1.0.1-1') < SemVer('1.0.1-rc1')
     assert SemVer('1.0.1-beta') > SemVer('1.0.1-alpha')
     assert SemVer('1.0.1-beta') < SemVer('1.0.1-beta.1')
     assert SemVer('1.0.1-beta.1') < SemVer('1.0.1-beta.2')

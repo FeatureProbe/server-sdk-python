@@ -24,12 +24,11 @@ from featureprobe.user import User
 
 class Split:
     _BUCKET_SIZE = 10000
-    _INVALID_INDEX = -1
 
     def __init__(self, distribution: List[List[List[int]]] = None):
         self._distribution = distribution or []
-        self.bucket_by = ''
-        self.salt = ''
+        self._bucket_by = ''
+        self._salt = ''
 
     @property
     def distribution(self) -> List[List[List[int]]]:
@@ -61,11 +60,11 @@ class Split:
             if user.has_attr(self._bucket_by):
                 hash_key = user.attrs.get(self._bucket_by)
             else:
-                return HitResult(False,
+                return HitResult(hit=False,
                                  reason='Warning: User with key \'%s\' does not have attribute name \'%s\''
                                         % (user.key, self._bucket_by))
         group_index = self._get_group(self._hash(hash_key, self._salt or toggle_key, self._BUCKET_SIZE))
-        return HitResult(True, index=group_index,
+        return HitResult(hit=True, index=group_index,
                          reason='selected %d percentage group' % group_index)
 
     def _get_group(self, hash_value) -> Optional[int]:
@@ -73,7 +72,7 @@ class Split:
             for rng in groups:
                 if rng[0] <= hash_value < rng[1]:
                     return index
-        return None
+        return -1  # TODO: return None, HitResult.hit = False? inconsistent with Java SDK
 
     @staticmethod
     def _hash(hash_key, hash_salt, bucket_size):

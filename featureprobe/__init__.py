@@ -24,3 +24,6 @@ __version__ = '0.1.0'
 # API
 
 from featureprobe.user import User
+
+
+from featureprobe.model.condition import Condition

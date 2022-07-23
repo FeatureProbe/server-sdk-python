@@ -19,6 +19,7 @@ from typing import List
 
 from featureprobe.hit_result import HitResult
 from featureprobe.model.condition import Condition
+from featureprobe.model.predicate import ConditionType
 from featureprobe.user import User
 
 
@@ -39,12 +40,12 @@ class SegmentRule:
             segments  # Dict[str, Segment]
             ) -> HitResult:
         for condition in self._conditions:
-            if condition.type != condition.ConditionType.SEGMENT and not user.has_attr(condition.subject):
-                return HitResult(False,
-                                 reason='Warning: User with key \'%s\' does not have attribute name \'%s\''
+            if condition.type != ConditionType.SEGMENT and not user.has_attr(condition.subject):
+                return HitResult(hit=False,
+                                 reason="Warning: User with key '%s' does not have attribute name '%s'"
                                         % (user.key, condition.subject))
             if not condition.match_objects(user, segments):
-                return HitResult(False)
+                return HitResult(hit=False)
 
         return HitResult(True)
 
@@ -79,7 +80,7 @@ class Segment:
     def rules(self, value: List[SegmentRule]):
         self._rules = value or []
 
-    def contain(self, user: User, segments):
+    def contains(self, user: User, segments):
         for rule in self._rules:
             hit_result = rule.hit(user, segments)
             if hit_result.hit:

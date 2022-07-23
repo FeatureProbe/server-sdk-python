@@ -14,19 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Optional
+
+from typing import Optional
 
 
 class Detail:
-    def __init__(self, value=None, reason: Optional[str] = None,
-                 rule_index: Optional[int] = None, version: Optional[int] = None):
+    def __init__(self, value=None,
+                 rule_index: Optional[int] = None,
+                 version: Optional[int] = None,
+                 reason: Optional[str] = None):
         self._value = value
         self._rule_index = rule_index
         self._version = version
         self._reason = reason
 
     def __str__(self):
-        return 'FPDetail{value=%s, rule_index=%s, version=%s, reason=\'%s\'}' % \
+        return "FPDetail{value=%s, rule_index=%s, version=%s, reason='%s'}" % \
                (self._value, self._rule_index, self._version, self._reason)
 
     @property
@@ -42,21 +45,21 @@ class Detail:
         return self._rule_index
 
     @rule_index.setter
-    def rule_index(self, rule_index):
-        self._rule_index = rule_index
+    def rule_index(self, value: Optional[int]):
+        self._rule_index = value
 
     @property
     def version(self):
         return self._version
 
     @version.setter
-    def version(self, version):
-        self._version = version
+    def version(self, value: Optional[int]):
+        self._version = value
 
     @property
     def reason(self):
         return self._reason
 
     @reason.setter
-    def reason(self, reason):
-        self._reason = reason
+    def reason(self, value: Optional[str]):
+        self._reason = value

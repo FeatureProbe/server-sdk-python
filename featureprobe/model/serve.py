@@ -45,6 +45,6 @@ class Serve:
 
     def eval_index(self, user: User, toggle_key: str) -> HitResult:
         if self._select:
-            return HitResult(True, self._select)
+            return HitResult(hit=True, index=self._select)
 
         return self._split.find_index(user, toggle_key)

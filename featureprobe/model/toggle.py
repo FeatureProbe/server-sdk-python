@@ -127,13 +127,13 @@ class Toggle:
 
     def _hit_value(self, hit_result: HitResult, default_value, rule_index: Optional[int] = None) -> EvaluationResult:
         res = EvaluationResult(default_value, rule_index, hit_result.index, self._version, hit_result.reason or '')
-        if hit_result.index:
+        if hit_result.index is not None:
             variation = self._variations[hit_result.index]
             if isinstance(variation, int) and isinstance(default_value, float):
                 res.value = float(variation)
             else:
                 res.value = variation
-            if rule_index:
+            if rule_index is not None:
                 res.reason = 'Rule %d hit' % rule_index
 
         return res

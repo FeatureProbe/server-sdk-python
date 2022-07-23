@@ -19,6 +19,7 @@ import logging
 import time
 from typing import List, Dict, Union
 
+from featureprobe.internal.semver import SemVer
 from featureprobe.model.predicate import ConditionType, Predicate
 from featureprobe.model.segment import Segment
 from featureprobe.user import User
@@ -28,16 +29,16 @@ class Condition:
     __logger = logging.getLogger('FeatureProbe-Evaluator')
 
     def __init__(self,
-                 cond_type: ConditionType = None,
-                 subject: str = '',
-                 predicate: Predicate = None,
-                 objects: List[str] = None):
-        self._type = cond_type
+                 subject: str,
+                 type_: ConditionType,
+                 predicate: Predicate,
+                 objects: List[str]):
         self._subject = subject
+        self._type = type_
         self._predicate = predicate
         self._objects = objects or []
 
-    def match_objects(self, usr: User, segments: Dict[str, Segment]) -> bool:
+    def match_objects(self, user: User, segments: Dict[str, Segment]) -> bool:
         if self._type is None or self._predicate is None:
             return False
 
@@ -50,13 +51,10 @@ class Condition:
         }
 
         match = matcher_proc.get(self._type, default=Condition._match_dummy_condition)
-        return match({
-            'usr': usr,
-            'segments': segments,
-        })
+        return match(user=user, segments=segments)
 
-    def _match_string_condition(self, usr: User, **_) -> bool:
-        subject_val = usr[self._subject]
+    def _match_string_condition(self, user: User, **_) -> bool:
+        subject_val = user[self._subject]
         if not subject_val:
             return False
         return self._predicate.matcher(subject_val, self._objects)
@@ -64,8 +62,8 @@ class Condition:
     def _match_segment_condition(self, user: User, segments: Dict[str, Segment], **_) -> bool:
         return self._predicate.matcher(user, segments, self._objects)
 
-    def _match_datetime_condition(self, usr: User, **_):  # sourcery skip: replace-interpolation-with-fstring
-        cv = usr[self._subject] or time.time()
+    def _match_datetime_condition(self, user: User, **_):  # sourcery skip: replace-interpolation-with-fstring
+        cv = user[self._subject] or time.time()
         try:
             cv = int(cv)
         except ValueError:
@@ -78,8 +76,8 @@ class Condition:
             self.__logger.error('Met a string that cannot be parsed to int in Condition.objects: %s' % str(e))
             return False
 
-    def _match_number_condition(self, usr: User, **_):  # sourcery skip: replace-interpolation-with-fstring
-        cv = usr[self._subject]
+    def _match_number_condition(self, user: User, **_):  # sourcery skip: replace-interpolation-with-fstring
+        cv = user[self._subject]
         if not cv:
             return False
         try:
@@ -94,9 +92,14 @@ class Condition:
             self.__logger.error('Met a string that cannot be parsed to float in Condition.objects: %s' % str(e))
             return False
 
-    def _match_semver_condition(self, usr: User, **_):
-        # TODO
-        raise NotImplementedError()
+    def _match_semver_condition(self, user: User, **_):
+        cv = user[self._subject]
+        try:
+            cv = SemVer(cv)
+            return self._predicate.matcher(cv, self._objects)
+        except ValueError as e:
+            self.__logger.error(e)
+            return False
 
     @staticmethod
     def _match_dummy_condition(**_):

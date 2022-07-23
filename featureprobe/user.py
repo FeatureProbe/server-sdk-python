@@ -20,14 +20,14 @@ from typing import Dict
 
 class User:
 
-    def __init__(self, key: str):
+    def __init__(self, key: str, attrs: Dict[str, str] = None):
         self._key = key
-        self._attrs = {}
+        self._attrs = attrs or {}
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: str):
         self._attrs[key] = value
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str):
         return self._attrs[item]
 
     @property

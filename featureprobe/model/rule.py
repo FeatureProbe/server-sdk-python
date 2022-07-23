@@ -51,10 +51,10 @@ class Rule:
         for condition in self._conditions:
             if condition.type not in (ConditionType.SEGMENT, ConditionType.DATETIME) \
                     and not user.has_attr(condition.subject):
-                return HitResult(False,
+                return HitResult(hit=False,
                                  reason="Warning: User with key '%s' does not have attribute name '%s'"
                                         % (user.key, condition.subject))
             if not condition.match_objects(user, segments):
-                return HitResult(False)
+                return HitResult(hit=False)
 
         return self._serve.eval_index(user, toggle_key)

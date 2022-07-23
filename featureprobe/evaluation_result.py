@@ -14,9 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+from typing import Optional
+
+
 class EvaluationResult:
 
-    def __init__(self, value, rule_index, variation_index, version, reason):
+    def __init__(self,
+                 value,
+                 rule_index: Optional[int],
+                 variation_index: Optional[int],
+                 version: int,
+                 reason: str):
         self._value = value
         self._rule_index = rule_index
         self._variation_index = variation_index
@@ -36,29 +45,29 @@ class EvaluationResult:
         return self._rule_index
 
     @rule_index.setter
-    def rule_index(self, rule_index):
-        self._rule_index = rule_index
+    def rule_index(self, value):
+        self._rule_index = value
 
     @property
     def variation_index(self):
         return self._variation_index
 
     @variation_index.setter
-    def variation_index(self, variation_index):
-        self._variation_index = variation_index
+    def variation_index(self, value):
+        self._variation_index = value
 
     @property
     def version(self):
         return self._version
 
     @version.setter
-    def version(self, version):
-        self._version = version
+    def version(self, value):
+        self._version = value
 
     @property
     def reason(self):
         return self._reason
 
     @reason.setter
-    def reason(self, reason):
-        self._reason = reason
+    def reason(self, value):
+        self._reason = value

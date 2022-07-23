@@ -14,15 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Optional
-
 
 class HitResult:
 
-    def __init__(self, hit: bool, index=0, reason: Optional[str] = None):
+    def __init__(self, hit: bool, index: int = None, reason: str = None):
         self._hit = hit
         self._index = index
-        self._reason = reason
+        self._reason = reason or ''
 
     @property
     def hit(self):

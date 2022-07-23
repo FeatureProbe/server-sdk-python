@@ -13,12 +13,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from user import FPUser
+
+
+from featureprobe.user import User
 
 
 class Event:
-
-    def __init__(self, created_time: int, user: FPUser):
+    def __init__(self, created_time: int, user: User):
         self._created_time = created_time
         self._user = user
 
@@ -27,13 +28,13 @@ class Event:
         return self._created_time
 
     @property
-    def user(self) -> FPUser:
+    def user(self) -> User:
         return self._user
 
 
 class AccessEvent(Event):
 
-    def __init__(self, timestamp: int, user: FPUser, key: str, value: str, version: int, index: int):
+    def __init__(self, timestamp: int, user: User, key: str, value: str, version: int, index: int):
         super().__init__(timestamp, user)
         self._key = key
         self._value = value
