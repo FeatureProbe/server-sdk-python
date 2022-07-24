@@ -16,20 +16,22 @@
 
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from featureprobe.context import Context
-from featureprobe.event import Event
+if TYPE_CHECKING:
+    from featureprobe.context import Context
+    from featureprobe.event import Event
 
 
 class EventProcessor(ABC):
 
     @classmethod
     @abstractmethod
-    def from_context(cls, context: Context):
+    def from_context(cls, context: "Context"):
         pass
 
     @abstractmethod
-    def push(self, event: Event):
+    def push(self, event: "Event"):
         pass
 
     @abstractmethod

@@ -27,10 +27,17 @@ if TYPE_CHECKING:
 class Split:
     _BUCKET_SIZE = 10000
 
-    def __init__(self, distribution: List[List[List[int]]] = None):
+    def __init__(self, distribution: List[List[List[int]]], bucket_by: str, salt: str):
         self._distribution = distribution or []
-        self._bucket_by = ''
-        self._salt = ''
+        self._bucket_by = bucket_by
+        self._salt = salt
+
+    @classmethod
+    def from_json(cls, json: dict):
+        distribution = json.get('distribution')
+        bucket_by = json.get('bucketBy')
+        salt = json.get('salt')
+        return cls(distribution, bucket_by, salt)
 
     @property
     def distribution(self) -> List[List[List[int]]]:

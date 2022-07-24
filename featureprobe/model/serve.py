@@ -26,10 +26,18 @@ if TYPE_CHECKING:
 
 class Serve:
     def __init__(self,
-                 select: int = 0,
-                 split: "Split" = None):
+                 select: int,
+                 split: "Split"):
         self._select = select
         self._split = split
+
+    @classmethod
+    def from_json(cls, json: dict):
+        select = json.get('select', 0)
+        split = json.get('split')
+        if split is not None:
+            split = Split.from_json(split)
+        return cls(select, split)
 
     @property
     def select(self) -> int:

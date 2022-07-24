@@ -50,6 +50,7 @@ class DataRepository(metaclass=ABCMeta):
     def get_all_segment(self) -> Dict[str, Toggle]:
         pass
 
+    @property
     @abstractmethod
     def initialized(self) -> bool:
         pass

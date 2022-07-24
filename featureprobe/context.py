@@ -15,24 +15,23 @@
 # limitations under the License.
 
 
-import logging
+from typing import TYPE_CHECKING
 
-from featureprobe.config import Config
+if TYPE_CHECKING:
+    from featureprobe.config import Config
 
 
 class Context:
-    __logger = logging.getLogger('FeatureProbe')
+    _GET_REPOSITORY_DATA_API = '/api/server-sdk/toggles'
+    _POST_EVENTS_DATA_API = '/api/events'
 
-    GET_REPOSITORY_DATA_API = '/api/server-sdk/toggles'
-    POST_EVENTS_DATA_API = '/api/events'
-
-    def __init__(self, server_sdk_key: str, config: Config):
-        self._synchronizer_url = config.synchronizer_url or config.remote_uri + Context.GET_REPOSITORY_DATA_API
-        self._event_url = config.event_url or config.remote_uri + Context.POST_EVENTS_DATA_API
-        self._server_sdk_key = server_sdk_key
+    def __init__(self, sdk_key: str, config: "Config"):
+        self._synchronizer_url = config.synchronizer_url or config.remote_uri + self._GET_REPOSITORY_DATA_API
+        self._event_url = config.event_url or config.remote_uri + self._POST_EVENTS_DATA_API
+        self._sdk_key = sdk_key
         self._refresh_interval = config.refresh_interval
         self._location = config.location
-        self._http_configuration = config.http_configuration
+        self._http_config = config.http_config
 
     @property
     def synchronizer_url(self):
@@ -43,8 +42,8 @@ class Context:
         return self._event_url
 
     @property
-    def server_sdk_key(self):
-        return self._server_sdk_key
+    def sdk_key(self):
+        return self._sdk_key
 
     @property
     def refresh_interval(self):
@@ -55,5 +54,5 @@ class Context:
         return self._location
 
     @property
-    def http_configuration(self):
-        return self._http_configuration
+    def http_config(self):
+        return self._http_config

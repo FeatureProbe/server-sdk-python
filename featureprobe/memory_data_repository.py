@@ -24,24 +24,16 @@ class MemoryDataRepository(DataRepository):
             self._updated_timestamp = int(time.time())
 
     def get_toggle(self, key: str) -> Toggle:
-        if self._initialized:
-            return self._data.toggles.get(key)
-        return None
+        return self._data.toggles.get(key) if self._initialized else None
 
     def get_all_toggle(self) -> Dict[str, Toggle]:
-        if self._initialized:
-            return self._data.toggles
-        return {}
+        return self._data.toggles if self._initialized else {}
 
     def get_segment(self, key: str) -> Toggle:
-        if self._initialized:
-            return self._data.segments.get(key)
-        return None
+        return self._data.segments.get(key) if self._initialized else None
 
     def get_all_segment(self) -> Dict[str, Toggle]:
-        if self._initialized:
-            return self._data.segments
-        return {}
+        return self._data.segments if self._initialized else {}
 
     def initialized(self) -> bool:
         return self._initialized

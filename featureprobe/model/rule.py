@@ -34,6 +34,14 @@ class Rule:
         self._serve = serve
         self._conditions = conditions or []
 
+    @classmethod
+    def from_json(cls, json: dict):
+        serve = json.get('serve')
+        if serve is not None:
+            serve = Serve.from_json(serve)
+        conditions = [Condition.from_json(c) for c in json.get('conditions', [])]
+        return cls(serve, conditions)
+
     @property
     def serve(self) -> "Serve":
         return self._serve

@@ -15,11 +15,10 @@
 # limitations under the License.
 
 
-from typing import Dict, TYPE_CHECKING
+from typing import Dict
 
-if TYPE_CHECKING:
-    from featureprobe.model.segment import Segment
-    from featureprobe.model.toggle import Toggle
+from featureprobe.model.segment import Segment
+from featureprobe.model.toggle import Toggle
 
 
 class Repository:
@@ -28,6 +27,19 @@ class Repository:
                  segments: Dict[str, "Segment"] = None):
         self._toggles = toggles or {}
         self._segments = segments or {}
+
+    @classmethod
+    def from_json(cls, json: dict):
+        toggles = json.get('toggles', {})
+        segments = json.get('segments', {})
+
+        print(type(toggles))
+        print(type(segments))
+
+        return cls(
+            toggles={k: Toggle.from_json(v) for k, v in toggles.items()},
+            segments={k: Segment.from_json(v) for k, v in segments.items()}
+        )
 
     @property
     def toggles(self) -> Dict[str, "Toggle"]:

@@ -16,7 +16,7 @@
 
 
 import copy
-from time import time
+import time
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -53,10 +53,10 @@ class AccessCounter:
     def increment(self):
         self._count += 1
 
-    def is_group(self, _event: "AccessEvent"):
-        return self._VALUE == _event.value \
-               and self._VERSION == _event.version \
-               and self._INDEX == _event.index
+    def is_group(self, event: "AccessEvent"):
+        return self._VALUE == event.value \
+               and self._VERSION == event.version \
+               and self._INDEX == event.index
 
 
 class AccessRecorder:
@@ -79,8 +79,8 @@ class AccessRecorder:
 
     def add(self, _event: "AccessEvent"):  # sourcery skip: use-named-expression
         if not self._counters:
-            self._start_time = int(time() * 1000)
-        counters = self._counters.get(_event.key, None)
+            self._start_time = int(time.time())  # FIXME: epoch sec / milli sec?
+        counters = self._counters.get(_event.key)
         if counters:
             for counter in counters:
                 if counter.is_group(_event):
@@ -93,7 +93,7 @@ class AccessRecorder:
 
     def snapshot(self):
         _snapshot = copy.deepcopy(self)
-        _snapshot._end_time = int(time() * 1000)
+        _snapshot._end_time = int(time.time())  # FIXME: epoch sec / milli sec?
         return _snapshot
 
     def clear(self):

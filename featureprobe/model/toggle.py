@@ -18,25 +18,45 @@
 from typing import List, Optional, Dict, TYPE_CHECKING
 
 from featureprobe.evaluation_result import EvaluationResult
+from featureprobe.model.rule import Rule
 
 if TYPE_CHECKING:
     from featureprobe.hit_result import HitResult
-    from featureprobe.model.rule import Rule
     from featureprobe.model.segment import Segment
     from featureprobe.model.serve import Serve
     from featureprobe.user import User
 
 
 class Toggle:
-    def __init__(self):
-        self._key = ''
-        self._enabled = False
-        self._version = 0
-        self._disabled_serve = None  # Serve
-        self._default_serve = None  # Serve
-        self._rules = []  # List[Rule]
-        self._variations = []
-        self._for_client = False
+    def __init__(self,
+                 key: str,
+                 enabled: bool,
+                 version: int,
+                 disabled_serve: "Serve",
+                 default_serve: "Serve",
+                 rules: List["Rule"],
+                 variations: list,
+                 for_client: bool):
+        self._key = key
+        self._enabled = enabled
+        self._version = version
+        self._disabled_serve = disabled_serve
+        self._default_serve = default_serve
+        self._rules = rules
+        self._variations = variations
+        self._for_client = for_client
+
+    @classmethod
+    def from_json(cls, json: dict):
+        key = json.get('key')
+        enabled = json.get('enabled', False)
+        version = json.get('version', 1)
+        disabled_serve = json.get('disabledServe')
+        default_serve = json.get('defaultServe')
+        rules = [Rule.from_json(r) for r in json.get('rules', [])]
+        variations = json.get('variations', [])
+        for_client = json.get('forClient', False)
+        return cls(key, enabled, version, disabled_serve, default_serve, rules, variations, for_client)
 
     @property
     def key(self) -> str:

@@ -29,6 +29,11 @@ class SegmentRule:
     def __init__(self, conditions: List["Condition"] = None):
         self._conditions = conditions or []
 
+    @classmethod
+    def from_json(cls, json: dict):
+        conditions = [Condition.from_json(c) for c in json.get('conditions', [])]
+        return cls(conditions)
+
     @property
     def conditions(self) -> List["Condition"]:
         return self._conditions
@@ -54,12 +59,19 @@ class SegmentRule:
 
 class Segment:
     def __init__(self,
-                 uid='',
-                 version=1,
+                 uid: str,
+                 version: int,
                  rules: List[SegmentRule] = None):
         self._uid = uid
         self._version = version
         self._rules = rules or []
+
+    @classmethod
+    def from_json(cls, json: dict):
+        uid = json.get('uniqueId')
+        version = json.get('version', 1)
+        rules = [SegmentRule.from_json(r) for r in json.get('rules', [])]
+        return cls(uid, version, rules)
 
     @property
     def uid(self):

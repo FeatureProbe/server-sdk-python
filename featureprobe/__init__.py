@@ -15,14 +15,13 @@
 # limitations under the License.
 
 
-# basic metadata
-
 __author__ = 'FeatureProbe'
 __license__ = 'Apache 2.0'
 
 __version__ = '0.1.0'
 
-# expose API
+# --------------- API --------------- #
+# TODO: reconsider what to expose
 
 from featureprobe.model import *
 
@@ -34,3 +33,7 @@ from featureprobe.access_recorder import (
 from featureprobe.event import AccessEvent
 
 from featureprobe.user import User
+
+from featureprobe.data_repository import DataRepository
+from featureprobe.file_synchronizer import FileSynchronizer
+from featureprobe.memory_data_repository import MemoryDataRepository

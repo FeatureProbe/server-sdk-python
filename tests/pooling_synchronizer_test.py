@@ -13,31 +13,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
-from abc import ABC, abstractmethod
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from featureprobe.context import Context
-    from featureprobe.data_repository import DataRepository
-
-
-class Synchronizer(ABC):
-
-    @classmethod
-    @abstractmethod
-    def from_context(cls, context: "Context", data_repo: "DataRepository"):
-        pass
-
-    @abstractmethod
-    def sync(self):
-        pass
-
-    @abstractmethod
-    def close(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()

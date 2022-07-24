@@ -41,3 +41,10 @@ def test_add_event():
     assert 1 == recorder.counters.get('test_toggle')[0].count
     assert 1 == recorder.counters.get('test_toggle')[0].version
     assert 0 == recorder.counters.get('test_toggle')[0].index
+
+
+def test_get_snapshot():
+    recorder.add(event)
+    snapshot = recorder.snapshot()
+    assert 1 == len(snapshot.counters)
+    assert 1 == len(snapshot.counters.get('test_toggle'))

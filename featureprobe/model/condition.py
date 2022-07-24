@@ -45,6 +45,14 @@ class Condition:
             self._predicate = None
         self._objects = objects or []
 
+    @classmethod
+    def from_json(cls, json: dict):
+        subject = json.get('subject')
+        type_ = json.get('type')
+        predicate = json.get('predicate')
+        objects = json.get('objects')
+        return cls(subject, type_, predicate, objects)
+
     def match_objects(self, user: "User", segments: Optional[Dict[str, "Segment"]]) -> bool:
         if self._type is None or self._predicate is None:
             return False
