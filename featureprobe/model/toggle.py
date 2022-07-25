@@ -18,12 +18,13 @@
 from typing import List, Optional, Dict, TYPE_CHECKING
 
 from featureprobe.evaluation_result import EvaluationResult
+from featureprobe.internal.json_nullable import json_nullable
 from featureprobe.model.rule import Rule
+from featureprobe.model.serve import Serve
 
 if TYPE_CHECKING:
     from featureprobe.hit_result import HitResult
     from featureprobe.model.segment import Segment
-    from featureprobe.model.serve import Serve
     from featureprobe.user import User
 
 
@@ -47,12 +48,13 @@ class Toggle:
         self._for_client = for_client
 
     @classmethod
-    def from_json(cls, json: dict):
+    @json_nullable
+    def from_json(cls, json: dict) -> "Toggle":
         key = json.get('key')
         enabled = json.get('enabled', False)
         version = json.get('version', 1)
-        disabled_serve = json.get('disabledServe')
-        default_serve = json.get('defaultServe')
+        disabled_serve = Serve.from_json(json.get('disabledServe'))
+        default_serve = Serve.from_json(json.get('defaultServe'))
         rules = [Rule.from_json(r) for r in json.get('rules', [])]
         variations = json.get('variations', [])
         for_client = json.get('forClient', False)

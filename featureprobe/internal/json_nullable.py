@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # Copyright 2022 FeatureProbe
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,29 +13,8 @@
 # limitations under the License.
 
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+def json_nullable(func):
+    def wrapper(self, json):
+        return None if json is None else func(self, json)
 
-if TYPE_CHECKING:
-    from featureprobe.context import Context
-    from featureprobe.event import Event
-
-
-class EventProcessor(ABC):
-
-    @classmethod
-    @abstractmethod
-    def from_context(cls, context: "Context") -> "EventProcessor":
-        pass
-
-    @abstractmethod
-    def push(self, event: "Event"):
-        pass
-
-    @abstractmethod
-    def flush(self):
-        pass
-
-    @abstractmethod
-    def shutdown(self):
-        pass
+    return wrapper

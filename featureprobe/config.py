@@ -27,7 +27,7 @@ from featureprobe.memory_data_repository import MemoryDataRepository
 from featureprobe.pooling_synchronizer import PoolingSynchronizer
 
 
-class SyncMode(Enum, str):
+class SyncMode(str, Enum):
     def __new__(cls, value, synchronizer_creator):
         if type(value) is cls:
             return value
@@ -47,13 +47,13 @@ class SyncMode(Enum, str):
 class Config:
 
     def __init__(self,
-                 location: str,
-                 sync_mode: SyncMode,
-                 synchronizer_url: str,
-                 event_url: str,
+                 location: str = None,
+                 sync_mode: SyncMode = SyncMode.POOLING,
+                 synchronizer_url: str = None,
+                 event_url: str = None,
                  remote_uri: str = 'http://127.0.0.1:4007',
-                 http_config: HttpConfig = None,
-                 refresh_interval: Union[timedelta, int] = timedelta(seconds=5),
+                 http_config: HttpConfig = HttpConfig(),
+                 refresh_interval: Union[timedelta, float] = timedelta(seconds=5),
                  ):
         self._location = location
         self._synchronizer_creator = sync_mode.synchronizer_creator
@@ -63,10 +63,9 @@ class Config:
         self._event_url = event_url
         self._remote_uri = remote_uri
         self._http_config = http_config or HttpConfig()
-        if isinstance(refresh_interval, timedelta):
-            self._refresh_interval = refresh_interval
-        else:
-            self._refresh_interval = timedelta(seconds=refresh_interval)
+        self._refresh_interval = refresh_interval \
+            if isinstance(refresh_interval, timedelta) \
+            else timedelta(seconds=refresh_interval)
 
     @property
     def location(self):

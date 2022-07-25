@@ -19,6 +19,7 @@ import logging
 import time
 from typing import List, Dict, Union, Optional, TYPE_CHECKING
 
+from featureprobe.internal.json_nullable import json_nullable
 from featureprobe.internal.semver import SemVer
 from featureprobe.model.predicate import ConditionType, Predicate
 
@@ -36,17 +37,24 @@ class Condition:
                  predicate: Union[Predicate, str, None],
                  objects: Optional[List[str]]):
         self._subject = subject
-        self._type = ConditionType(type_) if type_ is not None else None
+        try:
+            self._type = ConditionType(type_)
+        except ValueError:
+            self._type = None
         if isinstance(predicate, Predicate):
             self._predicate = predicate
-        elif self._type is not None and predicate is not None:
-            self._predicate = self._type.predicates(predicate)
+        elif self._type is not None:
+            try:
+                self._predicate = self._type.predicates(predicate)
+            except ValueError:
+                self._predicate = None
         else:
             self._predicate = None
         self._objects = objects or []
 
     @classmethod
-    def from_json(cls, json: dict):
+    @json_nullable
+    def from_json(cls, json: dict) -> "Condition":
         subject = json.get('subject')
         type_ = json.get('type')
         predicate = json.get('predicate')

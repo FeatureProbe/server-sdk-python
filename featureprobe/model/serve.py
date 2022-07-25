@@ -18,9 +18,10 @@
 from typing import TYPE_CHECKING
 
 from featureprobe.hit_result import HitResult
+from featureprobe.internal.json_nullable import json_nullable
+from featureprobe.model.split import Split
 
 if TYPE_CHECKING:
-    from featureprobe.model.split import Split
     from featureprobe.user import User
 
 
@@ -32,11 +33,10 @@ class Serve:
         self._split = split
 
     @classmethod
-    def from_json(cls, json: dict):
+    @json_nullable
+    def from_json(cls, json: dict) -> "Serve":
         select = json.get('select', 0)
-        split = json.get('split')
-        if split is not None:
-            split = Split.from_json(split)
+        split = Split.from_json(json.get('split'))
         return cls(select, split)
 
     @property

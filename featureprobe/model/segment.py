@@ -18,10 +18,11 @@
 from typing import List, TYPE_CHECKING
 
 from featureprobe.hit_result import HitResult
+from featureprobe.internal.json_nullable import json_nullable
+from featureprobe.model.condition import Condition
 from featureprobe.model.predicate import ConditionType
 
 if TYPE_CHECKING:
-    from featureprobe.model.condition import Condition
     from featureprobe.user import User
 
 
@@ -30,7 +31,8 @@ class SegmentRule:
         self._conditions = conditions or []
 
     @classmethod
-    def from_json(cls, json: dict):
+    @json_nullable
+    def from_json(cls, json: dict) -> "SegmentRule":
         conditions = [Condition.from_json(c) for c in json.get('conditions', [])]
         return cls(conditions)
 
@@ -67,7 +69,8 @@ class Segment:
         self._rules = rules or []
 
     @classmethod
-    def from_json(cls, json: dict):
+    @json_nullable
+    def from_json(cls, json: dict) -> "Segment":
         uid = json.get('uniqueId')
         version = json.get('version', 1)
         rules = [SegmentRule.from_json(r) for r in json.get('rules', [])]

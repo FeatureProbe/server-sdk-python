@@ -15,29 +15,13 @@
 # limitations under the License.
 
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+import json
 
-if TYPE_CHECKING:
-    from featureprobe.context import Context
-    from featureprobe.event import Event
+import featureprobe as fp
 
 
-class EventProcessor(ABC):
-
-    @classmethod
-    @abstractmethod
-    def from_context(cls, context: "Context") -> "EventProcessor":
-        pass
-
-    @abstractmethod
-    def push(self, event: "Event"):
-        pass
-
-    @abstractmethod
-    def flush(self):
-        pass
-
-    @abstractmethod
-    def shutdown(self):
-        pass
+def test_serialize_toggles_to_repo():
+    with open('resources/datasource/repo.json') as f:
+        dic = json.load(f)
+    repo = fp.Repository.from_json(dic)
+    assert 1 <= len(repo.toggles)

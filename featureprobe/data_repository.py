@@ -27,7 +27,7 @@ class DataRepository(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def from_context(cls, context: Context):
+    def from_context(cls, context: Context) -> "DataRepository":
         pass
 
     @abstractmethod

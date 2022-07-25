@@ -32,6 +32,7 @@ from featureprobe.access_recorder import (
 
 from featureprobe.event import AccessEvent
 
+from featureprobe.server import Server
 from featureprobe.user import User
 
 from featureprobe.data_repository import DataRepository

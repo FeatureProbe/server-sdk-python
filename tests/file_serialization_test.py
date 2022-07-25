@@ -15,29 +15,11 @@
 # limitations under the License.
 
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from featureprobe.context import Context
-    from featureprobe.event import Event
+import featureprobe as fp
 
 
-class EventProcessor(ABC):
-
-    @classmethod
-    @abstractmethod
-    def from_context(cls, context: "Context") -> "EventProcessor":
-        pass
-
-    @abstractmethod
-    def push(self, event: "Event"):
-        pass
-
-    @abstractmethod
-    def flush(self):
-        pass
-
-    @abstractmethod
-    def shutdown(self):
-        pass
+def test_local_mode_synchronizer():
+    feature_probe = fp.Server(sdk_key='server-61db54ecea79824cae3ac38d73f1961d698d0477')
+    repo = feature_probe._data_repo
+    assert 0 < len(repo.get_all_toggle())
+    assert 0 < len(repo.get_all_segment())

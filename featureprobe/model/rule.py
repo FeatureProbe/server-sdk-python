@@ -18,12 +18,12 @@
 from typing import List, Dict, TYPE_CHECKING
 
 from featureprobe.hit_result import HitResult
-from featureprobe.model.condition import ConditionType
+from featureprobe.internal.json_nullable import json_nullable
+from featureprobe.model.condition import Condition, ConditionType
+from featureprobe.model.serve import Serve
 
 if TYPE_CHECKING:
-    from featureprobe.model.condition import Condition
     from featureprobe.model.segment import Segment
-    from featureprobe.model.serve import Serve
     from featureprobe.user import User
 
 
@@ -35,10 +35,9 @@ class Rule:
         self._conditions = conditions or []
 
     @classmethod
-    def from_json(cls, json: dict):
-        serve = json.get('serve')
-        if serve is not None:
-            serve = Serve.from_json(serve)
+    @json_nullable
+    def from_json(cls, json: dict) -> "Rule":
+        serve = Serve.from_json(json.get('serve'))
         conditions = [Condition.from_json(c) for c in json.get('conditions', [])]
         return cls(serve, conditions)
 

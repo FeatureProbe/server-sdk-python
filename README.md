@@ -24,7 +24,7 @@ We provide a runnable demo code for you to understand how FeatureProbe SDK is us
 ```bash
 git clone https://github.com/FeatureProbe/server-sdk-python.git
 cd server-sdk-python
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 python3 demo.py
 ```
 3. Find the Demo code in [example](https://github.com/FeatureProbe/server-sdk-python/blob/main/demo.py), 

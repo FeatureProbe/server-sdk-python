@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pytest pytest-cov
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
       - name: Install pypa/build
         run: >-

@@ -34,8 +34,9 @@ class Server:
         if not sdk_key:
             raise ValueError('sdk key must not be blank')
         context = Context(sdk_key, config)
-        self._event_processor = config.event_processor_factory.create(context)
-        self._data_repo = config.data_repository_factory.create(context)
+        self._event_processor = config.event_processor_creator(context)
+        self._data_repo = config.data_repository_creator(context)
+        config.synchronizer_creator(context, self._data_repo).sync()
         config.synchronizer_factory.create(context, self._data_repo).sync()
 
     def flush(self):
