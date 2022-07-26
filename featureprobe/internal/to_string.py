@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # Copyright 2022 FeatureProbe
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +13,20 @@
 # limitations under the License.
 
 
-import json
+def stringifiable(cls):
+    def __str__(self):
+        attrs = sorted(filter(lambda attr: not callable(attr[1]),
+                            self.__dict__.items()))
 
-import featureprobe as fp
+        return '%s(%s)' % (
+            cls.__name__,
+            ', '.join(
+                '%s=\'%s\'' % item
+                if isinstance(item[1], (str, bytes))
+                else '%s=%s' % item
+                for item in attrs
+            )
+        )
 
-
-def test_serialize_toggles_to_repo():
-    with open('resources/datasource/repo.json') as f:
-        dic = json.load(f)
-    repo = fp.Repository.from_json(dic)
-    assert len(repo.toggles) >= 1
+    cls.__str__ = __str__
+    return cls

@@ -15,21 +15,24 @@
 # limitations under the License.
 
 
-import asyncio
 import contextlib
+import json
 import logging
-from apscheduler.schedulers.background import BackgroundScheduler
+import queue
 import threading
-from asyncio import Queue, QueueFull, QueueEmpty
+from concurrent.futures.thread import ThreadPoolExecutor
+from datetime import datetime
 from enum import Enum
+from queue import Queue
 from typing import List, Optional
 
-import aiohttp
+import requests
+from apscheduler.schedulers.background import BackgroundScheduler
 
-from access_recorder import AccessRecorder
-from event import Event, AccessEvent
-from event_processor import EventProcessor
+from featureprobe.access_recorder import AccessRecorder
 from featureprobe.context import Context
+from featureprobe.event import Event, AccessEvent
+from featureprobe.event_processor import EventProcessor
 
 
 class _EventAction:
@@ -55,6 +58,12 @@ class _EventRepository:
         repo.access = access.snapshot()
         return repo
 
+    def to_dict(self) -> dict:
+        return {
+            'events': self.events,
+            'access': self.access.to_dict(),
+        }
+
     def __bool__(self):
         return not self.is_empty()
 
@@ -73,124 +82,69 @@ class _EventRepository:
         self.access.clear()
 
 
-class _SendEventsTask(threading.Thread):
-    GET_SDK_KEY_HEADER = 'Authorization'
-
-    def __init__(self, context: Context, repositories: List[_EventRepository]):
-        self.repositories = repositories
-        self.api_url = context.event_url
-        self.headers = {_SendEventsTask.GET_SDK_KEY_HEADER, context.sdk_key}
-        self.http_client = aiohttp.ClientSession(
-            connector=context.http_config.connecter,
-            conn_timeout=context.http_config.conn_timeout,
-            read_timeout=context.http_config.read_timeout
-        )
-
-    def run(self) -> None:
-        # FIXME
-        pass
-
-    """
-        Request request;
-        try {
-            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"),
-                    mapper.writeValueAsString(repositories));
-            request = new Request.Builder()
-                    .url(apiUrl.toString())
-                    .headers(headers)
-                    .post(requestBody)
-                    .build();
-        } catch (Exception e) {
-            logger.error(LOG_SENDER_ERROR, e);
-            return;
-        }
-        try (Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new HttpErrorException("Http request error: " + response.code());
-            }
-            logger.debug("Http response: {}", response);
-        } catch (Exception e) {
-            logger.error(LOG_SENDER_ERROR, e);
-        }
-    """
-
-
 class DefaultEventProcessor(EventProcessor):
     __logger = logging.getLogger('FeatureProbe-Event')
     __EVENT_BATCH_HANDLE_SIZE = 50
     __CAPACITY = 10000
 
-    __LOG_SENDER_ERROR = 'Unexpected error from event sender'
     __LOG_BUSY_EVENT = 'Event processing is busy, some will be dropped'
 
     def __init__(self, context: Context):
         self._closed = False
-        self._events = Queue(DefaultEventProcessor.__CAPACITY)
-        # self._executor = ThreadPoolExecutor(max_workers=5, thread_name_prefix='FeatureProbe_event_handle')
-        # FIXME
-        event_repository = _EventRepository()
-        threading.Thread(target=self.__handle_event(context, self._events, event_repository),
-                         name='FeatureProbe_event_dispatch',
-                         daemon=True).start()
+        self._events = Queue(maxsize=DefaultEventProcessor.__CAPACITY)
 
-        self._scheduler = sched.scheduler()
-        threading.Thread(target=self.__schedule_flush, name='FeatureProbe_scheduled_flush', daemon=True).start()
+        self._api_url = context.event_url
+        self._session = requests.Session()
+        self._session.mount('http://', context.http_config.adapter)
+        self._session.mount('https://', context.http_config.adapter)
+        self._session.headers = {'Authorization', context.sdk_key}
+        self._timeout = (context.http_config.conn_timeout, context.http_config.read_timeout)
+
+        event_repository = _EventRepository()
+        handler_thread = threading.Thread(target=self._handle_event,
+                                          args=(self._events, event_repository),
+                                          daemon=True)
+        handler_thread.start()
+
+        self._executor = ThreadPoolExecutor(max_workers=5)
+        self._scheduler = BackgroundScheduler()
+        self._scheduler.start()
+        self._scheduler.add_job(self.flush,
+                                trigger='interval',
+                                seconds=5,
+                                next_run_time=datetime.now())
 
     @classmethod
     def from_context(cls, context: Context) -> EventProcessor:
         return cls(context)
 
-    async def push(self, event: Event):
-        if not self._closed:
-            await self._events.put(_EventAction(_EventAction.Type.EVENT, event))
-
-    def push_nowait(self, event: Event):
+    def push(self, event: Event):
         if not self._closed:
             try:
                 self._events.put_nowait(_EventAction(_EventAction.Type.EVENT, event))
-            except QueueFull:
+            except queue.Full:
                 DefaultEventProcessor.__logger.warning(DefaultEventProcessor.__LOG_BUSY_EVENT)
 
-    def __scheduled_flush(self):
-        self._scheduler.enter(delay=5, priority=1, action=self.__scheduled_flush)
-        self.flush_nowait()
-
-    def scheduled(self, delay, func):
-        def wrapper(*args, **kwargs):
-            self._scheduler.enter(delay=delay, priority=1, action=func)
-
-
-
-
-    def __schedule_flush(self):
-        self._scheduler.enter(delay=0, priority=1, action=self.__scheduled_flush)
-        self._scheduler.run()
-
-    async def flush(self):
-        if not self._closed:
-            await self._events.put(_EventAction(_EventAction.Type.FLUSH, None))
-
-    def flush_nowait(self):
+    def flush(self):
         if not self._closed:
             try:
                 self._events.put_nowait(_EventAction(_EventAction.Type.FLUSH, None))
-            except QueueFull:
+            except queue.Full:
                 DefaultEventProcessor.__logger.warning(DefaultEventProcessor.__LOG_BUSY_EVENT)
 
-    async def shutdown(self):
+    def shutdown(self):
         if self._closed:
             return
         self._closed = True
-        await self._events.put(_EventAction(_EventAction.Type.FLUSH, None))
-        await self._events.put(_EventAction(_EventAction.Type.SHUTDOWN, None))
+        self._events.put(_EventAction(_EventAction.Type.FLUSH, None))
+        self._events.put(_EventAction(_EventAction.Type.SHUTDOWN, None))
 
-    def __handle_event(self, context: Context, events: Queue, event_repo: _EventRepository):
+    def _handle_event(self, events: Queue, event_repo: _EventRepository):
         actions = []
-        while not self._closed or events:
-            # actions.append(asyncio.run(events.get()))
-            aaa = asyncio.get_event_loop().run_until_complete(events.get())
-            actions.append(aaa)
-            with contextlib.suppress(QueueEmpty):
+        while not self._closed or not events.empty():
+            actions.clear()
+            actions.append(events.get())
+            with contextlib.suppress(queue.Empty):
                 actions.extend(events.get_nowait()
                                for _ in range(1, DefaultEventProcessor.__EVENT_BATCH_HANDLE_SIZE))
             try:
@@ -198,45 +152,30 @@ class DefaultEventProcessor(EventProcessor):
                     if action.type == _EventAction.Type.EVENT:
                         self.__process_event(action.event, event_repo)
                     elif action.type == _EventAction.Type.FLUSH:
-                        self.__process_flush(context, event_repo)
+                        self.__process_flush(event_repo)
                     elif action.type == _EventAction.Type.SHUTDOWN:
                         self.__do_shutdown()
             except Exception as e:
-                self.__logger.error('FeatureProbe event handle error', exc_info=e)  # FIXME
+                self.__logger.error('FeatureProbe event handle error', exc_info=e)
 
-    # async def __handle_event(self, context: FPContext, events: Queue, event_repo: EventRepository):
-    #     actions = []
-    #     while not self._closed or events:
-    #         actions.append(await events.get())
-    #         with contextlib.suppress(QueueEmpty):
-    #             actions.extend(events.get_nowait()
-    #                            for _ in range(1, DefaultEventProcessor.__EVENT_BATCH_HANDLE_SIZE))
-    #         try:
-    #             for action in actions:
-    #                 if action.type == EventAction.Type.EVENT:
-    #                     self.__process_event(action.event, event_repo)
-    #                 elif action.type == EventAction.Type.FLUSH:
-    #                     self.__process_flush(context, event_repo)
-    #                 elif action.type == EventAction.Type.SHUTDOWN:
-    #                     self.__do_shutdown()
-    #         except Exception as e:
-    #             self.__logger.error('FeatureProbe event handle error', exc_info=e)  # FIXME
-    #
     def __do_shutdown(self):
         self._executor.shutdown(wait=False)
 
     def __process_event(self, event: Event, event_repo: _EventRepository):
         event_repo.add(event)
 
-    def __process_flush(self, context: Context, event_repo: _EventRepository):
-        if not event_repo:  # FIXME  eventRepository.isEmpty()
+    def _send_events(self, repositories: List[_EventRepository]):
+        repositories = [repo.to_dict() for repo in repositories]
+        resp = self._session.post(self._api_url, json=json.dumps(repositories), timeout=self._timeout)
+        self.__logger.debug('Http response: %s' % resp.text)  # sourcery skip: replace-interpolation-with-fstring
+        try:
+            resp.raise_for_status()
+        except requests.HTTPError as e:
+            self.__logger.error('Unexpected error from event sender', exc_info=e)
+
+    def __process_flush(self, event_repo: _EventRepository):
+        if not event_repo:
             return
-
         send_queue = [event_repo.snapshot()]
-        send_task = _SendEventsTask(context, send_queue)
-
-        # FIXME:::::::: run send_task, say POST the send_queue
-        self._executor.submit(send_task.run)
-        # executor.submit(task);   in java
-
+        self._executor.submit(self._send_events, send_queue)
         event_repo.clear()

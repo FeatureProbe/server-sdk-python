@@ -43,7 +43,7 @@ class MemoryDataRepository(DataRepository):
     def refresh(self, repo: Repository):
         if repo is not None \
                 and repo.toggles is not None \
-                and repo.segments:
+                and repo.segments is not None:
             self._data = Repository(repo.toggles.copy(), repo.segments.copy())
             self._initialized = True
             self._updated_timestamp = int(time.time())

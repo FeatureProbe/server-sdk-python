@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 # Copyright 2022 FeatureProbe
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +13,7 @@
 # limitations under the License.
 
 
-import json
-
-import featureprobe as fp
-
-
-def test_serialize_toggles_to_repo():
-    with open('resources/datasource/repo.json') as f:
-        dic = json.load(f)
-    repo = fp.Repository.from_json(dic)
-    assert len(repo.toggles) >= 1
+def serializable(cls):
+    # TODO(chris): inject from_json & to_dict to cls
+    # this will deprecate @json_decoder
+    ...

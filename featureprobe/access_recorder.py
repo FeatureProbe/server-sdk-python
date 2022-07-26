@@ -65,6 +65,13 @@ class AccessRecorder:
         self._start_time = 0
         self._end_time = 0
 
+    def to_dict(self) -> dict:
+        return {
+            'counters': self._counters,
+            'startTime': self._start_time,
+            'endTime': self._end_time,
+        }
+
     @property
     def counters(self):
         return self._counters

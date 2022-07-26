@@ -19,15 +19,18 @@ import logging
 import time
 from typing import List, Dict, Union, Optional, TYPE_CHECKING
 
-from featureprobe.internal.json_nullable import json_nullable
+from featureprobe.internal.json_decoder import json_decoder
 from featureprobe.internal.semver import SemVer
+from featureprobe.internal.to_string import stringifiable
 from featureprobe.model.predicate import ConditionType, Predicate
+from internal.empty_str import empty_str
 
 if TYPE_CHECKING:
     from featureprobe.model.segment import Segment
     from featureprobe.user import User
 
 
+@stringifiable
 class Condition:
     __logger = logging.getLogger('FeatureProbe-Evaluator')
 
@@ -53,7 +56,7 @@ class Condition:
         self._objects = objects or []
 
     @classmethod
-    @json_nullable
+    @json_decoder
     def from_json(cls, json: dict) -> "Condition":
         subject = json.get('subject')
         type_ = json.get('type')
@@ -78,7 +81,7 @@ class Condition:
 
     def _match_string_condition(self, user: "User", **_) -> bool:
         subject_val = user[self._subject]
-        if not subject_val:
+        if empty_str(subject_val):
             return False
         return self._predicate.matcher(subject_val, self._objects)
 

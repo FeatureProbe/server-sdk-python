@@ -17,7 +17,7 @@
 
 from typing import Dict
 
-from featureprobe.internal.json_nullable import json_nullable
+from featureprobe.internal.json_decoder import json_decoder
 from featureprobe.model.segment import Segment
 from featureprobe.model.toggle import Toggle
 
@@ -30,7 +30,7 @@ class Repository:
         self._segments = segments or {}
 
     @classmethod
-    @json_nullable
+    @json_decoder
     def from_json(cls, json: dict) -> "Repository":
         toggles = json.get('toggles', {})
         segments = json.get('segments', {})

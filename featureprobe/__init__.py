@@ -29,6 +29,7 @@ from featureprobe.access_recorder import (
     AccessCounter,
     AccessRecorder,
 )
+from featureprobe.config import Config
 
 from featureprobe.event import AccessEvent
 

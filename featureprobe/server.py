@@ -15,34 +15,30 @@
 # limitations under the License.
 
 
-import json
-import logging
 import time
 from typing import Any
 
-from featureprobe.event import AccessEvent
 from featureprobe.config import Config
 from featureprobe.context import Context
 from featureprobe.detail import Detail
+from featureprobe.event import AccessEvent
+from featureprobe.internal.empty_str import empty_str
 from featureprobe.user import User
 
 
 class Server:
-    __logger = logging.getLogger('FeatureProbe')
-
     def __init__(self, sdk_key: str, config: Config = Config()):
-        if not sdk_key:
+        if empty_str(sdk_key):
             raise ValueError('sdk key must not be blank')
         context = Context(sdk_key, config)
         self._event_processor = config.event_processor_creator(context)
         self._data_repo = config.data_repository_creator(context)
         config.synchronizer_creator(context, self._data_repo).sync()
-        config.synchronizer_factory.create(context, self._data_repo).sync()
 
     def flush(self):
         self._event_processor.flush()
 
-    def evaluate(self, toggle_key: str, user: User, default, is_json: bool) -> Any:
+    def evaluate(self, toggle_key: str, user: User, default) -> Any:
         toggle = self._data_repo.get_toggle(toggle_key)
         segments = self._data_repo.get_all_segment()
         if not toggle:
@@ -56,41 +52,23 @@ class Server:
                                    version=eval_result.version,
                                    index=eval_result.variation_index)
         self._event_processor.push(access_event)
-        if is_json:
-            ...
-            # FIXME
-            """
-            return mapper.readValue(value, clazz);
-                }
-            } catch (JsonProcessingException e) {
-                logger.error(LOG_CONVERSION_ERROR, toggleKey, e);
-            } catch (Exception e) {
-                logger.error(LOG_HANDLE_ERROR, toggleKey, e);
-            }
-            """
+        return eval_result.value
 
-            #     public <T> T jsonValue(String toggleKey, FPUser user, T defaultValue, Class<T> clazz) {
-            #         return jsonEvaluate(toggleKey, user, defaultValue, clazz);
-            #     }
-
-        else:
-            return eval_result.value
-
-    def evaluate_detail(self, toggle_key: str, user: User, default, is_json: bool) -> Detail:
+    def evaluate_detail(self, toggle_key: str, user: User, default) -> Detail:
         if not self._data_repo.initialized:
             return Detail(value=default, reason='FeatureProbe repository uninitialized')
 
         toggle = self._data_repo.get_toggle(toggle_key)
         segments = self._data_repo.get_all_segment()
 
-        if not toggle:
+        if toggle is None:
             return Detail(value=default, reason='Toggle not exist')
 
         eval_result = toggle.eval(user, segments, default)
-        detail = Detail(value=json.dumps(eval_result.value) if is_json else eval_result.value,
-                          reason=eval_result.reason,
-                          rule_index=eval_result.rule_index,
-                          version=eval_result.version)
+        detail = Detail(value=eval_result.value,
+                        reason=eval_result.reason,
+                        rule_index=eval_result.rule_index,
+                        version=eval_result.version)
         access_event = AccessEvent(timestamp=int(time.time()),
                                    user=user,
                                    key=toggle_key,

@@ -19,7 +19,7 @@ from hashlib import sha1
 from typing import List, Optional, TYPE_CHECKING
 
 from featureprobe.hit_result import HitResult
-from featureprobe.internal.json_nullable import json_nullable
+from featureprobe.internal.json_decoder import json_decoder
 
 if TYPE_CHECKING:
     from featureprobe.user import User
@@ -34,7 +34,7 @@ class Split:
         self._salt = salt
 
     @classmethod
-    @json_nullable
+    @json_decoder
     def from_json(cls, json: dict) -> "Split":
         distribution = json.get('distribution')
         bucket_by = json.get('bucketBy')

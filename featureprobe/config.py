@@ -48,7 +48,7 @@ class Config:
 
     def __init__(self,
                  location: str = None,
-                 sync_mode: SyncMode = SyncMode.POOLING,
+                 sync_mode: Union[str, SyncMode] = SyncMode.POOLING,
                  synchronizer_url: str = None,
                  event_url: str = None,
                  remote_uri: str = 'http://127.0.0.1:4007',
@@ -56,7 +56,7 @@ class Config:
                  refresh_interval: Union[timedelta, float] = timedelta(seconds=5),
                  ):
         self._location = location
-        self._synchronizer_creator = sync_mode.synchronizer_creator
+        self._synchronizer_creator = SyncMode(sync_mode).synchronizer_creator
         self._data_repository_creator = MemoryDataRepository.from_context
         self._event_processor_creator = DefaultEventProcessor.from_context
         self._synchronizer_url = synchronizer_url

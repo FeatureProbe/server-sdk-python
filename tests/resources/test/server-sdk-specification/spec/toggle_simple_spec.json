@@ -1006,31 +1006,6 @@
             "no_rule_index": true,
             "reason": "default"
           }
-        },
-        {
-          "name": "test string variation get with bool_detail.",
-          "user": {
-            "key": "user id",
-            "customValues": [
-              {
-                "key": "email",
-                "value": "test@a.com"
-              },
-              {
-                "key": "city",
-                "value": "2"
-              }
-            ]
-          },
-          "function": {
-            "name": "bool_detail",
-            "toggle": "string_toggle",
-            "default": true
-          },
-          "expectResult": {
-            "value": true,
-            "reason": "type mismatch"
-          }
         }
       ]
     }

@@ -51,7 +51,7 @@ class StringPredicate(Predicate):
         any(o in target for o in objects)
 
     MATCHES_REGEX = 'matches regex', lambda target, objects: \
-        any(re.match(pattern=o, string=target) for o in objects)
+        any(re.search(pattern=o, string=target) for o in objects)
 
     IS_NOT_ANY_OF = 'is not any of', lambda target, objects: \
         target not in objects
@@ -66,7 +66,7 @@ class StringPredicate(Predicate):
         all(o not in target for o in objects)
 
     DOES_NOT_MATCH_REGEX = 'does not match regex', lambda target, objects: \
-        all(not re.match(pattern=o, string=target) for o in objects)
+        all(not re.search(pattern=o, string=target) for o in objects)
 
 
 class SegmentPredicate(Predicate):

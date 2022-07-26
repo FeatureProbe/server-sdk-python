@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 # Copyright 2022 FeatureProbe
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +15,10 @@
 # limitations under the License.
 
 
-def json_nullable(func):
-    def wrapper(self, json):
-        return None if json is None else func(self, json)
+import featureprobe as fp
 
-    return wrapper
+
+def test_local_mode_synchronizer():
+    feature_probe = fp.Server(sdk_key='server-61db54ecea79824cae3ac38d73f1961d698d0477')
+    repo = feature_probe._data_repo
+    # TODO

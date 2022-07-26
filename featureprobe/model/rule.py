@@ -18,7 +18,7 @@
 from typing import List, Dict, TYPE_CHECKING
 
 from featureprobe.hit_result import HitResult
-from featureprobe.internal.json_nullable import json_nullable
+from featureprobe.internal.json_decoder import json_decoder
 from featureprobe.model.condition import Condition, ConditionType
 from featureprobe.model.serve import Serve
 
@@ -35,7 +35,7 @@ class Rule:
         self._conditions = conditions or []
 
     @classmethod
-    @json_nullable
+    @json_decoder
     def from_json(cls, json: dict) -> "Rule":
         serve = Serve.from_json(json.get('serve'))
         conditions = [Condition.from_json(c) for c in json.get('conditions', [])]

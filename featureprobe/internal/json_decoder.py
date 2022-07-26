@@ -13,9 +13,16 @@
 # limitations under the License.
 
 
-class HTTPError(Exception):
-    def __init__(self, status: int):
-        self.status = status
+import json
 
-    def __str__(self):
-        return 'Http request error with code %d' % self.status
+
+def json_decoder(func):
+    def wrapper(cls, json_):
+        if json_ is None:
+            return None
+        if isinstance(json_, dict):
+            return func(cls, json_)
+
+        return func(cls, json.loads(json_))
+
+    return wrapper

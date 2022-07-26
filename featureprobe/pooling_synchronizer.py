@@ -13,18 +13,16 @@
 # limitations under the License.
 
 
-import asyncio
 import logging
 import threading
 import traceback
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-import aiohttp
+import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from featureprobe import Repository
-from featureprobe.internal.http_error import HTTPError
 from featureprobe.synchronizer import Synchronizer
 
 if TYPE_CHECKING:
@@ -41,14 +39,14 @@ class PoolingSynchronizer(Synchronizer):
         self._refresh_interval = context.refresh_interval
         self._api_url = context.synchronizer_url
         self._data_repo = data_repo
-        self._headers = {PoolingSynchronizer._GET_SDK_KEY_HEADER, context.sdk_key}
-        self._web_client = aiohttp.ClientSession(
-            connector=context.http_config.connector,
-            conn_timeout=context.http_config.conn_timeout,
-            read_timeout=context.http_config.read_timeout
-        )
+
+        self._session = requests.Session()
+        self._session.mount('http://', context.http_config.adapter)
+        self._session.mount('https://', context.http_config.adapter)
+        self._session.headers = {PoolingSynchronizer._GET_SDK_KEY_HEADER, context.sdk_key}
+        self._timeout = (context.http_config.conn_timeout, context.http_config.read_timeout)
+
         self._scheduler = None
-        self._loop = asyncio.get_event_loop()
         self._lock = threading.RLock()
 
     @classmethod
@@ -74,18 +72,13 @@ class PoolingSynchronizer(Synchronizer):
             del self._scheduler
 
     def _poll(self):
-        self._loop.run_until_complete(self._poll0())
-
-    async def _poll0(self):
         try:
-            async with self._web_client.get(self._api_url, headers=self._headers) as resp:
-                if not 200 <= resp.status < 300:  # not success
-                    raise HTTPError(resp.status)
-                self.__logger.debug('Http response: %s' % resp)  # sourcery skip: replace-interpolation-with-fstring
-                body = await resp.json()
-                self.__logger.debug('Http response body: %s' % body)
-                repo = Repository.from_json(body)
-                self._data_repo.refresh(repo)
-        except Exception:  # noqa
-            self.__logger.error('Unexpected error from polling processor')
-            self.__logger.error(traceback.format_exc())
+            resp = self._session.get(self._api_url, timeout=self._timeout)
+            resp.raise_for_status()
+            self.__logger.debug('Http response: %d' % resp.status_code)
+            body = resp.json()
+            self.__logger.debug('Http response body: %s' % body)  # sourcery skip: replace-interpolation-with-fstring
+            repo = Repository.from_json(body)
+            self._data_repo.refresh(repo)
+        except Exception as e:  # noqa
+            self.__logger.error('Unexpected error from polling processor', exc_info=e)

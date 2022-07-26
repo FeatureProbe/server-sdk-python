@@ -18,7 +18,7 @@
 from typing import TYPE_CHECKING
 
 from featureprobe.hit_result import HitResult
-from featureprobe.internal.json_nullable import json_nullable
+from featureprobe.internal.json_decoder import json_decoder
 from featureprobe.model.split import Split
 
 if TYPE_CHECKING:
@@ -33,9 +33,9 @@ class Serve:
         self._split = split
 
     @classmethod
-    @json_nullable
+    @json_decoder
     def from_json(cls, json: dict) -> "Serve":
-        select = json.get('select', 0)
+        select = json.get('select')
         split = Split.from_json(json.get('split'))
         return cls(select, split)
 
@@ -56,7 +56,7 @@ class Serve:
         self._split = value
 
     def eval_index(self, user: "User", toggle_key: str) -> HitResult:
-        if self._select:
+        if self._select is not None:
             return HitResult(hit=True, index=self._select)
 
         return self._split.find_index(user, toggle_key)

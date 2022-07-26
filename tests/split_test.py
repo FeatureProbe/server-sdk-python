@@ -23,16 +23,16 @@ def setup_function():
     split = fp.Split([
         [[0, 5000]],
         [[5000, 10000]],
-    ])
+    ], None, None)  # noqa
     user = fp.User('test_user_key')
 
 
 def test_get_user_group():
     common_index = split.find_index(user, 'test_toggle_key')
-    assert 0 == common_index.index
+    assert common_index.index == 0
 
     split.bucket_by = 'email'
     split.salt = 'abcddeafasde'
     user['email'] = 'test@gmail.com'
     custom_index = split.find_index(user, 'test_toggle_key')
-    assert 1 == custom_index.index
+    assert custom_index.index == 1
