@@ -1,26 +1,10 @@
-# Copyright 2022 FeatureProbe
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-
 import logging
 import threading
-import traceback
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-import requests
 from apscheduler.schedulers.background import BackgroundScheduler
+from requests import Session
 
 from featureprobe import Repository
 from featureprobe.synchronizer import Synchronizer
@@ -40,7 +24,7 @@ class PoolingSynchronizer(Synchronizer):
         self._api_url = context.synchronizer_url
         self._data_repo = data_repo
 
-        self._session = requests.Session()
+        self._session = Session()
         self._session.mount('http://', context.http_config.adapter)
         self._session.mount('https://', context.http_config.adapter)
         self._session.headers = {PoolingSynchronizer._GET_SDK_KEY_HEADER, context.sdk_key}

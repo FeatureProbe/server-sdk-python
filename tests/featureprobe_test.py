@@ -1,20 +1,3 @@
-# -*- coding: UTF-8 -*-
-
-# Copyright 2022 FeatureProbe
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-
 import json
 import logging
 
@@ -28,19 +11,19 @@ logging.basicConfig(level=logging.CRITICAL)
 
 def setup_function():
     global test_cases  # noqa
-    with open('resources/test/server-sdk-specification/spec/toggle_simple_spec.json', 'r', encoding='utf-8') as f:
+    with open('tests/resources/test/server-sdk-specification/spec/toggle_simple_spec.json', 'r', encoding='utf-8') as f:
         test_cases = json.load(f)
 
 
 def test_empty_sdk_key():
     with pytest.raises(ValueError):
-        fp.Server('')  # should not allow empty sdk key
+        fp.Sdk('')  # should not allow empty sdk key
 
     with pytest.raises(ValueError):
-        fp.Server('  \n\t  ')  # should not allow empty sdk key
+        fp.Sdk('  \n\t  ')  # should not allow empty sdk key
 
     try:
-        fp.Server('foo')
+        fp.Sdk('foo')
     except Exception:  # noqa
         pytest.fail('ctor should not fail with not empty sdk key')
 
@@ -55,7 +38,7 @@ def test_case():
         data_repo = fp.MemoryDataRepository(None, False, 0)  # noqa
         data_repo.refresh(repo)
 
-        server = fp.Server('test_sdk_key')
+        server = fp.Sdk('test_sdk_key')
         server._data_repo = data_repo
 
         cases = scenario['cases']

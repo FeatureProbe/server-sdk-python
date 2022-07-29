@@ -1,20 +1,3 @@
-# -*- coding: UTF-8 -*-
-
-# Copyright 2022 FeatureProbe
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-
 from typing import List, Optional, Dict, TYPE_CHECKING
 
 from featureprobe.evaluation_result import EvaluationResult
@@ -124,7 +107,7 @@ class Toggle:
     def for_client(self, value: bool):
         self._for_client = value
 
-    def eval(self, user: "User", segments: Dict[str, "Segment"], default_value) -> EvaluationResult:
+    def eval(self, user: "User", segments: Dict[str, "Segment"], default_value: object) -> "EvaluationResult":
         if not self._enabled:
             return self._create_disabled_result(user, self._key, default_value)
 
@@ -138,18 +121,21 @@ class Toggle:
 
         return self._create_default_result(user, self._key, default_value, warning)
 
-    def _create_disabled_result(self, user: "User", toggle_key: str, default_value):
+    def _create_disabled_result(self, user: "User", toggle_key: str, default_value: object) -> "EvaluationResult":
         disabled_result = self._hit_value(self._disabled_serve.eval_index(user, toggle_key), default_value)
         disabled_result.reason = 'Toggle disabled'
         return disabled_result
 
-    def _create_default_result(self, user: "User", toggle_key: str, default_value, warning: str) -> EvaluationResult:
-        # sourcery skip: replace-interpolation-with-fstring
+    def _create_default_result(self, user: "User", toggle_key: str,
+                               default_value: object,
+                               warning: str) -> "EvaluationResult":
         default_result = self._hit_value(self._default_serve.eval_index(user, toggle_key), default_value)
+        # sourcery skip: replace-interpolation-with-fstring
         default_result.reason = 'Default rule hit. %s' % warning
         return default_result
 
-    def _hit_value(self, hit_result: "HitResult", default_value, rule_index: Optional[int] = None) -> EvaluationResult:
+    def _hit_value(self, hit_result: "HitResult", default_value: object,
+                   rule_index: Optional[int] = None) -> "EvaluationResult":
         res = EvaluationResult(default_value, rule_index, hit_result.index, self._version, hit_result.reason or '')
         if hit_result.index is not None:
             variation = self._variations[hit_result.index]
