@@ -18,6 +18,7 @@ import logging
 import pytest
 
 import featureprobe as fp
+from featureprobe.memory_data_repository import MemoryDataRepository
 
 # DON'T CARE: warnings about http connection error (pool syncer)
 logging.basicConfig(level=logging.CRITICAL)
@@ -49,7 +50,7 @@ def test_case():
         fixture = scenario['fixture']
 
         repo = fp.Repository.from_json(fixture)
-        data_repo = fp.MemoryDataRepository(None, False, 0)  # noqa
+        data_repo = MemoryDataRepository(None, False, 0)  # noqa
         data_repo.refresh(repo)
 
         server = fp.Client('test_sdk_key')
