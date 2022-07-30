@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+import json
 
-import featureprobe
+import featureprobe as fp
 
-setup(
-    version=featureprobe.__version__,
-)
+
+def test_serialize_toggles_to_repo():
+    with open('tests/resources/datasource/repo.json') as f:
+        dic = json.load(f)
+    repo = fp.Repository.from_json(dic)
+    assert len(repo.toggles) >= 1

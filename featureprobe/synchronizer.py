@@ -12,10 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from abc import ABC, abstractmethod
 
-import featureprobe
+from typing import TYPE_CHECKING
 
-setup(
-    version=featureprobe.__version__,
-)
+if TYPE_CHECKING:
+    from featureprobe.context import Context
+    from featureprobe.data_repository import DataRepository
+
+
+class Synchronizer(ABC):
+
+    @classmethod
+    @abstractmethod
+    def from_context(cls, context: "Context", data_repo: "DataRepository") -> "Synchronizer":
+        pass
+
+    @abstractmethod
+    def sync(self):
+        pass
+
+    @abstractmethod
+    def close(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()

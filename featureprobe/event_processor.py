@@ -12,10 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-import featureprobe
+if TYPE_CHECKING:
+    from featureprobe.context import Context
+    from featureprobe.event import Event
 
-setup(
-    version=featureprobe.__version__,
-)
+
+class EventProcessor(ABC):
+
+    @classmethod
+    @abstractmethod
+    def from_context(cls, context: "Context") -> "EventProcessor":
+        pass
+
+    @abstractmethod
+    def push(self, event: "Event"):
+        pass
+
+    @abstractmethod
+    def flush(self):
+        pass
+
+    @abstractmethod
+    def shutdown(self):
+        pass

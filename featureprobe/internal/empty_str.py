@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from typing import Optional
 
-import featureprobe
 
-setup(
-    version=featureprobe.__version__,
-)
+def empty_str(s: Optional[str]):
+    return True if s is None else not bool(s.strip())

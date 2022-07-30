@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from typing import List
 
-import featureprobe
 
-setup(
-    version=featureprobe.__version__,
-)
+class Distribution:
+    def __init__(self, distribution: List[List[int]]):
+        self._distribution = distribution or []
+
+    @property
+    def distribution(self):
+        return self._distribution
