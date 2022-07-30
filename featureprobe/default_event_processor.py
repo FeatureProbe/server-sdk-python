@@ -94,7 +94,7 @@ class DefaultEventProcessor(EventProcessor):
         self._session = Session()
         self._session.mount('http://', context.http_config.adapter)
         self._session.mount('https://', context.http_config.adapter)
-        self._session.headers = {'Authorization', context.sdk_key}
+        self._session.headers.update({'Authorization': context.sdk_key})
         self._timeout = (context.http_config.conn_timeout, context.http_config.read_timeout)
 
         event_repository = EventRepository()
@@ -162,6 +162,8 @@ class DefaultEventProcessor(EventProcessor):
         event_repo.add(event)
 
     def _send_events(self, repositories: List[EventRepository]):
+        print(repositories[0].events)
+        print(repositories[0].access)
         repositories = [repo.to_dict() for repo in repositories]
         resp = self._session.post(self._api_url, json=json.dumps(repositories), timeout=self._timeout)
         self._logger.debug('Http response: %s' % resp.text)  # sourcery skip: replace-interpolation-with-fstring

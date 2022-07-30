@@ -31,13 +31,13 @@ def setup_function():
 
 def test_empty_sdk_key():
     with pytest.raises(ValueError):
-        fp.Sdk('')  # should not allow empty sdk key
+        fp.Client('')  # should not allow empty sdk key
 
     with pytest.raises(ValueError):
-        fp.Sdk('  \n\t  ')  # should not allow empty sdk key
+        fp.Client('  \n\t  ')  # should not allow empty sdk key
 
     try:
-        fp.Sdk('foo')
+        fp.Client('foo')
     except Exception:  # noqa
         pytest.fail('ctor should not fail with not empty sdk key')
 
@@ -52,7 +52,7 @@ def test_case():
         data_repo = fp.MemoryDataRepository(None, False, 0)  # noqa
         data_repo.refresh(repo)
 
-        server = fp.Sdk('test_sdk_key')
+        server = fp.Client('test_sdk_key')
         server._data_repo = data_repo
 
         cases = scenario['cases']

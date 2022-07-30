@@ -41,7 +41,7 @@ class PoolingSynchronizer(Synchronizer):
         self._session = Session()
         self._session.mount('http://', context.http_config.adapter)
         self._session.mount('https://', context.http_config.adapter)
-        self._session.headers = {PoolingSynchronizer._GET_SDK_KEY_HEADER, context.sdk_key}
+        self._session.headers.update({PoolingSynchronizer._GET_SDK_KEY_HEADER: context.sdk_key})
         self._timeout = (context.http_config.conn_timeout, context.http_config.read_timeout)
 
         self._scheduler = None
@@ -55,6 +55,7 @@ class PoolingSynchronizer(Synchronizer):
         PoolingSynchronizer.__logger.info(
             'Starting FeatureProbe polling repository with interval %d ms'
             % self._refresh_interval.total_seconds() * 1000)
+        self._poll()
         with self._lock:
             self._scheduler = BackgroundScheduler()
             self._scheduler.start()

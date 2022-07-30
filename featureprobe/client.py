@@ -23,7 +23,7 @@ from featureprobe.internal.empty_str import empty_str
 from featureprobe.user import User
 
 
-class Sdk:
+class Client:
     def __init__(self, sdk_key: str, config: Config = Config()):
         if empty_str(sdk_key):
             raise ValueError('sdk key must not be blank')
