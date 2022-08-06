@@ -190,7 +190,7 @@ def test_datetime_after():
     assert condition.match_objects(user, segments)
 
     del user['userId']
-    assert condition.match_objects(user, segments)
+    assert not condition.match_objects(user, segments)
 
     user['userId'] = '1000'
     assert not condition.match_objects(user, segments)
