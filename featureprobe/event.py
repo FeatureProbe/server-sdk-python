@@ -23,6 +23,12 @@ class Event:
         self._created_time = created_time
         self._user = user
 
+    def to_dict(self) -> dict:
+        return {
+            'createdTime': self._created_time,
+            'user': self._user.to_dict(),
+        }
+
     @property
     def created_time(self) -> int:
         return self._created_time

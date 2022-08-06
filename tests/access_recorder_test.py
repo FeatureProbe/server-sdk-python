@@ -18,7 +18,7 @@ import featureprobe as fp
 
 
 def _timestamp():
-    return int(time.time())
+    return int(time.time() * 1000)
 
 
 def setup_function():

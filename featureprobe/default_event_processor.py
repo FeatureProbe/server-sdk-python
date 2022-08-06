@@ -57,7 +57,7 @@ class EventRepository:
 
     def to_dict(self) -> dict:
         return {
-            'events': self.events,
+            'events': [e.to_dict() for e in self.events],
             'access': self.access.to_dict(),
         }
 
@@ -162,10 +162,8 @@ class DefaultEventProcessor(EventProcessor):
         event_repo.add(event)
 
     def _send_events(self, repositories: List[EventRepository]):
-        print(repositories[0].events)
-        print(repositories[0].access)
         repositories = [repo.to_dict() for repo in repositories]
-        resp = self._session.post(self._api_url, json=json.dumps(repositories), timeout=self._timeout)
+        resp = self._session.post(self._api_url, json=repositories, timeout=self._timeout)
         self._logger.debug('Http response: %s' % resp.text)  # sourcery skip: replace-interpolation-with-fstring
         try:
             resp.raise_for_status()

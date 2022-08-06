@@ -42,7 +42,7 @@ class Client:
             return default
 
         eval_result = toggle.eval(user, segments, default)
-        access_event = AccessEvent(timestamp=int(time.time()),
+        access_event = AccessEvent(timestamp=int(time.time() * 1000),
                                    user=user,
                                    key=toggle_key,
                                    value=str(eval_result.value),
@@ -66,7 +66,7 @@ class Client:
                         reason=eval_result.reason,
                         rule_index=eval_result.rule_index,
                         version=eval_result.version)
-        access_event = AccessEvent(timestamp=int(time.time()),
+        access_event = AccessEvent(timestamp=int(time.time() * 1000),
                                    user=user,
                                    key=toggle_key,
                                    value=eval_result.value,

@@ -43,7 +43,7 @@ class MemoryDataRepository(DataRepository):
                 and repo.segments is not None:
             self._data = Repository(repo.toggles.copy(), repo.segments.copy())
             self._initialized = True
-            self._updated_timestamp = int(time.time())
+            self._updated_timestamp = int(time.time() * 1000)
 
     def get_toggle(self, key: str) -> Optional["Toggle"]:
         return self._data.toggles.get(key) if self._initialized else None

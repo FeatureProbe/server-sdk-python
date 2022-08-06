@@ -32,6 +32,12 @@ class User:
     def __delitem__(self, key: str):
         self._attrs.pop(key, None)
 
+    def to_dict(self) -> dict:
+        return {
+            'key': self._key,
+            'attrs': self._attrs,
+        }
+
     @property
     def key(self) -> str:
         return self._key

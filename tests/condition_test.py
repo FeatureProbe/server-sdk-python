@@ -180,13 +180,13 @@ def test_segmenting_is_not_in():
 
 def test_datetime_after():
     condition.type = fp.ConditionType.DATETIME
-    condition.objects = [str(int(time.time()))]
+    condition.objects = [str(int(time.time() * 1000))]
     condition.predicate = fp.DatetimePredicate.AFTER
 
-    user['userId'] = str(int(time.time()))
+    user['userId'] = str(int(time.time() * 1000))
     assert condition.match_objects(user, segments)
 
-    user['userId'] = str(int(time.time() + 1))
+    user['userId'] = str(int(time.time() * 1000) + 1)
     assert condition.match_objects(user, segments)
 
     del user['userId']
@@ -198,13 +198,13 @@ def test_datetime_after():
 
 def test_datetime_before():
     condition.type = fp.ConditionType.DATETIME
-    condition.objects = [str(int(time.time()))]
+    condition.objects = [str(int(time.time() * 1000))]
     condition.predicate = fp.DatetimePredicate.BEFORE
 
-    user['userId'] = str(int(time.time() - 2))
+    user['userId'] = str(int(time.time() * 1000) - 2)
     assert condition.match_objects(user, segments)
 
-    user['userId'] = str(int(time.time() + 1))
+    user['userId'] = str(int(time.time() * 1000) + 1)
     assert not condition.match_objects(user, segments)
 
     user['userId'] = 'invalid datetime'

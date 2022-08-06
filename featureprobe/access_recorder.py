@@ -31,6 +31,14 @@ class AccessCounter:
         return "AccessCounter(value='%s', version=%d, index=%d, count=%d)" \
                % (self._VALUE, self._VERSION, self._INDEX, self._count)
 
+    def to_dict(self) -> dict:
+        return {
+            'value': self._VALUE,
+            'version': self._VERSION,
+            'index': self._INDEX,
+            'count': self._count,
+        }
+
     @property
     def value(self):
         return self._VALUE
@@ -64,7 +72,7 @@ class AccessRecorder:
 
     def to_dict(self) -> dict:
         return {
-            'counters': self._counters,
+            'counters': {k: [ac.to_dict() for ac in v] for k, v in self._counters.items()},
             'startTime': self._start_time,
             'endTime': self._end_time,
         }
@@ -83,7 +91,7 @@ class AccessRecorder:
 
     def add(self, _event: "AccessEvent"):  # sourcery skip: use-named-expression
         if not self._counters:
-            self._start_time = int(time.time())  # FIXME: epoch sec / milli sec?
+            self._start_time = int(time.time() * 1000)
         counters = self._counters.get(_event.key)
         if counters:
             for counter in counters:
@@ -97,7 +105,7 @@ class AccessRecorder:
 
     def snapshot(self):
         _snapshot = copy.deepcopy(self)
-        _snapshot._end_time = int(time.time())  # FIXME: epoch sec / milli sec?
+        _snapshot._end_time = int(time.time() * 1000)
         return _snapshot
 
     def clear(self):
