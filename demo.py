@@ -1,18 +1,34 @@
 import logging
-import time
+
 import featureprobe as fp
 
-
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 
 if __name__ == '__main__':
-    config = fp.Config(remote_uri='http://127.0.0.1:4007', sync_mode='pooling')
-    client = fp.Client('server-8ed48815ef044428826787e9a238b9c6a479f98c', config)
+    config = fp.Config(remote_uri='http://127.0.0.1:4007',  # FeatureProbe server URL
+                       sync_mode='pooling',
+                       refresh_interval=3)
 
-    user = fp.User('user_unique_id', {
-        'userId': '9876',
-        'tel': '12345678998'
-    })
-    eval_ = client.evaluate('promotion_activity', user, default=-1)
-    client.flush()
-    time.sleep(1)
+    client = fp.Client('server-8ed48815ef044428826787e9a238b9c6a479f98c',
+                       # Server Side SDK Key for your project and environment
+                       config)
+
+    # create one user, with id='user_unique_id' and one attribute
+    user = fp.User('user_unique_id', {'city': 'New York'})
+    discount = float(client.evaluate('promotion_activity',  # Toggle you want to use
+                                     user, default=0))
+    print('user in New York has a discount of : %d' % discount)
+
+    detail = client.evaluate_detail('promotion_activity', user, default=0)
+    print('detail: %s' % detail.reason)
+    print('rule index: ' + str(detail.rule_index))  # rule_index = None on default rule is hit
+
+    user2 = fp.User('user_id2')
+    user2['city'] = 'Paris'  # create another user, here's the alternative way to set user attributes
+
+    discount = float(client.evaluate('promotion_activity', user2, default=0))
+    print('user in Paris has a discount of : %d' % discount)
+
+    detail2 = client.evaluate_detail('promotion_activity', user2, default=0)
+    print('detail2: %s' % detail2.reason)
+    print('rule index: %d' % detail2.rule_index)
