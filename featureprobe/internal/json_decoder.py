@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+import json
 
-import featureprobe
 
-setup(
-    version=featureprobe.__version__,
-)
+def json_decoder(func):
+    def wrapper(cls, json_):
+        if json_ is None:
+            return None
+        if isinstance(json_, dict):
+            return func(cls, json_)
+
+        return func(cls, json.loads(json_))
+
+    return wrapper

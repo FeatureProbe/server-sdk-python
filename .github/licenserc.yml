@@ -6,6 +6,9 @@ header:
   paths:
     - 'featureprobe/**/*.py'
     - 'tests/**/*.py'
+    - 'setup.py'
+    - 'setup.cfg'
+    - 'conftest.py'
 
   paths-ignore:
     - '**/*.md'

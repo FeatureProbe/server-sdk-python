@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+def defaultable(cls):
+    _defaults = {}
 
-import featureprobe
+    def check_or_create(*args, **kwargs):
+        if args or kwargs:
+            return cls(*args, **kwargs)
+        if cls not in _defaults:
+            default = cls()
+            _defaults[cls] = default
+            return default
+        return _defaults[cls]
 
-setup(
-    version=featureprobe.__version__,
-)
+    return check_or_create

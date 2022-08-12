@@ -12,10 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from typing import Optional
 
-import featureprobe
 
-setup(
-    version=featureprobe.__version__,
-)
+class EvaluationResult:
+    def __init__(self,
+                 value,
+                 rule_index: Optional[int],
+                 variation_index: Optional[int],
+                 version: int,
+                 reason: str):
+        self.value = value
+        self.rule_index = rule_index
+        self.variation_index = variation_index
+        self.version = version
+        self.reason = reason

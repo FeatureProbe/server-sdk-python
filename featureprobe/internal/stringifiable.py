@@ -12,10 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+def stringifiable(cls):
+    """Experimental, unusable yet"""
 
-import featureprobe
+    def __str__(self):
+        attrs = sorted(filter(lambda attr: not callable(attr[1]),
+                              self.__dict__.items()))
 
-setup(
-    version=featureprobe.__version__,
-)
+        return '%s(%s)' % (
+            cls.__name__,
+            ', '.join(
+                '%s=\'%s\'' % item
+                if isinstance(item[1], (str, bytes))
+                else '%s=%s' % item
+                for item in attrs
+            )
+        )
+
+    cls.__str__ = __str__
+    return cls

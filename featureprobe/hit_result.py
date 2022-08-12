@@ -12,10 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+class HitResult:
+    def __init__(self, hit: bool, index: int = None, reason: str = None):
+        self._hit = hit
+        self._index = index
+        self._reason = reason
 
-import featureprobe
+    @property
+    def hit(self):
+        return self._hit
 
-setup(
-    version=featureprobe.__version__,
-)
+    @property
+    def index(self):
+        return self._index
+
+    @property
+    def reason(self):
+        return self._reason

@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+
 
 jobs:
   run:
@@ -12,17 +12,17 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.5
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.5'
 
       - name: Install dependencies
         run: |
           pip install pytest pytest-cov
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
       - name: Run tests and collect coverage
         run: pytest --cov featureprobe
