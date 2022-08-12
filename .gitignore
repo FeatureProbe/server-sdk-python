@@ -33,3 +33,7 @@ cover/
 .vscode/
 
 .DS_Store
+
+
+dist/
+featureprobe_server.egg-info/
