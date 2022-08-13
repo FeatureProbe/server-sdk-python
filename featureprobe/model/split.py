@@ -25,7 +25,10 @@ if TYPE_CHECKING:
 class Split:
     _BUCKET_SIZE = 10000
 
-    def __init__(self, distribution: List[List[List[int]]], bucket_by: str, salt: str):
+    def __init__(self,
+                 distribution: List[List[List[int]]],
+                 bucket_by: str,
+                 salt: str):
         self._distribution = distribution or []
         self._bucket_by = bucket_by
         self._salt = salt
@@ -68,10 +71,16 @@ class Split:
             if user.has_attr(self._bucket_by):
                 hash_key = user.attrs.get(self._bucket_by)
             else:
-                return HitResult(hit=False,
-                                 reason='Warning: User with key \'%s\' does not have attribute name \'%s\''
-                                        % (user.key, self._bucket_by))
-        group_index = self._get_group(self._hash(hash_key, self._salt or toggle_key, self._BUCKET_SIZE))
+                return HitResult(
+                    hit=False,
+                    reason='Warning: User with key \'%s\' does not have attribute name \'%s\'' %
+                    (user.key,
+                     self._bucket_by))
+        group_index = self._get_group(
+            self._hash(
+                hash_key,
+                self._salt or toggle_key,
+                self._BUCKET_SIZE))
         return HitResult(hit=True, index=group_index,
                          reason='selected %d percentage group' % group_index)
 

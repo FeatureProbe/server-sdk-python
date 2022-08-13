@@ -25,7 +25,10 @@ class Synchronizer(ABC):
 
     @classmethod
     @abstractmethod
-    def from_context(cls, context: "Context", data_repo: "DataRepository") -> "Synchronizer":
+    def from_context(
+            cls,
+            context: "Context",
+            data_repo: "DataRepository") -> "Synchronizer":
         pass
 
     @abstractmethod

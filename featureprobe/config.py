@@ -26,7 +26,7 @@ from featureprobe.pooling_synchronizer import PoolingSynchronizer
 
 class SyncMode(str, Enum):
     def __new__(cls, value, synchronizer_creator):
-        if type(value) is cls:
+        if isinstance(value, cls):
             return value
         if synchronizer_creator is None:
             return cls._value2member_map_[value]

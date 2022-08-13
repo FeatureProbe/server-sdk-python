@@ -35,7 +35,8 @@ class Rule:
     @json_decoder
     def from_json(cls, json: dict) -> "Rule":
         serve = Serve.from_json(json.get('serve'))
-        conditions = [Condition.from_json(c) for c in json.get('conditions', [])]
+        conditions = [Condition.from_json(c)
+                      for c in json.get('conditions', [])]
         return cls(serve, conditions)
 
     @property
@@ -54,13 +55,19 @@ class Rule:
     def conditions(self, value: List["Condition"]):
         self._conditions = value or []
 
-    def hit(self, user: "User", segments: Dict[str, "Segment"], toggle_key: str) -> HitResult:
+    def hit(self,
+            user: "User",
+            segments: Dict[str,
+                           "Segment"],
+            toggle_key: str) -> HitResult:
         for condition in self._conditions:
-            if condition.type not in (ConditionType.SEGMENT, ConditionType.DATETIME) \
-                    and not user.has_attr(condition.subject):
-                return HitResult(hit=False,
-                                 reason="Warning: User with key '%s' does not have attribute name '%s'"
-                                        % (user.key, condition.subject))
+            if condition.type not in (
+                    ConditionType.SEGMENT,
+                    ConditionType.DATETIME) and not user.has_attr(
+                    condition.subject):
+                return HitResult(
+                    hit=False, reason="Warning: User with key '%s' does not have attribute name '%s'" %
+                    (user.key, condition.subject))
             if not condition.match_objects(user, segments):
                 return HitResult(hit=False)
 

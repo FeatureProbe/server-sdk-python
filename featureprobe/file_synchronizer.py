@@ -34,7 +34,10 @@ class FileSynchronizer(Synchronizer):
         self._location = location
 
     @classmethod
-    def from_context(cls, context: "Context", data_repo: "DataRepository") -> "Synchronizer":
+    def from_context(
+            cls,
+            context: "Context",
+            data_repo: "DataRepository") -> "Synchronizer":
         return cls(data_repo, context.location)
 
     def sync(self):
@@ -44,7 +47,9 @@ class FileSynchronizer(Synchronizer):
                 self._data_repository.refresh(repo)
         except FileNotFoundError:
             # sourcery skip: replace-interpolation-with-fstring
-            self._logger.error('repository file resource not found in path: %s' % self._location)
+            self._logger.error(
+                'repository file resource not found in path: %s' %
+                self._location)
 
     def close(self):
         return

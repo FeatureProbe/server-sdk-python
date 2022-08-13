@@ -60,7 +60,9 @@ def test_case():
         for case in cases:
             case_name = case['name']
             # sourcery skip: replace-interpolation-with-fstring
-            print('start executing scenario [%s] case [%s]' % (name, case_name))
+            print(
+                'start executing scenario [%s] case [%s]' %
+                (name, case_name))
 
             user_case = case['user']
             custom_values = user_case['customValues']
@@ -77,9 +79,11 @@ def test_case():
             expect_value = expect_result['value']
 
             if func_name.endswith('value'):
-                assert server.evaluate(toggle_key, user, default_value) == expect_value
+                assert server.evaluate(
+                    toggle_key, user, default_value) == expect_value
             elif func_name.endswith('detail'):
-                detail = server.evaluate_detail(toggle_key, user, default_value)
+                detail = server.evaluate_detail(
+                    toggle_key, user, default_value)
                 assert detail.value == expect_value
                 # assert detail.reason == expect_result['reason']
                 # assert detail.version == expect_result['version']

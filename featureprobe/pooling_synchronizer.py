@@ -41,14 +41,20 @@ class PoolingSynchronizer(Synchronizer):
         self._session = Session()
         self._session.mount('http://', context.http_config.adapter)
         self._session.mount('https://', context.http_config.adapter)
-        self._session.headers.update({PoolingSynchronizer._GET_SDK_KEY_HEADER: context.sdk_key})
-        self._timeout = (context.http_config.conn_timeout, context.http_config.read_timeout)
+        self._session.headers.update(
+            {PoolingSynchronizer._GET_SDK_KEY_HEADER: context.sdk_key})
+        self._timeout = (
+            context.http_config.conn_timeout,
+            context.http_config.read_timeout)
 
         self._scheduler = None
         self._lock = threading.RLock()
 
     @classmethod
-    def from_context(cls, context: "Context", data_repo: "DataRepository") -> "Synchronizer":
+    def from_context(
+            cls,
+            context: "Context",
+            data_repo: "DataRepository") -> "Synchronizer":
         return cls(context, data_repo)
 
     def sync(self):
@@ -59,13 +65,15 @@ class PoolingSynchronizer(Synchronizer):
         with self._lock:
             self._scheduler = BackgroundScheduler()
             self._scheduler.start()
-            self._scheduler.add_job(self._poll,
-                                    trigger='interval',
-                                    seconds=self._refresh_interval.total_seconds(),
-                                    next_run_time=datetime.now())
+            self._scheduler.add_job(
+                self._poll,
+                trigger='interval',
+                seconds=self._refresh_interval.total_seconds(),
+                next_run_time=datetime.now())
 
     def close(self):
-        PoolingSynchronizer.__logger.info('Closing FeatureProbe PollingSynchronizer')
+        PoolingSynchronizer.__logger.info(
+            'Closing FeatureProbe PollingSynchronizer')
         with self._lock:
             self._scheduler.shutdown()
             del self._scheduler
@@ -76,8 +84,11 @@ class PoolingSynchronizer(Synchronizer):
             resp.raise_for_status()
             self.__logger.debug('Http response: %d' % resp.status_code)
             body = resp.json()
-            self.__logger.debug('Http response body: %s' % body)  # sourcery skip: replace-interpolation-with-fstring
+            # sourcery skip: replace-interpolation-with-fstring
+            self.__logger.debug('Http response body: %s' % body)
             repo = Repository.from_json(body)
             self._data_repo.refresh(repo)
         except Exception as e:  # noqa
-            self.__logger.error('Unexpected error from polling processor', exc_info=e)
+            self.__logger.error(
+                'Unexpected error from polling processor',
+                exc_info=e)

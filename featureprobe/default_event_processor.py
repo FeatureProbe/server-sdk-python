@@ -49,7 +49,10 @@ class EventRepository:
         self.access = AccessRecorder()
 
     @classmethod
-    def _clone(cls, events: List[Event], access: AccessRecorder) -> "EventRepository":
+    def _clone(
+            cls,
+            events: List[Event],
+            access: AccessRecorder) -> "EventRepository":
         repo = cls()
         repo.events = events.copy()
         repo.access = access.snapshot()
@@ -95,12 +98,14 @@ class DefaultEventProcessor(EventProcessor):
         self._session.mount('http://', context.http_config.adapter)
         self._session.mount('https://', context.http_config.adapter)
         self._session.headers.update({'Authorization': context.sdk_key})
-        self._timeout = (context.http_config.conn_timeout, context.http_config.read_timeout)
+        self._timeout = (
+            context.http_config.conn_timeout,
+            context.http_config.read_timeout)
 
         event_repository = EventRepository()
-        handler_thread = threading.Thread(target=self._handle_event,
-                                          args=(self._events, event_repository),
-                                          daemon=True)
+        handler_thread = threading.Thread(
+            target=self._handle_event, args=(
+                self._events, event_repository), daemon=True)
         handler_thread.start()
 
         self._executor = ThreadPoolExecutor(max_workers=5)
@@ -118,16 +123,20 @@ class DefaultEventProcessor(EventProcessor):
     def push(self, event: Event):
         if not self._closed:
             try:
-                self._events.put_nowait(EventAction(EventAction.Type.EVENT, event))
+                self._events.put_nowait(EventAction(
+                    EventAction.Type.EVENT, event))
             except queue.Full:
-                DefaultEventProcessor._logger.warning(DefaultEventProcessor._LOG_BUSY_EVENT)
+                DefaultEventProcessor._logger.warning(
+                    DefaultEventProcessor._LOG_BUSY_EVENT)
 
     def flush(self):
         if not self._closed:
             try:
-                self._events.put_nowait(EventAction(EventAction.Type.FLUSH, None))
+                self._events.put_nowait(
+                    EventAction(EventAction.Type.FLUSH, None))
             except queue.Full:
-                DefaultEventProcessor._logger.warning(DefaultEventProcessor._LOG_BUSY_EVENT)
+                DefaultEventProcessor._logger.warning(
+                    DefaultEventProcessor._LOG_BUSY_EVENT)
 
     def shutdown(self):
         if self._closed:
@@ -142,8 +151,9 @@ class DefaultEventProcessor(EventProcessor):
             actions.clear()
             actions.append(events.get())
             with contextlib.suppress(queue.Empty):
-                actions.extend(events.get_nowait()
-                               for _ in range(1, DefaultEventProcessor._EVENT_BATCH_HANDLE_SIZE))
+                actions.extend(
+                    events.get_nowait() for _ in range(
+                        1, DefaultEventProcessor._EVENT_BATCH_HANDLE_SIZE))
             try:
                 for action in actions:
                     if action.type == EventAction.Type.EVENT:
@@ -153,7 +163,8 @@ class DefaultEventProcessor(EventProcessor):
                     elif action.type == EventAction.Type.SHUTDOWN:
                         self._do_shutdown()
             except Exception as e:
-                self._logger.error('FeatureProbe event handle error', exc_info=e)
+                self._logger.error(
+                    'FeatureProbe event handle error', exc_info=e)
 
     def _do_shutdown(self):
         self._executor.shutdown(wait=False)
@@ -163,12 +174,18 @@ class DefaultEventProcessor(EventProcessor):
 
     def _send_events(self, repositories: List[EventRepository]):
         repositories = [repo.to_dict() for repo in repositories]
-        resp = self._session.post(self._api_url, json=repositories, timeout=self._timeout)
-        self._logger.debug('Http response: %s' % resp.text)  # sourcery skip: replace-interpolation-with-fstring
+        resp = self._session.post(
+            self._api_url,
+            json=repositories,
+            timeout=self._timeout)
+        # sourcery skip: replace-interpolation-with-fstring
+        self._logger.debug('Http response: %s' % resp.text)
         try:
             resp.raise_for_status()
         except HTTPError as e:
-            self._logger.error('Unexpected error from event sender', exc_info=e)
+            self._logger.error(
+                'Unexpected error from event sender',
+                exc_info=e)
 
     def _process_flush(self, event_repo: EventRepository):
         if not event_repo:
