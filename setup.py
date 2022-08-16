@@ -37,7 +37,7 @@ setup(
     keywords=['feature management', 'server sdk'],
 
     classifiers=[
-        'License :: OSI Approved :: Apache-2.0',
+        'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.5',
