@@ -22,6 +22,25 @@ def _requirements():
         return [req.strip() for req in f.readlines()]
 
 
+pypi_classifiers = [
+    'License :: OSI Approved :: Apache Software License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+]
+
+if 'alpha' in featureprobe.__version__:
+    pypi_classifiers.append('Development Status :: 3 - Alpha')
+elif 'beta' in featureprobe.__version__:
+    pypi_classifiers.append('Development Status :: 4 - Beta')
+else:
+    pypi_classifiers.append('Development Status :: 5 - Production/Stable')
+
 setup(
     name='featureprobe-server',
     version=featureprobe.__version__,
@@ -35,23 +54,7 @@ setup(
     long_description_content_type='text/markdown',
 
     keywords=['feature management', 'server sdk'],
-
-    classifiers=[
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-
-        'Development Status :: 3 - Alpha',
-        # 3 - Alpha
-        # 4 - Beta
-        # 5 - Production/Stable
-    ],
+    classifiers=pypi_classifiers,
 
     package_dir={'': 'featureprobe'},
     packages=find_packages(where='featureprobe'),
