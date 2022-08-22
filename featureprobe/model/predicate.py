@@ -20,7 +20,7 @@ from featureprobe.internal.semver import SemVer
 
 class Predicate(str, Enum):
     def __new__(cls, value, matcher=None):
-        if type(value) is cls:
+        if isinstance(value, cls):
             return value
         if matcher is None:
             return cls._value2member_map_[value]
@@ -124,7 +124,7 @@ class SemverPredicate(Predicate):
 
 class ConditionType(str, Enum):
     def __new__(cls, value, predicates):
-        if type(value) is cls:
+        if isinstance(value, cls):
             return value
         if predicates is None:
             return cls._value2member_map_[value]

@@ -1,27 +1,36 @@
-name: "Build & Tests"
+name: "Tests"
 
 on:
   push:
     branches: [ main ]
   pull_request:
 
+concurrency:
+  group: >-
+    ${{ github.workflow }}-
+    ${{ github.ref_type }}-
+    ${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
 
 jobs:
   run:
+    strategy:
+      matrix:
+        python: [ '3.5', '3.6', '3.7', '3.8', '3.9', '3.10' ]
+
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.5
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v4
         with:
-          python-version: '3.5'
+          python-version: ${{ matrix.python }}
 
       - name: Install dependencies
         run: |
-          pip install pytest pytest-cov
           pip install -r requirements-dev.txt
 
       - name: Run tests and collect coverage

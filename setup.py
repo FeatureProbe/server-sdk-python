@@ -12,10 +12,59 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 import featureprobe
 
+
+def _requirements():
+    with open('requirements.txt', 'r', encoding='utf-8') as f:
+        return [req.strip() for req in f.readlines()]
+
+
+pypi_classifiers = [
+    'License :: OSI Approved :: Apache Software License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+]
+
+if 'alpha' in featureprobe.__version__:
+    pypi_classifiers.append('Development Status :: 3 - Alpha')
+elif 'beta' in featureprobe.__version__:
+    pypi_classifiers.append('Development Status :: 4 - Beta')
+else:
+    pypi_classifiers.append('Development Status :: 5 - Production/Stable')
+
 setup(
+    name='featureprobe-server',
     version=featureprobe.__version__,
+
+    author='FeatureProbe',
+    license='Apache 2.0',
+    license_file='LICENSE',
+
+    description='FeatureProbe Server Side SDK for Python',
+    long_description=open('README.md', 'r', encoding='utf-8').read(),
+    long_description_content_type='text/markdown',
+
+    keywords=['feature management', 'server sdk'],
+    classifiers=pypi_classifiers,
+
+    package_dir={'': 'featureprobe'},
+    packages=find_packages(where='featureprobe'),
+
+    python_requires='>=3.5, <4',
+    install_requires=_requirements(),
+
+    project_urls={
+        'Project Homepage': 'https://github.com/FeatureProbe',
+        'Source Code': 'https://github.com/FeatureProbe/server-sdk-python',
+        'Bug Reports': 'https://github.com/FeatureProbe/server-sdk-python/issues',
+    }
 )

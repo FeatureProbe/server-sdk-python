@@ -6,8 +6,8 @@
 [![License](https://img.shields.io/github/license/FeatureProbe/server-sdk-python)](https://github.com/FeatureProbe/server-sdk-python/blob/main/LICENSE)
 
 
-Feature Probe is an open source feature management service. This SDK is used to control features in Python programs. This
-SDK is designed primarily for use in multi-user systems such as web servers and applications.
+Feature Probe is an open source feature management service. This SDK is used to control features in Python programs.
+This SDK is designed primarily for use in multi-user systems such as web servers and applications.
 
 
 ## Basic Terms
@@ -20,13 +20,15 @@ Reading the short [Basic Terms](https://github.com/FeatureProbe/FeatureProbe/blo
 We provide a runnable demo code for you to understand how FeatureProbe SDK is used.
 
 1. Start FeatureProbe Service with docker composer. [How to](https://github.com/FeatureProbe/FeatureProbe#1-starting-featureprobe-service-with-docker-compose)
+
 2. Download this repo and run the demo program:
 ```bash
 git clone https://github.com/FeatureProbe/server-sdk-python.git
 cd server-sdk-python
-pip3 install -r requirements-dev.txt
+pip3 install -r requirements.txt
 python3 demo.py
 ```
+
 3. Find the Demo code in [example](https://github.com/FeatureProbe/server-sdk-python/blob/main/demo.py), 
 do some change and run the program again.
 ```bash
@@ -65,7 +67,6 @@ After you install the SDK, import it, then create a single, shared instance of t
 ```python
 import featureprobe as fp
 
-
 config = fp.Config(remote_uri='http://127.0.0.1:4007', sync_mode='pooling', refresh_interval=3)
 client = fp.Client('server-8ed48815ef044428826787e9a238b9c6a479f98c', config)
 ```
@@ -77,7 +78,6 @@ You can use sdk to check which variation a particular user will receive for a gi
 
 ```python
 import featureprobe as fp
-
 
 config = fp.Config(remote_uri='http://127.0.0.1:4007', sync_mode='pooling', refresh_interval=3)
 client = fp.Client('server-8ed48815ef044428826787e9a238b9c6a479f98c', config)
@@ -97,12 +97,11 @@ if __name__ == '__main__':
 
 ## Testing
 
-We have unified integration tests for all our SDKs. Integration test cases are added as submodules for each SDK repo. So
-be sure to pull submodules first to get the latest integration tests before running tests.
+We have unified integration tests for all our SDKs. Integration test cases are added as submodules for each SDK repo. So be sure to pull submodules first to get the latest integration tests before running tests.
 
 ```shell
 git pull --recurse-submodules
-pip3 install pytest
+pip3 install -r requirements-dev.txt
 pytest featureprobe
 ```
 

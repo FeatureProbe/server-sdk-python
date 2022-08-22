@@ -21,10 +21,12 @@ if __name__ == '__main__':
 
     detail = client.evaluate_detail('promotion_activity', user, default=0)
     print('detail: %s' % detail.reason)
-    print('rule index: ' + str(detail.rule_index))  # rule_index = None on default rule is hit
+    # rule_index = None on default rule is hit
+    print('rule index: ' + str(detail.rule_index))
 
     user2 = fp.User('user_id2')
-    user2['city'] = 'Paris'  # create another user, here's the alternative way to set user attributes
+    # create another user, here's the alternative way to set user attributes
+    user2['city'] = 'Paris'
 
     discount = float(client.evaluate('promotion_activity', user2, default=0))
     print('user in Paris has a discount of : %d' % discount)

@@ -61,7 +61,8 @@ class Condition:
         objects = json.get('objects')
         return cls(subject, type_, predicate, objects)
 
-    def match_objects(self, user: "User", segments: Optional[Dict[str, "Segment"]]) -> bool:
+    def match_objects(self, user: "User",
+                      segments: Optional[Dict[str, "Segment"]]) -> bool:
         if self._type is None or self._predicate is None:
             return False
 
@@ -82,7 +83,8 @@ class Condition:
             return False
         return self._predicate.matcher(subject_val, self._objects)
 
-    def _match_segment_condition(self, user: "User", segments: Dict[str, "Segment"], **_) -> bool:
+    def _match_segment_condition(
+            self, user: "User", segments: Dict[str, "Segment"], **_) -> bool:
         return self._predicate.matcher(user, segments or {}, self._objects)
 
     def _match_datetime_condition(self, user: "User", **_):
@@ -91,13 +93,17 @@ class Condition:
             cv = int(cv)
         except ValueError:
             # sourcery skip: replace-interpolation-with-fstring
-            self._logger.error('User attribute type mismatch. attribute value: \'%s\', target type int' % cv)
+            self._logger.error(
+                'User attribute type mismatch. attribute value: \'%s\', target type int' %
+                cv)
             return False
 
         try:
             return self._predicate.matcher(cv, self._objects)
         except ValueError as e:
-            self._logger.error('Met a string that cannot be parsed to int in Condition.objects', exc_info=e)
+            self._logger.error(
+                'Met a string that cannot be parsed to int in Condition.objects',
+                exc_info=e)
             return False
 
     def _match_number_condition(self, user: "User", **_):
@@ -108,13 +114,17 @@ class Condition:
             cv = float(cv)
         except ValueError:
             # sourcery skip: replace-interpolation-with-fstring
-            self._logger.error('User attribute type mismatch. attribute value: \'%s\', target type float' % cv)
+            self._logger.error(
+                'User attribute type mismatch. attribute value: \'%s\', target type float' %
+                cv)
             return False
 
         try:
             return self._predicate.matcher(cv, self._objects)
         except ValueError as e:
-            self._logger.error('Met a string that cannot be parsed to float in Condition.objects', exc_info=e)
+            self._logger.error(
+                'Met a string that cannot be parsed to float in Condition.objects',
+                exc_info=e)
             return False
 
     def _match_semver_condition(self, user: "User", **_):
@@ -123,13 +133,17 @@ class Condition:
             cv = SemVer(cv)
         except ValueError as e:
             # sourcery skip: replace-interpolation-with-fstring
-            self._logger.error('Invalid user attribute. attribute value: \'%s\', target type semver' % cv, exc_info=e)
+            self._logger.error(
+                'Invalid user attribute. attribute value: \'%s\', target type semver' %
+                cv, exc_info=e)
             return False
 
         try:
             return self._predicate.matcher(cv, self._objects)
         except ValueError as e:
-            self._logger.error('Met a string that cannot be parsed to semver in Condition.objects', exc_info=e)
+            self._logger.error(
+                'Met a string that cannot be parsed to semver in Condition.objects',
+                exc_info=e)
             return False
 
     @staticmethod

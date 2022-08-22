@@ -15,7 +15,7 @@
 __author__ = 'FeatureProbe'
 __license__ = 'Apache 2.0'
 
-__version__ = '0.1.0'
+__version__ = '1.0.0-beta'
 
 # --------------- API --------------- #
 

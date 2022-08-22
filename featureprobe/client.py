@@ -53,7 +53,9 @@ class Client:
 
     def evaluate_detail(self, toggle_key: str, user: User, default) -> Detail:
         if not self._data_repo.initialized:
-            return Detail(value=default, reason='FeatureProbe repository uninitialized')
+            return Detail(
+                value=default,
+                reason='FeatureProbe repository uninitialized')
 
         toggle = self._data_repo.get_toggle(toggle_key)
         segments = self._data_repo.get_all_segment()

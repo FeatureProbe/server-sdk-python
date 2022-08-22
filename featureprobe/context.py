@@ -23,8 +23,10 @@ class Context:
     _POST_EVENTS_DATA_API = '/api/events'
 
     def __init__(self, sdk_key: str, config: "Config"):
-        self._synchronizer_url = config.synchronizer_url or (config.remote_uri + self._GET_REPOSITORY_DATA_API)
-        self._event_url = config.event_url or (config.remote_uri + self._POST_EVENTS_DATA_API)
+        self._synchronizer_url = config.synchronizer_url or (
+            config.remote_uri + self._GET_REPOSITORY_DATA_API)
+        self._event_url = config.event_url or (
+            config.remote_uri + self._POST_EVENTS_DATA_API)
         self._sdk_key = sdk_key
         self._refresh_interval = config.refresh_interval
         self._location = config.location

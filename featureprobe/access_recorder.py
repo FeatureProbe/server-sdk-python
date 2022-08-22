@@ -60,8 +60,8 @@ class AccessCounter:
 
     def is_group(self, event: "AccessEvent"):
         return self._VALUE == event.value \
-               and self._VERSION == event.version \
-               and self._INDEX == event.index
+            and self._VERSION == event.version \
+            and self._INDEX == event.index
 
 
 class AccessRecorder:
@@ -98,9 +98,17 @@ class AccessRecorder:
                 if counter.is_group(_event):
                     counter.increment()
                     return
-            counters.append(AccessCounter(_event.value, _event.version, _event.index))
+            counters.append(
+                AccessCounter(
+                    _event.value,
+                    _event.version,
+                    _event.index))
         else:
-            groups = [AccessCounter(_event.value, _event.version, _event.index)]
+            groups = [
+                AccessCounter(
+                    _event.value,
+                    _event.version,
+                    _event.index)]
             self._counters[_event.key] = groups
 
     def snapshot(self):
