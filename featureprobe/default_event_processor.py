@@ -22,6 +22,7 @@ from enum import Enum
 from queue import Queue
 from typing import List, Optional
 
+import tzlocal
 from apscheduler.schedulers.background import BackgroundScheduler
 from requests import Session, HTTPError
 
@@ -29,7 +30,6 @@ from featureprobe.access_recorder import AccessRecorder
 from featureprobe.context import Context
 from featureprobe.event import Event, AccessEvent
 from featureprobe.event_processor import EventProcessor
-from featureprobe.internal.tz_config import timezone
 
 
 class EventAction:
@@ -109,7 +109,7 @@ class DefaultEventProcessor(EventProcessor):
         handler_thread.start()
 
         self._executor = ThreadPoolExecutor(max_workers=5)
-        self._scheduler = BackgroundScheduler(timezone=timezone)
+        self._scheduler = BackgroundScheduler(timezone=tzlocal.get_localzone())
         self._scheduler.start()
         self._scheduler.add_job(self.flush,
                                 trigger='interval',
