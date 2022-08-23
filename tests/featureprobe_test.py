@@ -87,6 +87,9 @@ def test_case():
                     toggle_key, user, default_value)
                 assert detail.value == expect_value
                 if expect_result.get('reason') is not None:
-                    assert re.search(expect_result.get('reason'), detail.reason, re.IGNORECASE)
+                    assert re.search(
+                        expect_result.get('reason'),
+                        detail.reason,
+                        re.IGNORECASE)
             else:
                 pytest.fail('should have no other cases yet')

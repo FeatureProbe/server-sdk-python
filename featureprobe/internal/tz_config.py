@@ -23,5 +23,5 @@ if timezone is None:
             timezone = pathlib.Path('/etc/timezone').read_text()
         else:
             timezone = 'Asia/Shanghai'
-    except:
+    except BaseException:
         timezone = 'Asia/Shanghai'
