@@ -49,6 +49,8 @@ First, install the FeatureProbe SDK as a dependency in your application.
 pip3 install featureprobe-server
 ```
 
+> You may get the latest version of this repo (not released) via [TestPyPI](https://test.pypi.org/project/featureprobe-server/)
+
 <!-- WIP
 #### conda
 
@@ -87,11 +89,11 @@ if __name__ == '__main__':
         'userId': '9876',
         'tel': '12345678998',
     })
-    bool_eval = bool(client.evaluate('bool_toggle_key', user, default=False))
+    bool_eval = bool(client.value('bool_toggle_key', user, default=False))
     if bool_eval:
-        # application code to show the feature
+        ...  # application code to show the feature
     else:
-        # the code to run if the feature is off
+        ...  # the code to run if the feature is off
 ```
 
 

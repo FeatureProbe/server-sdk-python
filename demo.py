@@ -5,32 +5,28 @@ import featureprobe as fp
 logging.basicConfig(level=logging.WARNING)
 
 if __name__ == '__main__':
-    config = fp.Config(remote_uri='http://127.0.0.1:4007',  # FeatureProbe server URL
+    # FEATURE_PROBE_SERVER_URL = 'http://localhost:4007'  # for local docker
+    FEATURE_PROBE_SERVER_URL = 'https://featureprobe.io/server'  # for featureprobe.io
+
+    config = fp.Config(remote_uri=FEATURE_PROBE_SERVER_URL,  # FeatureProbe server URL
                        sync_mode='pooling',
                        refresh_interval=3)
 
-    client = fp.Client('server-8ed48815ef044428826787e9a238b9c6a479f98c',
+    client = fp.Client('server-b8b7c58417680d9e76b1b8454326f357296b5003',
                        # Server Side SDK Key for your project and environment
                        config)
 
-    # create one user, with id='user_unique_id' and one attribute
-    user = fp.User('user_unique_id', {'city': 'New York'})
-    discount = float(client.evaluate('promotion_activity',  # Toggle you want to use
-                                     user, default=0))
-    print('user in New York has a discount of : %d' % discount)
+    # create one user
+    # key is for percentage rollout, normally use userId as key
+    user = fp.User('00001', {'userId': '00001'})
 
-    detail = client.evaluate_detail('promotion_activity', user, default=0)
-    print('detail: %s' % detail.reason)
-    # rule_index = None on default rule is hit
-    print('rule index: ' + str(detail.rule_index))
+    # Toggle you want to use
+    TOGGLE_KEY = 'feature_toggle02'
 
-    user2 = fp.User('user_id2')
-    # create another user, here's the alternative way to set user attributes
-    user2['city'] = 'Paris'
+    # get toggle result for this user
+    is_open = client.value(TOGGLE_KEY, user, default=False)
+    print('feature for this user is: ' + str(is_open))
 
-    discount = float(client.evaluate('promotion_activity', user2, default=0))
-    print('user in Paris has a discount of : %d' % discount)
-
-    detail2 = client.evaluate_detail('promotion_activity', user2, default=0)
-    print('detail2: %s' % detail2.reason)
-    print('rule index: %d' % detail2.rule_index)
+    is_open_detail = client.value_detail(TOGGLE_KEY, user, default=False)
+    print('detail: ' + str(is_open_detail.reason))
+    print('rule index: ' + str(is_open_detail.rule_index))

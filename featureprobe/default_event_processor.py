@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import contextlib
-import json
 import logging
 import queue
 import threading
@@ -23,6 +22,7 @@ from enum import Enum
 from queue import Queue
 from typing import List, Optional
 
+import tzlocal
 from apscheduler.schedulers.background import BackgroundScheduler
 from requests import Session, HTTPError
 
@@ -109,7 +109,7 @@ class DefaultEventProcessor(EventProcessor):
         handler_thread.start()
 
         self._executor = ThreadPoolExecutor(max_workers=5)
-        self._scheduler = BackgroundScheduler()
+        self._scheduler = BackgroundScheduler(timezone=tzlocal.get_localzone())
         self._scheduler.start()
         self._scheduler.add_job(self.flush,
                                 trigger='interval',

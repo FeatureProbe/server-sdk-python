@@ -35,7 +35,7 @@ class Client:
     def flush(self):
         self._event_processor.flush()
 
-    def evaluate(self, toggle_key: str, user: User, default) -> Any:
+    def value(self, toggle_key: str, user: User, default) -> Any:
         toggle = self._data_repo.get_toggle(toggle_key)
         segments = self._data_repo.get_all_segment()
         if not toggle:
@@ -51,7 +51,7 @@ class Client:
         self._event_processor.push(access_event)
         return eval_result.value
 
-    def evaluate_detail(self, toggle_key: str, user: User, default) -> Detail:
+    def value_detail(self, toggle_key: str, user: User, default) -> Detail:
         if not self._data_repo.initialized:
             return Detail(
                 value=default,
