@@ -64,7 +64,8 @@ class PoolingSynchronizer(Synchronizer):
             % self._refresh_interval.total_seconds() * 1000)
         self._poll()
         with self._lock:
-            self._scheduler = BackgroundScheduler(timezone=tzlocal.get_localzone())
+            self._scheduler = BackgroundScheduler(
+                timezone=tzlocal.get_localzone())
             self._scheduler.start()
             self._scheduler.add_job(
                 self._poll,
