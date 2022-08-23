@@ -21,6 +21,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from requests import Session
 
 from featureprobe import Repository
+from featureprobe.internal.tz_config import timezone
 from featureprobe.synchronizer import Synchronizer
 
 if TYPE_CHECKING:
@@ -63,7 +64,7 @@ class PoolingSynchronizer(Synchronizer):
             % self._refresh_interval.total_seconds() * 1000)
         self._poll()
         with self._lock:
-            self._scheduler = BackgroundScheduler()
+            self._scheduler = BackgroundScheduler(timezone=timezone)
             self._scheduler.start()
             self._scheduler.add_job(
                 self._poll,

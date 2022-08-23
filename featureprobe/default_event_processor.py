@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import contextlib
-import json
 import logging
 import queue
 import threading
@@ -30,6 +29,7 @@ from featureprobe.access_recorder import AccessRecorder
 from featureprobe.context import Context
 from featureprobe.event import Event, AccessEvent
 from featureprobe.event_processor import EventProcessor
+from featureprobe.internal.tz_config import timezone
 
 
 class EventAction:
@@ -109,7 +109,7 @@ class DefaultEventProcessor(EventProcessor):
         handler_thread.start()
 
         self._executor = ThreadPoolExecutor(max_workers=5)
-        self._scheduler = BackgroundScheduler()
+        self._scheduler = BackgroundScheduler(timezone=timezone)
         self._scheduler.start()
         self._scheduler.add_job(self.flush,
                                 trigger='interval',

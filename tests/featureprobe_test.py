@@ -14,6 +14,7 @@
 
 import json
 import logging
+import re
 
 import pytest
 
@@ -79,14 +80,13 @@ def test_case():
             expect_value = expect_result['value']
 
             if func_name.endswith('value'):
-                assert server.evaluate(
+                assert server.value(
                     toggle_key, user, default_value) == expect_value
             elif func_name.endswith('detail'):
-                detail = server.evaluate_detail(
+                detail = server.value_detail(
                     toggle_key, user, default_value)
                 assert detail.value == expect_value
-                # assert detail.reason == expect_result['reason']
-                # assert detail.version == expect_result['version']
-                # assert (detail.rule_index is None) == expect_result['no_rule_index']
+                if expect_result.get('reason') is not None:
+                    assert re.search(expect_result.get('reason'), detail.reason, re.IGNORECASE)
             else:
                 pytest.fail('should have no other cases yet')
