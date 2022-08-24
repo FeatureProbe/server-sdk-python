@@ -97,7 +97,7 @@ class DefaultEventProcessor(EventProcessor):
         self._session = Session()
         self._session.mount('http://', context.http_config.adapter)
         self._session.mount('https://', context.http_config.adapter)
-        self._session.headers.update({'Authorization': context.sdk_key})
+        self._session.headers.update(context.headers)
         self._timeout = (
             context.http_config.conn_timeout,
             context.http_config.read_timeout)

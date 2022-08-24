@@ -23,6 +23,7 @@ class Context:
     _POST_EVENTS_DATA_API = '/api/events'
 
     def __init__(self, sdk_key: str, config: "Config"):
+        from featureprobe import __version__
         self._synchronizer_url = config.synchronizer_url or (
             config.remote_uri + self._GET_REPOSITORY_DATA_API)
         self._event_url = config.event_url or (
@@ -31,6 +32,10 @@ class Context:
         self._refresh_interval = config.refresh_interval
         self._location = config.location
         self._http_config = config.http_config
+        self._headers = {
+            'Authorization': sdk_key,
+            'user-agent': 'Python/' + str(__version__),
+        }
 
     @property
     def synchronizer_url(self):
@@ -55,3 +60,7 @@ class Context:
     @property
     def http_config(self):
         return self._http_config
+
+    @property
+    def headers(self):
+        return self._headers
