@@ -33,7 +33,8 @@ class Client:
         context = Context(sdk_key, config)
         self._event_processor = config.event_processor_creator(context)
         self._data_repo = config.data_repository_creator(context)
-        self._synchronizer = config.synchronizer_creator(context, self._data_repo)
+        self._synchronizer = config.synchronizer_creator(
+            context, self._data_repo)
         self._synchronizer.sync()
 
     def __enter__(self):
