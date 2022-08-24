@@ -41,6 +41,15 @@ class Client:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """Alias for :func:`~featureprobe.Client.close`
+
+        Usage::
+
+          >>> import featureprobe as fp
+          >>> with fp.Client('key_000') as client:
+          >>>     ...
+          >>> # client will be closed here
+        """
         self.close()
 
     def flush(self):
