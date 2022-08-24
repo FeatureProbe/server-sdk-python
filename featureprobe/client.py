@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import logging
 import time
 from typing import Any
@@ -28,7 +29,7 @@ class Client:
 
     Applications should instantiate a single :obj:`~featureprobe.Client` for the lifetime of their application.
     """
-    
+
     __logger = logging.getLogger('FeatureProbe')
 
     def __init__(self, server_sdk_key: str, config: Config = Config()):
@@ -49,18 +50,6 @@ class Client:
 
     def __enter__(self):
         return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Alias for :func:`~featureprobe.Client.close`
-
-        Usage::
-
-          >>> import featureprobe as fp
-          >>> with fp.Client('key_000') as client:
-          >>>     ...
-          >>> # client will be closed here
-        """
-        self.close()
 
     def flush(self):
         """Manually push events"""
