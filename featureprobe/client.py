@@ -28,7 +28,7 @@ class Client:
 
     Applications should instantiate a single :obj:`~featureprobe.Client` for the lifetime of their application.
     """
-    
+
     __logger = logging.getLogger('FeatureProbe')
 
     def __init__(self, server_sdk_key: str, config: Config = Config()):
