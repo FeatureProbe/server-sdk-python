@@ -16,16 +16,46 @@ from typing import Dict
 
 
 class User:
+    """A collection of attributes that can affect toggle evaluation.
+
+    Usually corresponding to a user of your application.
+    """
+
     def __init__(self, key: str, attrs: Dict[str, str] = None):
+        """Creates a new FeatureProbe User.
+
+        :param key: User unique ID for percentage rollout.
+        :param attrs: (optional) The initialize attribute for a user.
+        """
         self._key = key
         self._attrs = attrs or {}
 
     def __setitem__(self, key: str, value: str):
+        """Alias for :func:`~featureprobe.User.with_attr`.
+
+        Usage::
+
+          >>> import featureprobe as fp
+          >>> user = fp.User('unique id')
+          >>> user.with_attr('key1', 'value1')
+          >>> user['key2'] = 'value2'
+        """
         self._attrs[key] = value
 
-    def __getitem__(self, item: str):
+    def __getitem__(self, attr: str):
+        """Gets the value of specified attribute.
+
+        :param attr: Attribute name / key.
+        :returns: str or None
+
+        Usage::
+
+          >>> import featureprobe as fp
+          >>> user = fp.User('unique id', { 'key': 'value' })
+          >>> user['key']  # 'value'
+        """
         try:
-            return self._attrs[item]
+            return self._attrs[attr]
         except KeyError:
             return None
 
@@ -40,18 +70,38 @@ class User:
 
     @property
     def key(self) -> str:
+        """Gets FeatureProbe User unique identifier"""
         return self._key
 
     @property
     def attrs(self) -> Dict[str, str]:
+        """Gets all attributes of a FeatureProbe User"""
         return self._attrs
 
     @attrs.setter
     def attrs(self, attrs: Dict[str, str]):
+        """Sets (replace the original attributes) multiple attributes to a FeatureProbe User"""
         self._attrs = attrs
 
-    def with_attr(self, key: str, value: str):
-        self._attrs[key] = value
+    def with_attr(self, key: str, value: str) -> "User":
+        """Adds an attribute to the user.
 
-    def has_attr(self, attr: str):
+        :param key: Attribute key / name.
+        :param value: Attribute value.
+        :returns: User
+
+        Usage::
+
+          >>> import featureprobe as fp
+          >>> user = fp.User('unique id').with_attr('key1', 'value1').with_attr('key2', 'value2')
+        """
+        self._attrs[key] = value
+        return self
+
+    def has_attr(self, attr: str) -> bool:
+        """Checks if an attribute exists.
+
+        :param attr: Attribute name / key.
+        :returns: bool
+        """
         return attr in self._attrs
