@@ -56,9 +56,10 @@ class Client:
         self._event_processor.flush()
 
     def close(self):
+        """Safely shut down FeatureProbe client instance"""
         Client.__logger.info('Closing FeatureProbe Client')
+        self._event_processor.shutdown()
         self._synchronizer.close()
-        self.flush()
         self._data_repo.close()
 
     def value(self, toggle_key: str, user: User, default) -> Any:
