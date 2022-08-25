@@ -32,8 +32,6 @@ if TYPE_CHECKING:
 class PoolingSynchronizer(Synchronizer):
     __logger = logging.getLogger('FeatureProbe-Synchronizer')
 
-    _GET_SDK_KEY_HEADER = 'Authorization'
-
     def __init__(self, context: "Context", data_repo: "DataRepository"):
         self._refresh_interval = context.refresh_interval
         self._api_url = context.synchronizer_url
@@ -42,8 +40,7 @@ class PoolingSynchronizer(Synchronizer):
         self._session = Session()
         self._session.mount('http://', context.http_config.adapter)
         self._session.mount('https://', context.http_config.adapter)
-        self._session.headers.update(
-            {PoolingSynchronizer._GET_SDK_KEY_HEADER: context.sdk_key})
+        self._session.headers.update(context.headers)
         self._timeout = (
             context.http_config.conn_timeout,
             context.http_config.read_timeout)

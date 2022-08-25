@@ -46,10 +46,10 @@ First, install the FeatureProbe SDK as a dependency in your application.
 #### pip
 
 ```bash
-pip3 install featureprobe-server
+pip3 install featureprobe-server-sdk-python
 ```
 
-> You may get the latest version of this repo (not released) via [TestPyPI](https://test.pypi.org/project/featureprobe-server/)
+> You may get the latest version of this repo (not released) via [TestPyPI](https://test.pypi.org/project/featureprobe-server-sdk-python/)
 
 <!-- WIP
 #### conda
@@ -57,7 +57,7 @@ pip3 install featureprobe-server
 Will be supported later.
 
 ```bash
-conda install featureprobe-server
+conda install featureprobe-server-sdk-python
 ```
 -->
 

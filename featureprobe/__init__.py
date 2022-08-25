@@ -39,6 +39,8 @@ from featureprobe.user import User
 
 
 __all__ = [
+    '__version__',
+
     # featureprobe.model
 
     'Condition',
@@ -58,6 +60,7 @@ __all__ = [
     'Toggle',
 
     # featureprobe
+
     'AccessCounter',
     'AccessRecorder',
     'Client',
