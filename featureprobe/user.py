@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from typing import Dict
+import uuid
 
 
 class User:
-    def __init__(self, key: str, attrs: Dict[str, str] = None):
-        self._key = key
+    def __init__(self, stable_rollout_key: str = None, attrs: Dict[str, str] = None):
+        self._key = stable_rollout_key or str(uuid.uuid1())
         self._attrs = attrs or {}
 
     def __setitem__(self, key: str, value: str):
@@ -31,6 +32,10 @@ class User:
 
     def __delitem__(self, key: str):
         self._attrs.pop(key, None)
+
+    def stable_rollout(self, key):
+        self._key = key
+        return self
 
     def to_dict(self) -> dict:
         return {
