@@ -15,7 +15,11 @@
 __author__ = 'FeatureProbe'
 __license__ = 'Apache 2.0'
 
-__version__ = '1.0.0-beta'
+
+# PEP440 spec:
+# [N!]N(.N)*[{a|b|rc}N][.postN][.devN]
+__version__ = 'NO_MANUAL_MAINTENANCE_NEEDED'
+
 
 # --------------- API --------------- #
 
@@ -39,8 +43,6 @@ from featureprobe.user import User
 
 
 __all__ = [
-    '__version__',
-
     # featureprobe.model
 
     'Condition',

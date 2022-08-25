@@ -1,9 +1,10 @@
 name: "Release to PyPI & TestPyPI"
 
 on:
-  push:
-    branches: [ main ]
-
+  release:
+    types:
+      - released
+      - prereleased
 
 jobs:
   build-and-publish:
@@ -18,6 +19,20 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.5'
+
+      - name: Set the version metadata to the release tag
+        run: |
+          python .github/tools/check_metadata.py ${{ github.ref }}
+
+#      - name: PR for bumping version metadata
+#        uses: peter-evans/create-pull-request@v3
+#        with:
+#          author: GitHub Actions <41898282+github-actions[bot]@users.noreply.github.com>
+#          commit-message: "chore: bump version metadata for ${{ github.ref }}"
+#          title: "chore: bump version metadata for ${{ github.ref }}"
+#          body: The version metadata was not updated before release, it has been corrected when building dist, yet please update the code.
+#          branch: bump-version
+#          base: ${{ github.event.release.target_commitish }}
 
       - name: Install dependencies
         run: |
@@ -36,7 +51,7 @@ jobs:
           repository_url: https://test.pypi.org/legacy/
 
       - name: Publish to PyPI
-        if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+        if: ${{ github.event.action }} == "released"
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}

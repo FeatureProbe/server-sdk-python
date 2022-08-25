@@ -34,9 +34,9 @@ pypi_classifiers = [
     'Programming Language :: Python :: 3.10',
 ]
 
-if 'alpha' in featureprobe.__version__:
+if 'a' in featureprobe.__version__:
     pypi_classifiers.append('Development Status :: 3 - Alpha')
-elif 'beta' in featureprobe.__version__:
+elif 'b' in featureprobe.__version__ or 'rc' in featureprobe.__version__:
     pypi_classifiers.append('Development Status :: 4 - Beta')
 else:
     pypi_classifiers.append('Development Status :: 5 - Production/Stable')
