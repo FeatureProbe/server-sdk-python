@@ -12,21 +12,20 @@ if __name__ == '__main__':
                        sync_mode='pooling',
                        refresh_interval=3)
 
-    client = fp.Client('server-b8b7c58417680d9e76b1b8454326f357296b5003',
-                       # Server Side SDK Key for your project and environment
-                       config)
+    # Server Side SDK Key for your project and environment
+    SDK_KEY = 'server-b8b7c58417680d9e76b1b8454326f357296b5003'
+    with fp.Client(SDK_KEY, config) as client:
+        # create one user
+        # key is for percentage rollout, normally use userId as key
+        user = fp.User('00001', {'userId': '00001'})
 
-    # create one user
-    # key is for percentage rollout, normally use userId as key
-    user = fp.User('00001', {'userId': '00001'})
+        # Toggle you want to use
+        TOGGLE_KEY = 'feature_toggle02'
 
-    # Toggle you want to use
-    TOGGLE_KEY = 'feature_toggle02'
+        # get toggle result for this user
+        is_open = client.value(TOGGLE_KEY, user, default=False)
+        print('feature for this user is: ' + str(is_open))
 
-    # get toggle result for this user
-    is_open = client.value(TOGGLE_KEY, user, default=False)
-    print('feature for this user is: ' + str(is_open))
-
-    is_open_detail = client.value_detail(TOGGLE_KEY, user, default=False)
-    print('detail: ' + str(is_open_detail.reason))
-    print('rule index: ' + str(is_open_detail.rule_index))
+        is_open_detail = client.value_detail(TOGGLE_KEY, user, default=False)
+        print('detail: ' + str(is_open_detail.reason))
+        print('rule index: ' + str(is_open_detail.rule_index))

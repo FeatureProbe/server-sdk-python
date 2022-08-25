@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import time
 from typing import Any
 
@@ -24,16 +25,41 @@ from featureprobe.user import User
 
 
 class Client:
+    __logger = logging.getLogger('FeatureProbe')
+
     def __init__(self, sdk_key: str, config: Config = Config()):
         if empty_str(sdk_key):
             raise ValueError('sdk key must not be blank')
         context = Context(sdk_key, config)
         self._event_processor = config.event_processor_creator(context)
         self._data_repo = config.data_repository_creator(context)
-        config.synchronizer_creator(context, self._data_repo).sync()
+        self._synchronizer = config.synchronizer_creator(
+            context, self._data_repo)
+        self._synchronizer.sync()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Alias for :func:`~featureprobe.Client.close`
+
+        Usage::
+
+          >>> import featureprobe as fp
+          >>> with fp.Client('key_000') as client:
+          >>>     ...
+          >>> # client will be closed here
+        """
+        self.close()
 
     def flush(self):
         self._event_processor.flush()
+
+    def close(self):
+        Client.__logger.info('Closing FeatureProbe Client')
+        self._synchronizer.close()
+        self.flush()
+        self._data_repo.close()
 
     def value(self, toggle_key: str, user: User, default) -> Any:
         toggle = self._data_repo.get_toggle(toggle_key)
