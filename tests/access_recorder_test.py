@@ -24,7 +24,7 @@ def _timestamp():
 def setup_function():
     global recorder, event  # noqa
     recorder = fp.AccessRecorder()
-    user = fp.User('test_user')
+    user = fp.User().stable_rollout('test_user')
     event = fp.AccessEvent(_timestamp(), user,
                            key='test_toggle', value='true',
                            version=1, index=0)

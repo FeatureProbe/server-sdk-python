@@ -17,8 +17,8 @@ import uuid
 
 
 class User:
-    def __init__(self, stable_rollout_key: str = None,
-                 attrs: Dict[str, str] = None):
+    def __init__(self, attrs: Dict[str, str] = None,
+                 stable_rollout_key: str = None):
         self._key = stable_rollout_key or str(uuid.uuid1())
         self._attrs = attrs or {}
 

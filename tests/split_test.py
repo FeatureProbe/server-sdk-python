@@ -21,7 +21,7 @@ def setup_function():
         [[0, 5000]],
         [[5000, 10000]],
     ], None, None)  # noqa
-    user = fp.User('test_user_key')
+    user = fp.User(stable_rollout_key='test_user_key')
 
 
 def test_get_user_group():

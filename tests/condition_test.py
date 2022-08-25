@@ -23,7 +23,7 @@ def setup_function():
                              type_='string',
                              predicate=None,
                              objects=None)
-    user = fp.User(key='test_user')
+    user = fp.User(stable_rollout_key='test_user')
     segments = {'test_project$test_segment': fp.Segment(
         uid='test_project$test_segment',
         version=1,
