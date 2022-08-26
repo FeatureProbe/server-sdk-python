@@ -26,8 +26,8 @@ class User:
                  stable_rollout_key: str = None):
         """Creates a new FeatureProbe User.
 
-        :param key: User unique ID for percentage rollout.
         :param attrs: (optional) The initialize attribute for a user.
+        :param stable_rollout_key: User unique ID for percentage rollout.
         """
         if stable_rollout_key is not None:
             self._key = stable_rollout_key
