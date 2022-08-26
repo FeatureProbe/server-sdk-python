@@ -1,6 +1,7 @@
 # FeatureProbe Server Side SDK for Python
 
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/featureprobe-server-sdk-python)
+[![PyPI](https://img.shields.io/pypi/v/featureprobe-server-sdk-python)](https://pypi.python.org/pypi/featureprobe-server-sdk-python)
+[![PyPI](https://img.shields.io/pypi/pyversions/featureprobe-server-sdk-python.svg)](https://pypi.python.org/pypi/featureprobe-server-sdk-python)
 [![codecov](https://codecov.io/gh/FeatureProbe/server-sdk-python/branch/main/graph/badge.svg)](https://codecov.io/gh/FeatureProbe/server-sdk-python)
 [![GitHub Star](https://img.shields.io/github/stars/FeatureProbe/server-sdk-python)](https://github.com/FeatureProbe/server-sdk-python/stargazers)
 [![License](https://img.shields.io/github/license/FeatureProbe/server-sdk-python)](https://github.com/FeatureProbe/server-sdk-python/blob/main/LICENSE)
