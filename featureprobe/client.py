@@ -51,9 +51,27 @@ class Client:
     def __enter__(self):
         return self
 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Alias for :func:`~featureprobe.Client.close`
+
+        Usage::
+
+          >>> import featureprobe as fp
+          >>> with fp.Client('key_000') as client:
+          >>>     ...
+          >>> # client will be closed here
+        """
+        self.close()
+
     def flush(self):
         """Manually push events"""
         self._event_processor.flush()
+
+    def close(self):
+        Client.__logger.info('Closing FeatureProbe Client')
+        self._synchronizer.close()
+        self.flush()
+        self._data_repo.close()
 
     def value(self, toggle_key: str, user: User, default) -> Any:
         """Gets the evaluated value of a toggle.
