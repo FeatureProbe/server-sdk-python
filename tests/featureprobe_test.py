@@ -68,7 +68,7 @@ def test_case():
             user_case = case['user']
             custom_values = user_case['customValues']
             attrs = {cv['key']: cv['value'] for cv in custom_values}
-            user = fp.User(user_case['key'])
+            user = fp.User().stable_rollout(user_case['key'])
             user.attrs = attrs
 
             func_case = case['function']
