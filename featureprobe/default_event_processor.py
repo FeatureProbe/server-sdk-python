@@ -102,10 +102,10 @@ class DefaultEventProcessor(EventProcessor):
             context.http_config.conn_timeout,
             context.http_config.read_timeout)
 
-        event_repository = EventRepository()
+        self._event_repository = EventRepository()
         handler_thread = threading.Thread(
             target=self._handle_event, args=(
-                self._events, event_repository), daemon=True)
+                self._events, self._event_repository), daemon=True)
         handler_thread.start()
 
         self._executor = ThreadPoolExecutor(max_workers=5)
@@ -139,11 +139,7 @@ class DefaultEventProcessor(EventProcessor):
                     DefaultEventProcessor._LOG_BUSY_EVENT)
 
     def shutdown(self):
-        if self._closed:
-            return
-        self._closed = True
-        self._events.put(EventAction(EventAction.Type.FLUSH, None))
-        self._events.put(EventAction(EventAction.Type.SHUTDOWN, None))
+        self._do_shutdown()
 
     def _handle_event(self, events: Queue, event_repo: EventRepository):
         actions = []
@@ -167,7 +163,12 @@ class DefaultEventProcessor(EventProcessor):
                     'FeatureProbe event handle error', exc_info=e)
 
     def _do_shutdown(self):
-        self._executor.shutdown(wait=False)
+        if self._closed:
+            return
+        self._closed = True
+        self._process_flush(self._event_repository)
+        self._scheduler.shutdown(wait=True)
+        self._executor.shutdown(wait=True)
 
     def _process_event(self, event: Event, event_repo: EventRepository):
         event_repo.add(event)

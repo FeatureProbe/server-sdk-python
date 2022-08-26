@@ -40,7 +40,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: EndBug/add-and-commit@v8.0.2
       with:
-        default_author: github_actions
+        default_author: github_actor
         message: "chore: add license header(s)"
 
     - name: Create pull request
@@ -73,5 +73,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       uses: EndBug/add-and-commit@v8.0.2
       with:
-        default_author: github_actions
+        default_author: github_actor
         message: "style: format python code (pep8)"

@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import featureprobe as fp
+import re
+import sys
 
 
-def test_local_mode_synchronizer():
-    config = fp.Config(
-        sync_mode='file',
-        location='tests/resources/datasource/repo.json')
-    feature_probe = fp.Client(
-        server_sdk_key='server-61db54ecea79824cae3ac38d73f1961d698d0477',
-        config=config)
-    repo = feature_probe._data_repo
-    assert len(repo.get_all_toggle()) > 0
-    assert len(repo.get_all_segment()) > 0
+with open('featureprobe/__init__.py', 'r') as f:
+    content = f.read()
+    fmt = re.compile(r"__version__ = '(?P<version>.*)'")
+    version = fmt.search(content).groupdict()['version']
+
+tag = sys.argv[1].split('/')[-1]
+
+with open('featureprobe/__init__.py', 'w') as f:
+    version = "__version__ = '%s'" % tag
+    f.write(re.sub('__version__ = \'.*\'', version, content))

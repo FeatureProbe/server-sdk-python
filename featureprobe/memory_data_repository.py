@@ -61,4 +61,4 @@ class MemoryDataRepository(DataRepository):
         return self._initialized
 
     def close(self):
-        return
+        self._data = None
