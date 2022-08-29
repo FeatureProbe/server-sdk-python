@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 from typing import Dict
 
 
@@ -21,13 +22,17 @@ class User:
     Usually corresponding to a user of your application.
     """
 
-    def __init__(self, key: str, attrs: Dict[str, str] = None):
+    def __init__(self, attrs: Dict[str, str] = None,
+                 stable_rollout_key: str = None):
         """Creates a new FeatureProbe User.
 
-        :param key: User unique ID for percentage rollout.
         :param attrs: (optional) The initialize attribute for a user.
+        :param stable_rollout_key: User unique ID for percentage rollout.
         """
-        self._key = key
+        if stable_rollout_key is not None:
+            self._key = stable_rollout_key
+        else:
+            self._key = str(int(time.time() * 10**6))
         self._attrs = attrs or {}
 
     def __setitem__(self, key: str, value: str):
@@ -61,6 +66,10 @@ class User:
 
     def __delitem__(self, key: str):
         self._attrs.pop(key, None)
+
+    def stable_rollout(self, key):
+        self._key = key
+        return self
 
     def to_dict(self) -> dict:
         return {

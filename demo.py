@@ -17,7 +17,7 @@ if __name__ == '__main__':
     with fp.Client(SDK_KEY, config) as client:
         # create one user
         # key is for percentage rollout, normally use userId as key
-        user = fp.User('00001', {'userId': '00001'})
+        user = fp.User().stable_rollout('00001').with_attr('userId', '00001')
 
         # Toggle you want to use
         TOGGLE_KEY = 'feature_toggle02'
