@@ -50,14 +50,13 @@ setup(
     license_file='LICENSE',
 
     description='FeatureProbe Server Side SDK for Python',
-    long_description=open('README.md', 'r', encoding='utf-8').read(),
-    long_description_content_type='text/markdown',
+    long_description=open('README.rst', 'r', encoding='utf-8').read(),
+    long_description_content_type='text/x-rst',
 
     keywords=['feature management', 'server sdk'],
     classifiers=pypi_classifiers,
 
-    package_dir={'': 'featureprobe'},
-    packages=find_packages(where='featureprobe'),
+    packages=find_packages(),
 
     python_requires='>=3.5, <4',
     install_requires=_requirements(),
