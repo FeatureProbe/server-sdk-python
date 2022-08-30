@@ -13,19 +13,19 @@ if __name__ == '__main__':
                        refresh_interval=3)
 
     # Server Side SDK Key for your project and environment
-    SDK_KEY = 'server-b8b7c58417680d9e76b1b8454326f357296b5003'
+    SDK_KEY = 'server-8ed48815ef044428826787e9a238b9c6a479f98c'
     with fp.Client(SDK_KEY, config) as client:
-        # create one user
-        # key is for percentage rollout, normally use userId as key
-        user = fp.User().stable_rollout('00001').with_attr('userId', '00001')
+        # Create one user
+        user = fp.User().with_attr('userId', '00001')  # "userId" is used in rules, should be filled in.
 
-        # Toggle you want to use
-        TOGGLE_KEY = 'feature_toggle02'
+        # Get toggle result for this user.
+        TOGGLE_KEY = 'campaign_allow_list'
 
-        # get toggle result for this user
+        # Get toggle result for this user
         is_open = client.value(TOGGLE_KEY, user, default=False)
         print('feature for this user is: ' + str(is_open))
 
+        # Demo of Detail function
         is_open_detail = client.value_detail(TOGGLE_KEY, user, default=False)
         print('detail: ' + str(is_open_detail.reason))
         print('rule index: ' + str(is_open_detail.rule_index))
