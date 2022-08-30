@@ -16,7 +16,8 @@ if __name__ == '__main__':
     SDK_KEY = 'server-8ed48815ef044428826787e9a238b9c6a479f98c'
     with fp.Client(SDK_KEY, config) as client:
         # Create one user
-        user = fp.User().with_attr('userId', '00001')  # "userId" is used in rules, should be filled in.
+        # "userId" is used in rules, should be filled in.
+        user = fp.User().with_attr('userId', '00001')
 
         # Get toggle result for this user.
         TOGGLE_KEY = 'campaign_allow_list'
