@@ -36,4 +36,6 @@ cover/
 
 
 dist/
-featureprobe_server.egg-info/
+featureprobe_server_sdk_python.egg-info/
+
+docs/_build
