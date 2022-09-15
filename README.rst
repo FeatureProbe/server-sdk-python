@@ -29,14 +29,14 @@ Basic Terms
 -----------
 
 Reading the short `Basic Terms <https://docs.featureprobe.io/sdk/sdk-introduction>`_ will help to understand the code blow more easily.
-`中文 <https://github.com/FeatureProbe/FeatureProbe/blob/main/BASIC_TERMS_CN.md>`__
+`中文 <https://docs.featureprobe.io/zh-CN/reference/sdk-introduction>`__
 
 
 How to User This SDK
 --------------------
 
 See `SDK Doc <https://docs.featureprobe.io/sdk/Server-Side%20SDKs/python-sdk>`_ for detail.
-`中文 <https://docs.featureprobe.io/zh-CN/sdk/Server-Side%20SDKs/python-sdk>`__
+`中文 <https://docs.featureprobe.io/zh-CN/how-to/Server-Side%20SDKs/python-sdk>`__
 
 
 Contributing
