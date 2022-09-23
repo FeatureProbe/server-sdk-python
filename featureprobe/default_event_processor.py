@@ -103,13 +103,14 @@ class DefaultEventProcessor(EventProcessor):
             context.http_config.read_timeout)
 
         self._event_repository = EventRepository()
-        handler_thread = threading.Thread(
+        self._handler_thread = threading.Thread(
             target=self._handle_event, args=(
                 self._events, self._event_repository), daemon=True)
-        handler_thread.start()
+        self._handler_thread.start()
 
         self._executor = ThreadPoolExecutor(max_workers=5)
-        self._scheduler = BackgroundScheduler(timezone=tzlocal.get_localzone())
+        self._scheduler = BackgroundScheduler(
+            timezone=tzlocal.get_localzone(), logger=self._logger)
         self._scheduler.start()
         self._scheduler.add_job(self.flush,
                                 trigger='interval',
@@ -121,22 +122,24 @@ class DefaultEventProcessor(EventProcessor):
         return cls(context)
 
     def push(self, event: Event):
-        if not self._closed:
-            try:
-                self._events.put_nowait(EventAction(
-                    EventAction.Type.EVENT, event))
-            except queue.Full:
-                DefaultEventProcessor._logger.warning(
-                    DefaultEventProcessor._LOG_BUSY_EVENT)
+        if self._closed:
+            return
+        try:
+            self._events.put_nowait(EventAction(
+                EventAction.Type.EVENT, event))
+        except queue.Full:
+            DefaultEventProcessor._logger.warning(
+                DefaultEventProcessor._LOG_BUSY_EVENT)
 
-    def flush(self):
-        if not self._closed:
-            try:
-                self._events.put_nowait(
-                    EventAction(EventAction.Type.FLUSH, None))
-            except queue.Full:
-                DefaultEventProcessor._logger.warning(
-                    DefaultEventProcessor._LOG_BUSY_EVENT)
+    def flush(self, block=False, timeout=None):
+        if self._closed:
+            return
+        try:
+            self._events.put(
+                EventAction(EventAction.Type.FLUSH, None), block, timeout)
+        except queue.Full:
+            DefaultEventProcessor._logger.warning(
+                DefaultEventProcessor._LOG_BUSY_EVENT)
 
     def shutdown(self):
         self._do_shutdown()
@@ -165,8 +168,10 @@ class DefaultEventProcessor(EventProcessor):
     def _do_shutdown(self):
         if self._closed:
             return
+
+        self.flush(block=True, timeout=2)
         self._closed = True
-        self._process_flush(self._event_repository)
+        self._handler_thread.join(2)
         self._scheduler.shutdown(wait=True)
         self._executor.shutdown(wait=True)
 

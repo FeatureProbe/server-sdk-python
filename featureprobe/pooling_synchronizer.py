@@ -58,7 +58,7 @@ class PoolingSynchronizer(Synchronizer):
     def sync(self):
         PoolingSynchronizer.__logger.info(
             'Starting FeatureProbe polling repository with interval %d ms'
-            % self._refresh_interval.total_seconds() * 1000)
+            % (self._refresh_interval.total_seconds() * 1000))
         self._poll()
         with self._lock:
             self._scheduler = BackgroundScheduler(
