@@ -109,7 +109,8 @@ class DefaultEventProcessor(EventProcessor):
         self._handler_thread.start()
 
         self._executor = ThreadPoolExecutor(max_workers=5)
-        self._scheduler = BackgroundScheduler(timezone=tzlocal.get_localzone(), logger=self._logger)
+        self._scheduler = BackgroundScheduler(
+            timezone=tzlocal.get_localzone(), logger=self._logger)
         self._scheduler.start()
         self._scheduler.add_job(self.flush,
                                 trigger='interval',
