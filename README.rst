@@ -28,14 +28,14 @@ This SDK is designed primarily for use in multi-user systems such as web servers
 Basic Terms
 -----------
 
-Reading the short `Basic Terms <https://docs.featureprobe.io/sdk/sdk-introduction>`_ will help to understand the code blow more easily.
+Reading the short `Introduction <https://docs.featureprobe.io/reference/sdk-introduction>`_ will help to understand the code blow more easily.
 `中文 <https://docs.featureprobe.io/zh-CN/reference/sdk-introduction>`__
 
 
 How to User This SDK
 --------------------
 
-See `SDK Doc <https://docs.featureprobe.io/sdk/Server-Side%20SDKs/python-sdk>`_ for detail.
+See `SDK Doc <https://docs.featureprobe.io/how-to/Server-Side%20SDKs/python-sdk>`_ for detail.
 `中文 <https://docs.featureprobe.io/zh-CN/how-to/Server-Side%20SDKs/python-sdk>`__
 
 
