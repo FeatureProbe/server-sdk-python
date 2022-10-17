@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
+from threading import Event 
 
 from typing import TYPE_CHECKING
 
@@ -28,7 +29,8 @@ class Synchronizer(ABC):
     def from_context(
             cls,
             context: "Context",
-            data_repo: "DataRepository") -> "Synchronizer":
+            data_repo: "DataRepository",
+            ready: "Event") -> "Synchronizer":
         pass
 
     @abstractmethod
@@ -37,6 +39,10 @@ class Synchronizer(ABC):
 
     @abstractmethod
     def close(self):
+        pass
+
+    @abstractmethod
+    def initialized(self):
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):

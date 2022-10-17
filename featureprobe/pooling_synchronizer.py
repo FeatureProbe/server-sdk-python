@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 class PoolingSynchronizer(Synchronizer):
     __logger = logging.getLogger('FeatureProbe-Synchronizer')
 
-    def __init__(self, context: "Context", data_repo: "DataRepository"):
+    def __init__(self, context: "Context", data_repo: "DataRepository", ready: "threading.Event"):
         self._refresh_interval = context.refresh_interval
         self._api_url = context.synchronizer_url
         self._data_repo = data_repo
@@ -47,13 +47,15 @@ class PoolingSynchronizer(Synchronizer):
 
         self._scheduler = None
         self._lock = threading.RLock()
+        self._ready = ready
 
     @classmethod
     def from_context(
             cls,
             context: "Context",
-            data_repo: "DataRepository") -> "Synchronizer":
-        return cls(context, data_repo)
+            data_repo: "DataRepository",
+            ready: "threading.Event") -> "Synchronizer":
+        return cls(context, data_repo, ready)
 
     def sync(self):
         PoolingSynchronizer.__logger.info(
@@ -77,6 +79,7 @@ class PoolingSynchronizer(Synchronizer):
         with self._lock:
             self._scheduler.shutdown()
             del self._scheduler
+            self._ready.clear()
 
     def _poll(self):
         try:
@@ -88,7 +91,13 @@ class PoolingSynchronizer(Synchronizer):
             self.__logger.debug('Http response body: %s' % body)
             repo = Repository.from_json(body)
             self._data_repo.refresh(repo)
+
+            if not self._ready.is_set():
+                self._ready.set()
         except Exception as e:  # noqa
             self.__logger.error(
                 'Unexpected error from polling processor',
                 exc_info=e)
+
+    def initialized(self):
+       return self._ready.is_set()
