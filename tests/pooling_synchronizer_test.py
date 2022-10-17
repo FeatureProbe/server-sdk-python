@@ -43,13 +43,14 @@ def test_init_synchronizer_wait_for_init_success(session_get):
 
     assert synchroizer.initialized()
 
+
 class MockHttpReponse:
-    def __init__(self,  status_code, json_response):
+    def __init__(self, status_code, json_response):
         self.status_code = status_code
         self.response = json_response
 
     def raise_for_status(self):
         pass
-    
+
     def json(self):
         return self.response

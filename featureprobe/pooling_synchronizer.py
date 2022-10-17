@@ -32,7 +32,11 @@ if TYPE_CHECKING:
 class PoolingSynchronizer(Synchronizer):
     __logger = logging.getLogger('FeatureProbe-Synchronizer')
 
-    def __init__(self, context: "Context", data_repo: "DataRepository", ready: "threading.Event"):
+    def __init__(
+            self,
+            context: "Context",
+            data_repo: "DataRepository",
+            ready: "threading.Event"):
         self._refresh_interval = context.refresh_interval
         self._api_url = context.synchronizer_url
         self._data_repo = data_repo
@@ -100,4 +104,4 @@ class PoolingSynchronizer(Synchronizer):
                 exc_info=e)
 
     def initialized(self):
-       return self._ready.is_set()
+        return self._ready.is_set()

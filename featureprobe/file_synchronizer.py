@@ -14,7 +14,7 @@
 
 import json
 import logging
-from threading import Event 
+from threading import Event
 from typing import TYPE_CHECKING
 
 from featureprobe.model.repository import Repository
@@ -57,7 +57,7 @@ class FileSynchronizer(Synchronizer):
                 self._location)
 
     def initialized(self):
-       return self._ready.is_set()
+        return self._ready.is_set()
 
     def close(self):
         self._ready.clear()

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
-from threading import Event 
+from threading import Event
 
 from typing import TYPE_CHECKING
 

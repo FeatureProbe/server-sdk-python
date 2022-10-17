@@ -51,7 +51,7 @@ class Config:
                  remote_uri: str = 'http://127.0.0.1:4007',
                  http_config: HttpConfig = HttpConfig(),
                  refresh_interval: Union[timedelta, float] = timedelta(seconds=2),
-                 start_wait: float=5,
+                 start_wait: float = 5,
                  ):
         self._location = location
         self._synchronizer_creator = SyncMode(sync_mode).synchronizer_creator
