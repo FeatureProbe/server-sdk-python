@@ -98,6 +98,7 @@ def test_string_matches_regex():
     user['userId'] = '122122'
     assert not condition.match_objects(user, segments)
 
+
 def test_string_invalid_regex():
     condition.objects = ['\\\\\\']
     user['userId'] = '13797347245'
