@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import re
 import time
 from typing import List, Dict, Union, Optional, TYPE_CHECKING
 
@@ -81,7 +82,11 @@ class Condition:
         subject_val = user[self._subject]
         if empty_str(subject_val):
             return False
-        return self._predicate.matcher(subject_val, self._objects)
+        try:
+            return self._predicate.matcher(subject_val, self._objects)
+        except re.error as e:
+            self._logger.error('Invalid regular expression', exc_info=e)
+            return False
 
     def _match_segment_condition(
             self, user: "User", segments: Dict[str, "Segment"], **_) -> bool:
