@@ -11,3 +11,46 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from featureprobe.pooling_synchronizer import PoolingSynchronizer
+from featureprobe.memory_data_repository import MemoryDataRepository
+from featureprobe.config import Config
+from featureprobe.context import Context
+from threading import Event
+from requests import Session
+from unittest.mock import patch
+
+
+def test_init_synchronizer_failed():
+    realy = Event()
+    context = Context("test-sdk-key", Config())
+    synchroizer = PoolingSynchronizer.from_context(
+        context, MemoryDataRepository.from_context(context), realy)
+    realy.wait(2)
+
+    assert not synchroizer.initialized()
+
+
+@patch.object(Session, 'get')
+def test_init_synchronizer_wait_for_init_success(session_get):
+    realy = Event()
+    context = Context("test-sdk-key", Config())
+    session_get.return_value = MockHttpReponse(200, '{}')
+    synchroizer = PoolingSynchronizer.from_context(
+        context, MemoryDataRepository.from_context(context), realy)
+    synchroizer.sync()
+    realy.wait(5)
+
+    assert synchroizer.initialized()
+
+
+class MockHttpReponse:
+    def __init__(self, status_code, json_response):
+        self.status_code = status_code
+        self.response = json_response
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self.response

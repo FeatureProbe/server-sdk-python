@@ -14,6 +14,7 @@
 
 import logging
 import time
+from threading import Event
 from typing import Any
 
 from featureprobe.config import Config
@@ -44,9 +45,21 @@ class Client:
         context = Context(server_sdk_key, config)
         self._event_processor = config.event_processor_creator(context)
         self._data_repo = config.data_repository_creator(context)
+
+        synchronize_process_ready = Event()
         self._synchronizer = config.synchronizer_creator(
-            context, self._data_repo)
+            context, self._data_repo, synchronize_process_ready)
         self._synchronizer.sync()
+        if config.start_wait > 0:
+            Client.__logger.info("Waiting up to " +
+                                 str(config.start_wait) +
+                                 " seconds for FeatureProbe client to initialize...")
+            synchronize_process_ready.wait(config.start_wait)
+        if self._synchronizer.initialized() is True:
+            Client.__logger.info("Started FeatureProbe Client: Successfully")
+        else:
+            Client.__logger.warning(
+                "Initialization timeout exceeded for FeatureProbe Client or an error occurred")
 
     def __enter__(self):
         return self
@@ -62,6 +75,10 @@ class Client:
           >>> # client will be closed here
         """
         self.close()
+
+    def initialized(self):
+        """Tests whether the FeatureProbe client is ready to be used"""
+        return self._synchronizer.initialized()
 
     def flush(self):
         """Manually push events"""

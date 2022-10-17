@@ -50,7 +50,8 @@ class Config:
                  event_url: str = None,
                  remote_uri: str = 'http://127.0.0.1:4007',
                  http_config: HttpConfig = HttpConfig(),
-                 refresh_interval: Union[timedelta, float] = timedelta(seconds=5),
+                 refresh_interval: Union[timedelta, float] = timedelta(seconds=2),
+                 start_wait: float = 5,
                  ):
         self._location = location
         self._synchronizer_creator = SyncMode(sync_mode).synchronizer_creator
@@ -59,6 +60,7 @@ class Config:
         self._synchronizer_url = synchronizer_url
         self._event_url = event_url
         self._remote_uri = remote_uri
+        self._start_wait = start_wait
         self._http_config = http_config or HttpConfig()
         self._refresh_interval = refresh_interval \
             if isinstance(refresh_interval, timedelta) \
@@ -99,3 +101,7 @@ class Config:
     @property
     def refresh_interval(self):
         return self._refresh_interval
+
+    @property
+    def start_wait(self):
+        return self._start_wait

@@ -10,11 +10,17 @@ if __name__ == '__main__':
 
     config = fp.Config(remote_uri=FEATURE_PROBE_SERVER_URL,  # FeatureProbe server URL
                        sync_mode='pooling',
-                       refresh_interval=3)
+                       refresh_interval=2,
+                       start_wait=5)
 
     # Server Side SDK Key for your project and environment
     SDK_KEY = 'server-8ed48815ef044428826787e9a238b9c6a479f98c'
     with fp.Client(SDK_KEY, config) as client:
+        if client.initialized():
+            print("SDK successfully initialized!")
+        else:
+            print("SDK failed to initialize!")
+            exit()
         # Create one user
         # "userId" is used in rules, should be filled in.
         user = fp.User().with_attr('userId', '00001')
