@@ -106,7 +106,7 @@ def test_string_invalid_regex():
     condition.predicate = fp.StringPredicate.MATCHES_REGEX
     assert not condition.match_objects(user, segments)
 
-    condition.predicate = fp.StringPredicate.MATCHES_REGEX
+    condition.predicate = fp.StringPredicate.DOES_NOT_MATCH_REGEX
     assert not condition.match_objects(user, segments)
 
 
