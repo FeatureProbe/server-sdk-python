@@ -99,6 +99,17 @@ def test_string_matches_regex():
     assert not condition.match_objects(user, segments)
 
 
+def test_string_invalid_regex():
+    condition.objects = ['\\\\\\']
+    user['userId'] = '13797347245'
+
+    condition.predicate = fp.StringPredicate.MATCHES_REGEX
+    assert not condition.match_objects(user, segments)
+
+    condition.predicate = fp.StringPredicate.DOES_NOT_MATCH_REGEX
+    assert not condition.match_objects(user, segments)
+
+
 def test_string_is_not_any_of():
     condition.objects = ['12345', '987654', '665544']
     condition.predicate = fp.StringPredicate.IS_NOT_ANY_OF
