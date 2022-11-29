@@ -18,52 +18,46 @@ import featureprobe
 
 
 def _requirements():
-    with open('requirements.txt', 'r', encoding='utf-8') as f:
+    with open("requirements.txt", "r", encoding="utf-8") as f:
         return [req.strip() for req in f.readlines()]
 
 
 pypi_classifiers = [
-    'License :: OSI Approved :: Apache Software License',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python :: 3 :: Only',
-    'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6',
-    'Programming Language :: Python :: 3.7',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
 
-if 'a' in featureprobe.__version__:
-    pypi_classifiers.append('Development Status :: 3 - Alpha')
-elif 'b' in featureprobe.__version__ or 'rc' in featureprobe.__version__:
-    pypi_classifiers.append('Development Status :: 4 - Beta')
+if "a" in featureprobe.__version__:
+    pypi_classifiers.append("Development Status :: 3 - Alpha")
+elif "b" in featureprobe.__version__ or "rc" in featureprobe.__version__:
+    pypi_classifiers.append("Development Status :: 4 - Beta")
 else:
-    pypi_classifiers.append('Development Status :: 5 - Production/Stable')
+    pypi_classifiers.append("Development Status :: 5 - Production/Stable")
 
 setup(
-    name='featureprobe-server-sdk-python',
+    name="featureprobe-server-sdk-python",
     version=featureprobe.__version__,
-
-    author='FeatureProbe',
-    license='Apache 2.0',
-    license_file='LICENSE',
-
-    description='FeatureProbe Server Side SDK for Python',
-    long_description=open('README.rst', 'r', encoding='utf-8').read(),
-    long_description_content_type='text/x-rst',
-
-    keywords=['feature management', 'server sdk'],
+    author="FeatureProbe",
+    license="Apache 2.0",
+    license_file="LICENSE",
+    description="FeatureProbe Server Side SDK for Python",
+    long_description=open("README.rst", "r", encoding="utf-8").read(),
+    long_description_content_type="text/x-rst",
+    keywords=["feature management", "server sdk"],
     classifiers=pypi_classifiers,
-
     packages=find_packages(),
-
-    python_requires='>=3.5, <4',
+    python_requires=">=3.5, <4",
     install_requires=_requirements(),
-
     project_urls={
-        'Project Homepage': 'https://github.com/FeatureProbe',
-        'Source Code': 'https://github.com/FeatureProbe/server-sdk-python',
-        'Bug Reports': 'https://github.com/FeatureProbe/server-sdk-python/issues',
-    }
+        "Project Homepage": "https://github.com/FeatureProbe",
+        "Source Code": "https://github.com/FeatureProbe/server-sdk-python",
+        "Bug Reports": "https://github.com/FeatureProbe/server-sdk-python/issues",
+    },
 )

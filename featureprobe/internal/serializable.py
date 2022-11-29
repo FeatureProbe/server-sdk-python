@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 def serializable(cls):
     # TODO(chris): inject from_json & to_dict to cls
     # this will deprecate @json_decoder

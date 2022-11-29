@@ -22,8 +22,7 @@ class User:
     Usually corresponding to a user of your application.
     """
 
-    def __init__(self, attrs: Dict[str, str] = None,
-                 stable_rollout_key: str = None):
+    def __init__(self, attrs: Dict[str, str] = None, stable_rollout_key: str = None):
         """Creates a new FeatureProbe User.
 
         :param attrs: (optional) The initialize attribute for a user.
@@ -73,8 +72,8 @@ class User:
 
     def to_dict(self) -> dict:
         return {
-            'key': self._key,
-            'attrs': self._attrs,
+            "key": self._key,
+            "attrs": self._attrs,
         }
 
     @property

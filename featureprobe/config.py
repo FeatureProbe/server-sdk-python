@@ -36,35 +36,40 @@ class SyncMode(str, Enum):
         obj.synchronizer_creator = synchronizer_creator
         return obj
 
-    POOLING = 'pooling', PoolingSynchronizer.from_context
-    FILE = 'file', FileSynchronizer.from_context
+    POOLING = "pooling", PoolingSynchronizer.from_context
+    FILE = "file", FileSynchronizer.from_context
 
 
 @defaultable
 class Config:
-
-    def __init__(self,
-                 location: str = None,
-                 sync_mode: Union[str, SyncMode] = SyncMode.POOLING,
-                 synchronizer_url: str = None,
-                 event_url: str = None,
-                 remote_uri: str = 'http://127.0.0.1:4007',
-                 http_config: HttpConfig = HttpConfig(),
-                 refresh_interval: Union[timedelta, float] = timedelta(seconds=2),
-                 start_wait: float = 5,
-                 ):
+    def __init__(
+        self,
+        location: str = None,
+        sync_mode: Union[str, SyncMode] = SyncMode.POOLING,
+        remote_uri: str = "http://127.0.0.1:4007",
+        synchronizer_url: str = None,
+        event_url: str = None,
+        realtime_url: str = None,
+        http_config: HttpConfig = HttpConfig(),
+        refresh_interval: Union[timedelta, float] = timedelta(seconds=2),
+        start_wait: float = 5,
+    ):
         self._location = location
+        self._sync_mode = sync_mode
         self._synchronizer_creator = SyncMode(sync_mode).synchronizer_creator
         self._data_repository_creator = MemoryDataRepository.from_context
         self._event_processor_creator = DefaultEventProcessor.from_context
+        self._remote_uri = remote_uri
         self._synchronizer_url = synchronizer_url
         self._event_url = event_url
-        self._remote_uri = remote_uri
+        self._realtime_url = realtime_url
         self._start_wait = start_wait
         self._http_config = http_config or HttpConfig()
-        self._refresh_interval = refresh_interval \
-            if isinstance(refresh_interval, timedelta) \
+        self._refresh_interval = (
+            refresh_interval
+            if isinstance(refresh_interval, timedelta)
             else timedelta(seconds=refresh_interval)
+        )
 
     @property
     def location(self):
@@ -95,6 +100,10 @@ class Config:
         return self._remote_uri
 
     @property
+    def realtime_url(self):
+        return self._realtime_url
+
+    @property
     def http_config(self):
         return self._http_config
 
@@ -105,3 +114,7 @@ class Config:
     @property
     def start_wait(self):
         return self._start_wait
+
+    @property
+    def socketio_available(self) -> bool:
+        return self._sync_mode == SyncMode.POOLING

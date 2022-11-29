@@ -12,67 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'FeatureProbe'
-__license__ = 'Apache 2.0'
+__author__ = "FeatureProbe"
+__license__ = "Apache 2.0"
 
 
 # PEP440 spec:
 # [N!]N(.N)*[{a|b|rc}N][.postN][.devN]
-__version__ = 'NO_MANUAL_MAINTENANCE_NEEDED'
+__version__ = "NO_MANUAL_MAINTENANCE_NEEDED"
 
 
 # --------------- API --------------- #
 
-from featureprobe.model import *
-
-from featureprobe.access_recorder import (
-    AccessCounter,
-    AccessRecorder,
-)
-
 from featureprobe.config import Config
-from featureprobe.context import Context
-from featureprobe.data_repository import DataRepository
 from featureprobe.detail import Detail
-from featureprobe.evaluation_result import EvaluationResult
-from featureprobe.event import AccessEvent
-from featureprobe.hit_result import HitResult
 from featureprobe.http_config import HttpConfig
 from featureprobe.client import Client
 from featureprobe.user import User
 
 
 __all__ = [
-    # featureprobe.model
-
-    'Condition',
-    'ConditionType',
-    'StringPredicate',
-    'SegmentPredicate',
-    'DatetimePredicate',
-    'NumberPredicate',
-    'SemverPredicate',
-    'Distribution',
-    'Repository',
-    'Rule',
-    'Segment',
-    'SegmentRule',
-    'Serve',
-    'Split',
-    'Toggle',
-
-    # featureprobe
-
-    'AccessCounter',
-    'AccessRecorder',
-    'Client',
-    'Config',
-    'Context',
-    'DataRepository',
-    'Detail',
-    'EvaluationResult',
-    'AccessEvent',
-    'HitResult',
-    'HttpConfig',
-    'User',
+    "Client",
+    "Config",
+    "Detail",
+    "HttpConfig",
+    "User",
 ]

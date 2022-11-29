@@ -19,22 +19,29 @@ if TYPE_CHECKING:
 
 
 class Context:
-    _GET_REPOSITORY_DATA_API = '/api/server-sdk/toggles'
-    _POST_EVENTS_DATA_API = '/api/events'
+    _GET_REPOSITORY_DATA_API = "/api/server-sdk/toggles"
+    _POST_EVENTS_DATA_API = "/api/events"
+    _REALTIME_EVENT_API = "/realtime"
 
     def __init__(self, sdk_key: str, config: "Config"):
-        from featureprobe import __version__
+        from featureprobe import __version__  # noqa not included in __all__
+
         self._synchronizer_url = config.synchronizer_url or (
-            config.remote_uri + self._GET_REPOSITORY_DATA_API)
+            config.remote_uri + self._GET_REPOSITORY_DATA_API
+        )
         self._event_url = config.event_url or (
-            config.remote_uri + self._POST_EVENTS_DATA_API)
+            config.remote_uri + self._POST_EVENTS_DATA_API
+        )
+        self._realtime_url = config.realtime_url or (
+            config.remote_uri + self._REALTIME_EVENT_API
+        )
         self._sdk_key = sdk_key
         self._refresh_interval = config.refresh_interval
         self._location = config.location
         self._http_config = config.http_config
         self._headers = {
-            'Authorization': sdk_key,
-            'user-agent': 'Python/' + str(__version__),
+            "Authorization": sdk_key,
+            "user-agent": "Python/" + str(__version__),
         }
 
     @property
@@ -44,6 +51,10 @@ class Context:
     @property
     def event_url(self):
         return self._event_url
+
+    @property
+    def realtime_url(self):
+        return self._realtime_url
 
     @property
     def sdk_key(self):

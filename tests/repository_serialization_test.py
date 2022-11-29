@@ -14,11 +14,11 @@
 
 import json
 
-import featureprobe as fp
+from featureprobe.model import Repository
 
 
 def test_serialize_toggles_to_repo():
-    with open('tests/resources/datasource/repo.json') as f:
+    with open("tests/resources/datasource/repo.json") as f:
         dic = json.load(f)
-    repo = fp.Repository.from_json(dic)
+    repo = Repository.from_json(dic)
     assert len(repo.toggles) >= 1

@@ -22,7 +22,6 @@ if TYPE_CHECKING:
 
 
 class DataRepository(metaclass=ABCMeta):
-
     @classmethod
     @abstractmethod
     def from_context(cls, context: "Context") -> "DataRepository":

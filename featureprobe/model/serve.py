@@ -23,17 +23,15 @@ if TYPE_CHECKING:
 
 
 class Serve:
-    def __init__(self,
-                 select: int,
-                 split: "Split"):
+    def __init__(self, select: int, split: "Split"):
         self._select = select
         self._split = split
 
     @classmethod
     @json_decoder
     def from_json(cls, json: dict) -> "Serve":
-        select = json.get('select')
-        split = Split.from_json(json.get('split'))
+        select = json.get("select")
+        split = Split.from_json(json.get("split"))
         return cls(select, split)
 
     @property

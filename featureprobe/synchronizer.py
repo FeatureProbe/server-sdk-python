@@ -23,14 +23,15 @@ if TYPE_CHECKING:
 
 
 class Synchronizer(ABC):
-
     @classmethod
     @abstractmethod
     def from_context(
-            cls,
-            context: "Context",
-            data_repo: "DataRepository",
-            ready: "Event") -> "Synchronizer":
+        cls, context: "Context", data_repo: "DataRepository", ready: "Event"
+    ) -> "Synchronizer":
+        pass
+
+    @abstractmethod
+    def start(self):
         pass
 
     @abstractmethod
@@ -41,8 +42,9 @@ class Synchronizer(ABC):
     def close(self):
         pass
 
+    @property
     @abstractmethod
-    def initialized(self):
+    def initialized(self) -> bool:
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):

@@ -21,7 +21,7 @@ import tzlocal
 from apscheduler.schedulers.background import BackgroundScheduler
 from requests import Session
 
-from featureprobe import Repository
+from featureprobe.model import Repository
 from featureprobe.synchronizer import Synchronizer
 
 if TYPE_CHECKING:
@@ -30,24 +30,23 @@ if TYPE_CHECKING:
 
 
 class PoolingSynchronizer(Synchronizer):
-    __logger = logging.getLogger('FeatureProbe-Synchronizer')
+    __logger = logging.getLogger("FeatureProbe-Synchronizer")
 
     def __init__(
-            self,
-            context: "Context",
-            data_repo: "DataRepository",
-            ready: "threading.Event"):
+        self, context: "Context", data_repo: "DataRepository", ready: "threading.Event"
+    ):
         self._refresh_interval = context.refresh_interval
         self._api_url = context.synchronizer_url
         self._data_repo = data_repo
 
         self._session = Session()
-        self._session.mount('http://', context.http_config.adapter)
-        self._session.mount('https://', context.http_config.adapter)
+        self._session.mount("http://", context.http_config.adapter)
+        self._session.mount("https://", context.http_config.adapter)
         self._session.headers.update(context.headers)
         self._timeout = (
             context.http_config.conn_timeout,
-            context.http_config.read_timeout)
+            context.http_config.read_timeout,
+        )
 
         self._scheduler = None
         self._lock = threading.RLock()
@@ -55,53 +54,51 @@ class PoolingSynchronizer(Synchronizer):
 
     @classmethod
     def from_context(
-            cls,
-            context: "Context",
-            data_repo: "DataRepository",
-            ready: "threading.Event") -> "Synchronizer":
+        cls, context: "Context", data_repo: "DataRepository", ready: "threading.Event"
+    ) -> "Synchronizer":
         return cls(context, data_repo, ready)
 
-    def sync(self):
+    def start(self):
         PoolingSynchronizer.__logger.info(
-            'Starting FeatureProbe polling repository with interval %d ms'
-            % (self._refresh_interval.total_seconds() * 1000))
-        self._poll()
+            "Starting FeatureProbe polling repository with interval %d ms"
+            % (self._refresh_interval.total_seconds() * 1000)
+        )
+        self.sync()
         with self._lock:
             self._scheduler = BackgroundScheduler(
-                timezone=tzlocal.get_localzone(),
-                logger=self.__logger)
+                timezone=tzlocal.get_localzone(), logger=self.__logger
+            )
             self._scheduler.start()
             self._scheduler.add_job(
-                self._poll,
-                trigger='interval',
+                self.sync,
+                trigger="interval",
                 seconds=self._refresh_interval.total_seconds(),
-                next_run_time=datetime.now())
+                next_run_time=datetime.now(),
+            )
 
     def close(self):
-        PoolingSynchronizer.__logger.info(
-            'Closing FeatureProbe PollingSynchronizer')
+        PoolingSynchronizer.__logger.info("Closing FeatureProbe PollingSynchronizer")
         with self._lock:
             self._scheduler.shutdown()
             del self._scheduler
             self._ready.clear()
 
-    def _poll(self):
+    def sync(self):
         try:
             resp = self._session.get(self._api_url, timeout=self._timeout)
             resp.raise_for_status()
-            self.__logger.debug('Http response: %d' % resp.status_code)
+            self.__logger.debug("Http response: %d" % resp.status_code)
             body = resp.json()
             # sourcery skip: replace-interpolation-with-fstring
-            self.__logger.debug('Http response body: %s' % body)
+            self.__logger.debug("Http response body: %s" % body)
             repo = Repository.from_json(body)
             self._data_repo.refresh(repo)
 
             if not self._ready.is_set():
                 self._ready.set()
         except Exception as e:  # noqa
-            self.__logger.error(
-                'Unexpected error from polling processor',
-                exc_info=e)
+            self.__logger.error("Unexpected error from polling processor", exc_info=e)
 
-    def initialized(self):
+    @property
+    def initialized(self) -> bool:
         return self._ready.is_set()

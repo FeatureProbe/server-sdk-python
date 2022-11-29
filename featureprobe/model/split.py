@@ -25,10 +25,7 @@ if TYPE_CHECKING:
 class Split:
     _BUCKET_SIZE = 10000
 
-    def __init__(self,
-                 distribution: List[List[List[int]]],
-                 bucket_by: str,
-                 salt: str):
+    def __init__(self, distribution: List[List[List[int]]], bucket_by: str, salt: str):
         self._distribution = distribution or []
         self._bucket_by = bucket_by
         self._salt = salt
@@ -36,9 +33,9 @@ class Split:
     @classmethod
     @json_decoder
     def from_json(cls, json: dict) -> "Split":
-        distribution = json.get('distribution')
-        bucket_by = json.get('bucketBy')
-        salt = json.get('salt')
+        distribution = json.get("distribution")
+        bucket_by = json.get("bucketBy")
+        salt = json.get("salt")
         return cls(distribution, bucket_by, salt)
 
     @property
@@ -73,27 +70,30 @@ class Split:
             else:
                 return HitResult(
                     hit=False,
-                    reason='Warning: User with key \'%s\' does not have attribute name \'%s\'' %
-                    (user.key,
-                     self._bucket_by))
+                    reason="Warning: User with key '%s' does not have attribute name '%s'"
+                    % (user.key, self._bucket_by),
+                )
         group_index = self._get_group(
-            self._hash(
-                hash_key,
-                self._salt or toggle_key,
-                self._BUCKET_SIZE))
-        return HitResult(hit=True, index=group_index,
-                         reason='selected %d percentage group' % group_index)
+            self._hash(hash_key, self._salt or toggle_key, self._BUCKET_SIZE)
+        )
+        return HitResult(
+            hit=True,
+            index=group_index,
+            reason="selected %d percentage group" % group_index,
+        )
 
     def _get_group(self, hash_value: int) -> int:
         for index, groups in enumerate(self._distribution):
             for rng in groups:
                 if rng[0] <= hash_value < rng[1]:
                     return index
-        return -1  # TODO: return None, HitResult.hit = False? inconsistent with Java SDK
+        return (
+            -1
+        )  # TODO: return None, HitResult.hit = False? inconsistent with Java SDK
 
     @staticmethod
     def _hash(hash_key: str, hash_salt: str, bucket_size: int) -> int:
-        value = (hash_key + hash_salt).encode('utf-8')
+        value = (hash_key + hash_salt).encode("utf-8")
         sha = sha1(value)
         _bytes = sha.digest()[-4:]
-        return int.from_bytes(_bytes, byteorder='big') % bucket_size
+        return int.from_bytes(_bytes, byteorder="big") % bucket_size

@@ -26,14 +26,16 @@ def peer_cmp_only(func):
 class SemVer:
     """Under the [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html) standard."""
 
-    __slots__ = ('major', 'minor', 'patch', 'pre_release')
+    __slots__ = ("major", "minor", "patch", "pre_release")
 
     # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-    FORMAT = re.compile(r'^(?P<major>0|[1-9]\d*)\.'
-                        r'(?P<minor>0|[1-9]\d*)\.'
-                        r'(?P<patch>0|[1-9]\d*)'
-                        r'(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][\da-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][\da-zA-Z-]*))*))?'  # noqa
-                        r'(?:\+(?P<buildmetadata>[\da-zA-Z-]+(?:\.[\da-zA-Z-]+)*))?$')
+    FORMAT = re.compile(
+        r"^(?P<major>0|[1-9]\d*)\."
+        r"(?P<minor>0|[1-9]\d*)\."
+        r"(?P<patch>0|[1-9]\d*)"
+        r"(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][\da-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][\da-zA-Z-]*))*))?"  # noqa
+        r"(?:\+(?P<buildmetadata>[\da-zA-Z-]+(?:\.[\da-zA-Z-]+)*))?$"
+    )
 
     def __init__(self, semver: Union[str, bytes]):
         try:
@@ -41,14 +43,12 @@ class SemVer:
         except (TypeError, AttributeError) as e:
             # TypeError: semver is not str or bytes
             # AttributeError: invalid semver repr, leads re.match -> NoneType
-            raise ValueError(
-                'Bad semantic version representation \'%s\'' %
-                semver) from e
+            raise ValueError("Bad semantic version representation '%s'" % semver) from e
 
-        self.major = int(parsed['major'])
-        self.minor = int(parsed['minor'])
-        self.patch = int(parsed['patch'])
-        self.pre_release = parsed['prerelease']
+        self.major = int(parsed["major"])
+        self.minor = int(parsed["minor"])
+        self.patch = int(parsed["patch"])
+        self.pre_release = parsed["prerelease"]
 
     def _cmp(self, sv):
         if self.major != sv.major:
@@ -63,8 +63,8 @@ class SemVer:
         if self.pre_release is None or sv.pre_release is None:
             return 1 if self.pre_release is None else -1
 
-        self_release = self.pre_release.split('.')
-        other_release = sv.pre_release.split('.')
+        self_release = self.pre_release.split(".")
+        other_release = sv.pre_release.split(".")
 
         for i in range(min(len(self_release), len(other_release))):
             res = SemVer._cmp_release(self_release[i], other_release[i])

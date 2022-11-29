@@ -12,16 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
+import contextlib
 import logging
+import socketio
 import time
 from threading import Event
 from typing import Any
+from urllib.parse import urlparse
 
 from featureprobe.config import Config
 from featureprobe.context import Context
 from featureprobe.detail import Detail
 from featureprobe.event import AccessEvent
 from featureprobe.internal.empty_str import empty_str
+from featureprobe.realtime import RealtimeToggleUpdateNS
 from featureprobe.user import User
 
 
@@ -31,7 +36,7 @@ class Client:
     Applications should instantiate a single :obj:`~featureprobe.Client` for the lifetime of their application.
     """
 
-    __logger = logging.getLogger('FeatureProbe')
+    __logger = logging.getLogger("FeatureProbe")
 
     def __init__(self, server_sdk_key: str, config: Config = Config()):
         """Creates a new client instance that connects to FeatureProbe with the default configuration.
@@ -41,25 +46,34 @@ class Client:
                         Leaving this argument unfilled will use the default configuration.
         """
         if empty_str(server_sdk_key):
-            raise ValueError('sdk key must not be blank')
-        context = Context(server_sdk_key, config)
-        self._event_processor = config.event_processor_creator(context)
-        self._data_repo = config.data_repository_creator(context)
+            raise ValueError("sdk key must not be blank")
+        self._sdk_key = server_sdk_key
+        self._context = Context(server_sdk_key, config)
+        self._event_processor = config.event_processor_creator(self._context)
+        self._data_repo = config.data_repository_creator(self._context)
 
         synchronize_process_ready = Event()
         self._synchronizer = config.synchronizer_creator(
-            context, self._data_repo, synchronize_process_ready)
-        self._synchronizer.sync()
+            self._context, self._data_repo, synchronize_process_ready
+        )
+        self._synchronizer.start()
         if config.start_wait > 0:
-            Client.__logger.info("Waiting up to " +
-                                 str(config.start_wait) +
-                                 " seconds for FeatureProbe client to initialize...")
+            Client.__logger.info(
+                "Waiting up to "
+                + str(config.start_wait)
+                + " seconds for FeatureProbe client to initialize..."
+            )
             synchronize_process_ready.wait(config.start_wait)
-        if self._synchronizer.initialized() is True:
+        if self._synchronizer.initialized:
             Client.__logger.info("Started FeatureProbe Client: Successfully")
         else:
             Client.__logger.warning(
-                "Initialization timeout exceeded for FeatureProbe Client or an error occurred")
+                "Initialization timeout exceeded for FeatureProbe Client or an error occurred"
+            )
+
+        self._socket: socketio.Client
+        if config.socketio_available:
+            self._connect_socket(self._context.realtime_url)
 
     def __enter__(self):
         return self
@@ -76,9 +90,9 @@ class Client:
         """
         self.close()
 
-    def initialized(self):
+    def initialized(self) -> bool:
         """Tests whether the FeatureProbe client is ready to be used"""
-        return self._synchronizer.initialized()
+        return self._synchronizer.initialized
 
     def flush(self):
         """Manually push events"""
@@ -86,10 +100,34 @@ class Client:
 
     def close(self):
         """Safely shut down FeatureProbe client instance"""
-        Client.__logger.info('Closing FeatureProbe Client')
+        Client.__logger.info("Closing FeatureProbe Client")
         self._event_processor.shutdown()
         self._synchronizer.close()
         self._data_repo.close()
+        if self._socket is not None:
+            with contextlib.suppress(Exception):
+                self._socket.disconnect()
+
+    def _connect_socket(self, url):
+        path = urlparse(url).path
+        self._socket = socketio.Client()
+        self._socket.register_namespace(RealtimeToggleUpdateNS(path, self))
+
+        try:
+            self.__logger.info("connecting socket to {}, path={}".format(url, path))
+            self._socket.connect(
+                url,
+                transports=["websocket"],
+                socketio_path=path,
+                wait=True,
+                wait_timeout=1,
+            )
+        except socketio.exceptions.ConnectionError as e:
+            self.__logger.error(
+                "failed to connect socket, realtime toggle updating is disabled",
+                exc_info=e,
+            )
+            self._socket = None
 
     def value(self, toggle_key: str, user: User, default) -> Any:
         """Gets the evaluated value of a toggle.
@@ -105,12 +143,14 @@ class Client:
             return default
 
         eval_result = toggle.eval(user, segments, default)
-        access_event = AccessEvent(timestamp=int(time.time() * 1000),
-                                   user=user,
-                                   key=toggle_key,
-                                   value=str(eval_result.value),
-                                   version=eval_result.version,
-                                   index=eval_result.variation_index)
+        access_event = AccessEvent(
+            timestamp=int(time.time() * 1000),
+            user=user,
+            key=toggle_key,
+            value=str(eval_result.value),
+            version=eval_result.version,
+            index=eval_result.variation_index,
+        )
         self._event_processor.push(access_event)
         return eval_result.value
 
@@ -125,26 +165,28 @@ class Client:
         """
 
         if not self._data_repo.initialized:
-            return Detail(
-                value=default,
-                reason='FeatureProbe repository uninitialized')
+            return Detail(value=default, reason="FeatureProbe repository uninitialized")
 
         toggle = self._data_repo.get_toggle(toggle_key)
         segments = self._data_repo.get_all_segment()
 
         if toggle is None:
-            return Detail(value=default, reason='Toggle not exist')
+            return Detail(value=default, reason="Toggle not exist")
 
         eval_result = toggle.eval(user, segments, default)
-        detail = Detail(value=eval_result.value,
-                        reason=eval_result.reason,
-                        rule_index=eval_result.rule_index,
-                        version=eval_result.version)
-        access_event = AccessEvent(timestamp=int(time.time() * 1000),
-                                   user=user,
-                                   key=toggle_key,
-                                   value=eval_result.value,
-                                   version=eval_result.version,
-                                   index=eval_result.variation_index)
+        detail = Detail(
+            value=eval_result.value,
+            reason=eval_result.reason,
+            rule_index=eval_result.rule_index,
+            version=eval_result.version,
+        )
+        access_event = AccessEvent(
+            timestamp=int(time.time() * 1000),
+            user=user,
+            key=toggle_key,
+            value=eval_result.value,
+            version=eval_result.version,
+            index=eval_result.variation_index,
+        )
         self._event_processor.push(access_event)
         return detail
