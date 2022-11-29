@@ -106,9 +106,17 @@ class AccessRecorder:
                 if counter.is_group(_event):
                     counter.increment()
                     return
-            counters.append(AccessCounter(_event.value, _event.version, _event.index))
+            counters.append(
+                AccessCounter(
+                    _event.value,
+                    _event.version,
+                    _event.index))
         else:
-            groups = [AccessCounter(_event.value, _event.version, _event.index)]
+            groups = [
+                AccessCounter(
+                    _event.value,
+                    _event.version,
+                    _event.index)]
             self._counters[_event.key] = groups
 
     def snapshot(self):

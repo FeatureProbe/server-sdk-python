@@ -30,7 +30,8 @@ class SegmentRule:
     @classmethod
     @json_decoder
     def from_json(cls, json: dict) -> "SegmentRule":
-        conditions = [Condition.from_json(c) for c in json.get("conditions", [])]
+        conditions = [Condition.from_json(c)
+                      for c in json.get("conditions", [])]
         return cls(conditions)
 
     @property
@@ -47,10 +48,8 @@ class SegmentRule:
                 condition.subject
             ):
                 return HitResult(
-                    hit=False,
-                    reason="Warning: User with key '%s' does not have attribute name '%s'"
-                    % (user.key, condition.subject),
-                )
+                    hit=False, reason="Warning: User with key '%s' does not have attribute name '%s'" %
+                    (user.key, condition.subject), )
             if not condition.match_objects(user, segments):
                 return HitResult(hit=False)
 
@@ -58,7 +57,11 @@ class SegmentRule:
 
 
 class Segment:
-    def __init__(self, uid: str, version: int, rules: List["SegmentRule"] = None):
+    def __init__(
+            self,
+            uid: str,
+            version: int,
+            rules: List["SegmentRule"] = None):
         self._uid = uid
         self._version = version
         self._rules = rules or []

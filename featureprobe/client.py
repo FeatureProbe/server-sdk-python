@@ -114,7 +114,9 @@ class Client:
         self._socket.register_namespace(RealtimeToggleUpdateNS(path, self))
 
         try:
-            self.__logger.info("connecting socket to {}, path={}".format(url, path))
+            self.__logger.info(
+                "connecting socket to {}, path={}".format(
+                    url, path))
             self._socket.connect(
                 url,
                 transports=["websocket"],
@@ -165,7 +167,9 @@ class Client:
         """
 
         if not self._data_repo.initialized:
-            return Detail(value=default, reason="FeatureProbe repository uninitialized")
+            return Detail(
+                value=default,
+                reason="FeatureProbe repository uninitialized")
 
         toggle = self._data_repo.get_toggle(toggle_key)
         segments = self._data_repo.get_all_segment()

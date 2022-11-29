@@ -33,8 +33,10 @@ class PoolingSynchronizer(Synchronizer):
     __logger = logging.getLogger("FeatureProbe-Synchronizer")
 
     def __init__(
-        self, context: "Context", data_repo: "DataRepository", ready: "threading.Event"
-    ):
+            self,
+            context: "Context",
+            data_repo: "DataRepository",
+            ready: "threading.Event"):
         self._refresh_interval = context.refresh_interval
         self._api_url = context.synchronizer_url
         self._data_repo = data_repo
@@ -54,8 +56,10 @@ class PoolingSynchronizer(Synchronizer):
 
     @classmethod
     def from_context(
-        cls, context: "Context", data_repo: "DataRepository", ready: "threading.Event"
-    ) -> "Synchronizer":
+            cls,
+            context: "Context",
+            data_repo: "DataRepository",
+            ready: "threading.Event") -> "Synchronizer":
         return cls(context, data_repo, ready)
 
     def start(self):
@@ -77,7 +81,8 @@ class PoolingSynchronizer(Synchronizer):
             )
 
     def close(self):
-        PoolingSynchronizer.__logger.info("Closing FeatureProbe PollingSynchronizer")
+        PoolingSynchronizer.__logger.info(
+            "Closing FeatureProbe PollingSynchronizer")
         with self._lock:
             self._scheduler.shutdown()
             del self._scheduler
@@ -97,7 +102,9 @@ class PoolingSynchronizer(Synchronizer):
             if not self._ready.is_set():
                 self._ready.set()
         except Exception as e:  # noqa
-            self.__logger.error("Unexpected error from polling processor", exc_info=e)
+            self.__logger.error(
+                "Unexpected error from polling processor",
+                exc_info=e)
 
     @property
     def initialized(self) -> bool:

@@ -53,8 +53,8 @@ class FileSynchronizer(Synchronizer):
         except FileNotFoundError:
             # sourcery skip: replace-interpolation-with-fstring
             self._logger.error(
-                "repository file resource not found in path: %s" % self._location
-            )
+                "repository file resource not found in path: %s" %
+                self._location)
 
     @property
     def initialized(self) -> bool:

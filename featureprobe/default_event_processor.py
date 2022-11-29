@@ -49,7 +49,10 @@ class EventRepository:
         self.access = AccessRecorder()
 
     @classmethod
-    def _clone(cls, events: List[Event], access: AccessRecorder) -> "EventRepository":
+    def _clone(
+            cls,
+            events: List[Event],
+            access: AccessRecorder) -> "EventRepository":
         repo = cls()
         repo.events = events.copy()
         repo.access = access.snapshot()
@@ -114,8 +117,10 @@ class DefaultEventProcessor(EventProcessor):
         )
         self._scheduler.start()
         self._scheduler.add_job(
-            self.flush, trigger="interval", seconds=5, next_run_time=datetime.now()
-        )
+            self.flush,
+            trigger="interval",
+            seconds=5,
+            next_run_time=datetime.now())
 
     @classmethod
     def from_context(cls, context: Context) -> EventProcessor:
@@ -127,15 +132,22 @@ class DefaultEventProcessor(EventProcessor):
         try:
             self._events.put_nowait(EventAction(EventAction.Type.EVENT, event))
         except queue.Full:
-            DefaultEventProcessor._logger.warning(DefaultEventProcessor._LOG_BUSY_EVENT)
+            DefaultEventProcessor._logger.warning(
+                DefaultEventProcessor._LOG_BUSY_EVENT)
 
     def flush(self, block=False, timeout=None):
         if self._closed:
             return
         try:
-            self._events.put(EventAction(EventAction.Type.FLUSH, None), block, timeout)
+            self._events.put(
+                EventAction(
+                    EventAction.Type.FLUSH,
+                    None),
+                block,
+                timeout)
         except queue.Full:
-            DefaultEventProcessor._logger.warning(DefaultEventProcessor._LOG_BUSY_EVENT)
+            DefaultEventProcessor._logger.warning(
+                DefaultEventProcessor._LOG_BUSY_EVENT)
 
     def shutdown(self):
         self._do_shutdown()
@@ -159,7 +171,8 @@ class DefaultEventProcessor(EventProcessor):
                     elif action.type == EventAction.Type.SHUTDOWN:
                         self._do_shutdown()
             except Exception as e:
-                self._logger.error("FeatureProbe event handle error", exc_info=e)
+                self._logger.error(
+                    "FeatureProbe event handle error", exc_info=e)
 
     def _do_shutdown(self):
         if self._closed:
@@ -184,7 +197,9 @@ class DefaultEventProcessor(EventProcessor):
         try:
             resp.raise_for_status()
         except HTTPError as e:
-            self._logger.error("Unexpected error from event sender", exc_info=e)
+            self._logger.error(
+                "Unexpected error from event sender",
+                exc_info=e)
 
     def _process_flush(self, event_repo: EventRepository):
         if not event_repo:

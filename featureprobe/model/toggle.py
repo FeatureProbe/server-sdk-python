@@ -146,7 +146,8 @@ class Toggle:
                 return self._hit_value(hit_result, default_value, index)
             warning = hit_result.reason
 
-        return self._create_default_result(user, self._key, default_value, warning)
+        return self._create_default_result(
+            user, self._key, default_value, warning)
 
     def _create_disabled_result(
         self, user: "User", toggle_key: str, default_value: object
@@ -158,8 +159,11 @@ class Toggle:
         return disabled_result
 
     def _create_default_result(
-        self, user: "User", toggle_key: str, default_value: object, warning: str
-    ) -> "EvaluationResult":
+            self,
+            user: "User",
+            toggle_key: str,
+            default_value: object,
+            warning: str) -> "EvaluationResult":
         default_result = self._hit_value(
             self._default_serve.eval_index(user, toggle_key), default_value
         )

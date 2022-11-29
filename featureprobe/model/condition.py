@@ -103,9 +103,8 @@ class Condition:
         except ValueError:
             # sourcery skip: replace-interpolation-with-fstring
             self._logger.error(
-                "User attribute type mismatch. attribute value: '%s', target type int"
-                % cv
-            )
+                "User attribute type mismatch. attribute value: '%s', target type int" %
+                cv)
             return False
 
         try:
@@ -126,9 +125,8 @@ class Condition:
         except ValueError:
             # sourcery skip: replace-interpolation-with-fstring
             self._logger.error(
-                "User attribute type mismatch. attribute value: '%s', target type float"
-                % cv
-            )
+                "User attribute type mismatch. attribute value: '%s', target type float" %
+                cv)
             return False
 
         try:
@@ -147,10 +145,8 @@ class Condition:
         except ValueError as e:
             # sourcery skip: replace-interpolation-with-fstring
             self._logger.error(
-                "Invalid user attribute. attribute value: '%s', target type semver"
-                % cv,
-                exc_info=e,
-            )
+                "Invalid user attribute. attribute value: '%s', target type semver" %
+                cv, exc_info=e, )
             return False
 
         try:

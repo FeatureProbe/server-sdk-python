@@ -20,9 +20,11 @@ from featureprobe.model.toggle import Toggle
 
 
 class Repository:
-    def __init__(
-        self, toggles: Dict[str, "Toggle"] = None, segments: Dict[str, "Segment"] = None
-    ):
+    def __init__(self,
+                 toggles: Dict[str,
+                               "Toggle"] = None,
+                 segments: Dict[str,
+                                "Segment"] = None):
         self._toggles = toggles or {}
         self._segments = segments or {}
 

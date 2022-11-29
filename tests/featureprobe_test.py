@@ -130,12 +130,14 @@ def test_realtime_toggle_update(requests_mock):
         daemon=True,
     )
 
-    requests_mock.get("http://localhost:1234/api/server-sdk/toggles", text="{}")
+    requests_mock.get(
+        "http://localhost:1234/api/server-sdk/toggles",
+        text="{}")
 
     fp_client = fp.Client(
         "sdk key",
         fp.Config(
-            remote_uri="http://localhost:1234", realtime_url="http://0.0.0.0:63851"
-        ),
+            remote_uri="http://localhost:1234",
+            realtime_url="http://0.0.0.0:63851"),
     )
     assert fp_client._socket is not None

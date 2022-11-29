@@ -25,7 +25,10 @@ if TYPE_CHECKING:
 class Split:
     _BUCKET_SIZE = 10000
 
-    def __init__(self, distribution: List[List[List[int]]], bucket_by: str, salt: str):
+    def __init__(self,
+                 distribution: List[List[List[int]]],
+                 bucket_by: str,
+                 salt: str):
         self._distribution = distribution or []
         self._bucket_by = bucket_by
         self._salt = salt
@@ -69,10 +72,8 @@ class Split:
                 hash_key = user.attrs.get(self._bucket_by)
             else:
                 return HitResult(
-                    hit=False,
-                    reason="Warning: User with key '%s' does not have attribute name '%s'"
-                    % (user.key, self._bucket_by),
-                )
+                    hit=False, reason="Warning: User with key '%s' does not have attribute name '%s'" %
+                    (user.key, self._bucket_by), )
         group_index = self._get_group(
             self._hash(hash_key, self._salt or toggle_key, self._BUCKET_SIZE)
         )
@@ -87,9 +88,8 @@ class Split:
             for rng in groups:
                 if rng[0] <= hash_value < rng[1]:
                     return index
-        return (
-            -1
-        )  # TODO: return None, HitResult.hit = False? inconsistent with Java SDK
+        # TODO: return None, HitResult.hit = False? inconsistent with Java SDK
+        return (-1)
 
     @staticmethod
     def _hash(hash_key: str, hash_salt: str, bucket_size: int) -> int:

@@ -18,7 +18,7 @@ import warnings
 def _nameof(anything):
     if callable(anything):
         return "function<{}>".format(anything.__name__)
-    elif type(anything) == property:
+    elif isinstance(anything, property):
         return "property<{}>".format(anything.fget.__name__)
     # TODO: add more type support
     else:

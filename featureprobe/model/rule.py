@@ -25,7 +25,10 @@ if TYPE_CHECKING:
 
 
 class Rule:
-    def __init__(self, serve: "Serve" = None, conditions: List["Condition"] = None):
+    def __init__(
+            self,
+            serve: "Serve" = None,
+            conditions: List["Condition"] = None):
         self._serve = serve
         self._conditions = conditions or []
 
@@ -33,7 +36,8 @@ class Rule:
     @json_decoder
     def from_json(cls, json: dict) -> "Rule":
         serve = Serve.from_json(json.get("serve"))
-        conditions = [Condition.from_json(c) for c in json.get("conditions", [])]
+        conditions = [Condition.from_json(c)
+                      for c in json.get("conditions", [])]
         return cls(serve, conditions)
 
     @property
@@ -61,10 +65,8 @@ class Rule:
                 ConditionType.DATETIME,
             ) and not user.has_attr(condition.subject):
                 return HitResult(
-                    hit=False,
-                    reason="Warning: User with key '%s' does not have attribute name '%s'"
-                    % (user.key, condition.subject),
-                )
+                    hit=False, reason="Warning: User with key '%s' does not have attribute name '%s'" %
+                    (user.key, condition.subject), )
             if not condition.match_objects(user, segments):
                 return HitResult(hit=False)
 

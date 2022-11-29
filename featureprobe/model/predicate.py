@@ -45,7 +45,8 @@ class StringPredicate(Predicate):
         target.startswith(o) for o in objects
     )
 
-    CONTAINS = "contains", lambda target, objects: any(o in target for o in objects)
+    CONTAINS = "contains", lambda target, objects: any(
+        o in target for o in objects)
 
     MATCHES_REGEX = "matches regex", lambda target, objects: any(
         re.search(pattern=o, string=target) for o in objects
@@ -81,9 +82,11 @@ class SegmentPredicate(Predicate):
 
 
 class DatetimePredicate(Predicate):
-    AFTER = "after", lambda target, objects: any(target >= int(o) for o in objects)
+    AFTER = "after", lambda target, objects: any(
+        target >= int(o) for o in objects)
 
-    BEFORE = "before", lambda target, objects: any(target < int(o) for o in objects)
+    BEFORE = "before", lambda target, objects: any(
+        target < int(o) for o in objects)
 
 
 class NumberPredicate(Predicate):

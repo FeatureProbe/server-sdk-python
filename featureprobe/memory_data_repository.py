@@ -25,7 +25,11 @@ if TYPE_CHECKING:
 
 
 class MemoryDataRepository(DataRepository):
-    def __init__(self, data: Repository, initialized: bool, updated_timestamp: int):
+    def __init__(
+            self,
+            data: Repository,
+            initialized: bool,
+            updated_timestamp: int):
         self._data = data
         self._initialized = initialized
         self._updated_timestamp = updated_timestamp

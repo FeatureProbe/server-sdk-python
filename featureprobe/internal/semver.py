@@ -43,7 +43,9 @@ class SemVer:
         except (TypeError, AttributeError) as e:
             # TypeError: semver is not str or bytes
             # AttributeError: invalid semver repr, leads re.match -> NoneType
-            raise ValueError("Bad semantic version representation '%s'" % semver) from e
+            raise ValueError(
+                "Bad semantic version representation '%s'" %
+                semver) from e
 
         self.major = int(parsed["major"])
         self.minor = int(parsed["minor"])
