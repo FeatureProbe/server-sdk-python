@@ -28,8 +28,8 @@ def setup_function():
     recorder = AccessRecorder()
     user = User().stable_rollout('test_user')
     event = AccessEvent(_timestamp(), user,
-                           key='test_toggle', value='true',
-                           version=1, index=0)
+                        key='test_toggle', value='true',
+                        version=1, index=0)
 
 
 def test_add_event():

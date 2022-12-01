@@ -21,9 +21,9 @@ from featureprobe.model import *
 def setup_function():
     global condition, user, segments  # noqa
     condition = Condition(subject='userId',
-                             type_='string',
-                             predicate=None,
-                             objects=None)
+                          type_='string',
+                          predicate=None,
+                          objects=None)
     user = User(stable_rollout_key='test_user')
     segments = {'test_project$test_segment': Segment(
         uid='test_project$test_segment',
