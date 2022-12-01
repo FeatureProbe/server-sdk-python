@@ -42,18 +42,17 @@ class SyncMode(str, Enum):
 
 @defaultable
 class Config:
-    def __init__(
-        self,
-        location: str = None,
-        sync_mode: Union[str, SyncMode] = SyncMode.POOLING,
-        remote_uri: str = "http://127.0.0.1:4007",
-        synchronizer_url: str = None,
-        event_url: str = None,
-        realtime_url: str = None,
-        http_config: HttpConfig = HttpConfig(),
-        refresh_interval: Union[timedelta, float] = timedelta(seconds=2),
-        start_wait: float = 5,
-    ):
+    def __init__(self,
+                 location: str = None,
+                 sync_mode: Union[str, SyncMode] = SyncMode.POOLING,
+                 remote_uri: str = "http://127.0.0.1:4007",
+                 synchronizer_url: str = None,
+                 event_url: str = None,
+                 realtime_url: str = None,
+                 http_config: HttpConfig = HttpConfig(),
+                 refresh_interval: Union[timedelta, float] = timedelta(seconds=2),
+                 start_wait: float = 5,
+                 ):
         self._location = location
         self._sync_mode = sync_mode
         self._synchronizer_creator = SyncMode(sync_mode).synchronizer_creator

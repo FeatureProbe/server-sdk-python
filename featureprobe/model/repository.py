@@ -21,21 +21,19 @@ from featureprobe.model.toggle import Toggle
 
 class Repository:
     def __init__(self,
-                 toggles: Dict[str,
-                               "Toggle"] = None,
-                 segments: Dict[str,
-                                "Segment"] = None):
+                 toggles: Dict[str, "Toggle"] = None,
+                 segments: Dict[str, "Segment"] = None):
         self._toggles = toggles or {}
         self._segments = segments or {}
 
     @classmethod
     @json_decoder
     def from_json(cls, json: dict) -> "Repository":
-        toggles = json.get("toggles", {})
-        segments = json.get("segments", {})
+        toggles = json.get('toggles', {})
+        segments = json.get('segments', {})
         return cls(
             toggles={k: Toggle.from_json(v) for k, v in toggles.items()},
-            segments={k: Segment.from_json(v) for k, v in segments.items()},
+            segments={k: Segment.from_json(v) for k, v in segments.items()}
         )
 
     @property

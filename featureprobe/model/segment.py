@@ -31,7 +31,7 @@ class SegmentRule:
     @json_decoder
     def from_json(cls, json: dict) -> "SegmentRule":
         conditions = [Condition.from_json(c)
-                      for c in json.get("conditions", [])]
+                      for c in json.get('conditions', [])]
         return cls(conditions)
 
     @property
@@ -42,14 +42,16 @@ class SegmentRule:
     def conditions(self, value: List["Condition"]):
         self._conditions = value or []
 
-    def hit(self, user: "User", segments: Dict[str, "Segment"]) -> HitResult:
+    def hit(self,
+            user: "User",
+            segments: Dict[str, "Segment"]
+            ) -> HitResult:
         for condition in self._conditions:
             if condition.type != ConditionType.SEGMENT and not user.has_attr(
-                condition.subject
-            ):
+                    condition.subject):
                 return HitResult(
                     hit=False, reason="Warning: User with key '%s' does not have attribute name '%s'" %
-                    (user.key, condition.subject), )
+                    (user.key, condition.subject))
             if not condition.match_objects(user, segments):
                 return HitResult(hit=False)
 
@@ -57,11 +59,10 @@ class SegmentRule:
 
 
 class Segment:
-    def __init__(
-            self,
-            uid: str,
-            version: int,
-            rules: List["SegmentRule"] = None):
+    def __init__(self,
+                 uid: str,
+                 version: int,
+                 rules: List["SegmentRule"] = None):
         self._uid = uid
         self._version = version
         self._rules = rules or []
@@ -69,9 +70,9 @@ class Segment:
     @classmethod
     @json_decoder
     def from_json(cls, json: dict) -> "Segment":
-        uid = json.get("uniqueId")
-        version = json.get("version", 1)
-        rules = [SegmentRule.from_json(r) for r in json.get("rules", [])]
+        uid = json.get('uniqueId')
+        version = json.get('version', 1)
+        rules = [SegmentRule.from_json(r) for r in json.get('rules', [])]
         return cls(uid, version, rules)
 
     @property

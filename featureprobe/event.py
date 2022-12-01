@@ -25,8 +25,8 @@ class Event:
 
     def to_dict(self) -> dict:
         return {
-            "createdTime": self._created_time,
-            "user": self._user.to_dict(),
+            'createdTime': self._created_time,
+            'user': self._user.to_dict(),
         }
 
     @property
@@ -40,14 +40,13 @@ class Event:
 
 class AccessEvent(Event):
     def __init__(
-        self,
-        timestamp: int,
-        user: "User",
-        key: str,
-        value: str,
-        version: int,
-        index: int,
-    ):
+            self,
+            timestamp: int,
+            user: "User",
+            key: str,
+            value: str,
+            version: int,
+            index: int):
         super().__init__(timestamp, user)
         self._key = key
         self._value = value

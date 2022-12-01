@@ -30,15 +30,13 @@ if TYPE_CHECKING:
 
 @stringifiable
 class Condition:
-    _logger = logging.getLogger("FeatureProbe-Evaluator")
+    _logger = logging.getLogger('FeatureProbe-Evaluator')
 
-    def __init__(
-        self,
-        subject: str,
-        type_: Union["ConditionType", str],
-        predicate: Union["Predicate", str],
-        objects: List[str],
-    ):
+    def __init__(self,
+                 subject: str,
+                 type_: Union["ConditionType", str],
+                 predicate: Union["Predicate", str],
+                 objects: List[str]):
         self._subject = subject
         try:
             self._type = ConditionType(type_)
@@ -58,15 +56,14 @@ class Condition:
     @classmethod
     @json_decoder
     def from_json(cls, json: dict) -> "Condition":
-        subject = json.get("subject")
-        type_ = json.get("type")
-        predicate = json.get("predicate")
-        objects = json.get("objects")
+        subject = json.get('subject')
+        type_ = json.get('type')
+        predicate = json.get('predicate')
+        objects = json.get('objects')
         return cls(subject, type_, predicate, objects)
 
-    def match_objects(
-        self, user: "User", segments: Optional[Dict[str, "Segment"]]
-    ) -> bool:
+    def match_objects(self, user: "User",
+                      segments: Optional[Dict[str, "Segment"]]) -> bool:
         if self._type is None or self._predicate is None:
             return False
 
@@ -88,12 +85,11 @@ class Condition:
         try:
             return self._predicate.matcher(subject_val, self._objects)
         except re.error as e:
-            self._logger.error("Invalid regular expression", exc_info=e)
+            self._logger.error('Invalid regular expression', exc_info=e)
             return False
 
     def _match_segment_condition(
-        self, user: "User", segments: Dict[str, "Segment"], **_
-    ) -> bool:
+            self, user: "User", segments: Dict[str, "Segment"], **_) -> bool:
         return self._predicate.matcher(user, segments or {}, self._objects)
 
     def _match_datetime_condition(self, user: "User", **_):
@@ -103,7 +99,7 @@ class Condition:
         except ValueError:
             # sourcery skip: replace-interpolation-with-fstring
             self._logger.error(
-                "User attribute type mismatch. attribute value: '%s', target type int" %
+                'User attribute type mismatch. attribute value: \'%s\', target type int' %
                 cv)
             return False
 
@@ -111,9 +107,8 @@ class Condition:
             return self._predicate.matcher(cv, self._objects)
         except ValueError as e:
             self._logger.error(
-                "Met a string that cannot be parsed to int in Condition.objects",
-                exc_info=e,
-            )
+                'Met a string that cannot be parsed to int in Condition.objects',
+                exc_info=e)
             return False
 
     def _match_number_condition(self, user: "User", **_):
@@ -125,7 +120,7 @@ class Condition:
         except ValueError:
             # sourcery skip: replace-interpolation-with-fstring
             self._logger.error(
-                "User attribute type mismatch. attribute value: '%s', target type float" %
+                'User attribute type mismatch. attribute value: \'%s\', target type float' %
                 cv)
             return False
 
@@ -133,9 +128,8 @@ class Condition:
             return self._predicate.matcher(cv, self._objects)
         except ValueError as e:
             self._logger.error(
-                "Met a string that cannot be parsed to float in Condition.objects",
-                exc_info=e,
-            )
+                'Met a string that cannot be parsed to float in Condition.objects',
+                exc_info=e)
             return False
 
     def _match_semver_condition(self, user: "User", **_):
@@ -145,17 +139,16 @@ class Condition:
         except ValueError as e:
             # sourcery skip: replace-interpolation-with-fstring
             self._logger.error(
-                "Invalid user attribute. attribute value: '%s', target type semver" %
-                cv, exc_info=e, )
+                'Invalid user attribute. attribute value: \'%s\', target type semver' %
+                cv, exc_info=e)
             return False
 
         try:
             return self._predicate.matcher(cv, self._objects)
         except ValueError as e:
             self._logger.error(
-                "Met a string that cannot be parsed to semver in Condition.objects",
-                exc_info=e,
-            )
+                'Met a string that cannot be parsed to semver in Condition.objects',
+                exc_info=e)
             return False
 
     @staticmethod

@@ -25,11 +25,10 @@ if TYPE_CHECKING:
 
 
 class MemoryDataRepository(DataRepository):
-    def __init__(
-            self,
-            data: Repository,
-            initialized: bool,
-            updated_timestamp: int):
+    def __init__(self,
+                 data: Repository,
+                 initialized: bool,
+                 updated_timestamp: int):
         self._data = data
         self._initialized = initialized
         self._updated_timestamp = updated_timestamp
@@ -39,7 +38,9 @@ class MemoryDataRepository(DataRepository):
         return cls(data=None, initialized=False, updated_timestamp=0)  # noqa
 
     def refresh(self, repo: Repository):
-        if repo is not None and repo.toggles is not None and repo.segments is not None:
+        if repo is not None \
+                and repo.toggles is not None \
+                and repo.segments is not None:
             self._data = Repository(repo.toggles.copy(), repo.segments.copy())
             self._initialized = True
             self._updated_timestamp = int(time.time() * 1000)

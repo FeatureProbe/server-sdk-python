@@ -26,19 +26,22 @@ if TYPE_CHECKING:
 
 
 class FileSynchronizer(Synchronizer):
-    _logger = logging.getLogger("FeatureProbe-Synchronizer")
+    _logger = logging.getLogger('FeatureProbe-Synchronizer')
 
-    def __init__(
-        self, data_repository: "DataRepository", location: str, ready: "Event"
-    ):
+    def __init__(self,
+                 data_repository: "DataRepository",
+                 location: str,
+                 ready: "Event"):
         self._data_repository = data_repository
         self._location = location
         self._ready = ready
 
     @classmethod
     def from_context(
-        cls, context: "Context", data_repo: "DataRepository", ready: "Event"
-    ) -> "Synchronizer":
+            cls,
+            context: "Context",
+            data_repo: "DataRepository",
+            ready: "Event") -> "Synchronizer":
         return cls(data_repo, context.location, ready)
 
     def start(self):
@@ -46,18 +49,18 @@ class FileSynchronizer(Synchronizer):
 
     def sync(self):
         try:
-            with open(self._location, "r", encoding="utf-8") as f:
+            with open(self._location, 'r', encoding='utf-8') as f:
                 repo = Repository.from_json(json.load(f))
                 self._data_repository.refresh(repo)
             self._ready.set()
         except FileNotFoundError:
             # sourcery skip: replace-interpolation-with-fstring
             self._logger.error(
-                "repository file resource not found in path: %s" %
+                'repository file resource not found in path: %s' %
                 self._location)
 
     @property
-    def initialized(self) -> bool:
+    def initialized(self):
         return self._ready.is_set()
 
     def close(self):

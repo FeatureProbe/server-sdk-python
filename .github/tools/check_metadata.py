@@ -16,13 +16,13 @@ import re
 import sys
 
 
-with open("featureprobe/__init__.py", "r") as f:
+with open('featureprobe/__init__.py', 'r') as f:
     content = f.read()
     fmt = re.compile(r"__version__ = '(?P<version>.*)'")
-    version = fmt.search(content).groupdict()["version"]
+    version = fmt.search(content).groupdict()['version']
 
-tag = sys.argv[1].split("/")[-1]
+tag = sys.argv[1].split('/')[-1]
 
-with open("featureprobe/__init__.py", "w") as f:
+with open('featureprobe/__init__.py', 'w') as f:
     version = "__version__ = '%s'" % tag
-    f.write(re.sub("__version__ = '.*'", version, content))
+    f.write(re.sub('__version__ = \'.*\'', version, content))

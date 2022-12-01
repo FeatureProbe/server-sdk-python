@@ -73,8 +73,8 @@ class User:
 
     def to_dict(self) -> dict:
         return {
-            "key": self._key,
-            "attrs": self._attrs,
+            'key': self._key,
+            'attrs': self._attrs,
         }
 
     @property

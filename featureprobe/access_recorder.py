@@ -28,19 +28,15 @@ class AccessCounter:
         self._count = 1
 
     def __str__(self):
-        return "AccessCounter(value='%s', version=%d, index=%d, count=%d)" % (
-            self._VALUE,
-            self._VERSION,
-            self._INDEX,
-            self._count,
-        )
+        return "AccessCounter(value='%s', version=%d, index=%d, count=%d)" \
+               % (self._VALUE, self._VERSION, self._INDEX, self._count)
 
     def to_dict(self) -> dict:
         return {
-            "value": self._VALUE,
-            "version": self._VERSION,
-            "index": self._INDEX,
-            "count": self._count,
+            'value': self._VALUE,
+            'version': self._VERSION,
+            'index': self._INDEX,
+            'count': self._count,
         }
 
     @property
@@ -63,11 +59,9 @@ class AccessCounter:
         self._count += 1
 
     def is_group(self, event: "AccessEvent"):
-        return (
-            self._VALUE == event.value
-            and self._VERSION == event.version
+        return self._VALUE == event.value \
+            and self._VERSION == event.version \
             and self._INDEX == event.index
-        )
 
 
 class AccessRecorder:
@@ -78,11 +72,9 @@ class AccessRecorder:
 
     def to_dict(self) -> dict:
         return {
-            "counters": {
-                k: [ac.to_dict() for ac in v] for k, v in self._counters.items()
-            },
-            "startTime": self._start_time,
-            "endTime": self._end_time,
+            'counters': {k: [ac.to_dict() for ac in v] for k, v in self._counters.items()},
+            'startTime': self._start_time,
+            'endTime': self._end_time,
         }
 
     @property

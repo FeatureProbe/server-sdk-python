@@ -26,17 +26,15 @@ if TYPE_CHECKING:
 
 
 class Toggle:
-    def __init__(
-        self,
-        key: str,
-        enabled: bool,
-        version: int,
-        disabled_serve: "Serve",
-        default_serve: "Serve",
-        rules: List["Rule"],
-        variations: list,
-        for_client: bool,
-    ):
+    def __init__(self,
+                 key: str,
+                 enabled: bool,
+                 version: int,
+                 disabled_serve: "Serve",
+                 default_serve: "Serve",
+                 rules: List["Rule"],
+                 variations: list,
+                 for_client: bool):
         self._key = key
         self._enabled = enabled
         self._version = version
@@ -49,14 +47,14 @@ class Toggle:
     @classmethod
     @json_decoder
     def from_json(cls, json: dict) -> "Toggle":
-        key = json.get("key")
-        enabled = json.get("enabled", False)
-        version = json.get("version", 1)
-        disabled_serve = Serve.from_json(json.get("disabledServe"))
-        default_serve = Serve.from_json(json.get("defaultServe"))
-        rules = [Rule.from_json(r) for r in json.get("rules", [])]
-        variations = json.get("variations", [])
-        for_client = json.get("forClient", False)
+        key = json.get('key')
+        enabled = json.get('enabled', False)
+        version = json.get('version', 1)
+        disabled_serve = Serve.from_json(json.get('disabledServe'))
+        default_serve = Serve.from_json(json.get('defaultServe'))
+        rules = [Rule.from_json(r) for r in json.get('rules', [])]
+        variations = json.get('variations', [])
+        for_client = json.get('forClient', False)
         return cls(
             key,
             enabled,
@@ -65,8 +63,7 @@ class Toggle:
             default_serve,
             rules,
             variations,
-            for_client,
-        )
+            for_client)
 
     @property
     def key(self) -> str:
@@ -132,9 +129,11 @@ class Toggle:
     def for_client(self, value: bool):
         self._for_client = value
 
-    def eval(
-        self, user: "User", segments: Dict[str, "Segment"], default_value: object
-    ) -> "EvaluationResult":
+    def eval(self,
+             user: "User",
+             segments: Dict[str,
+                            "Segment"],
+             default_value: object) -> "EvaluationResult":
         if not self._enabled:
             return self._create_disabled_result(user, self._key, default_value)
 
@@ -150,40 +149,34 @@ class Toggle:
             user, self._key, default_value, warning)
 
     def _create_disabled_result(
-        self, user: "User", toggle_key: str, default_value: object
-    ) -> "EvaluationResult":
-        disabled_result = self._hit_value(
-            self._disabled_serve.eval_index(user, toggle_key), default_value
-        )
-        disabled_result.reason = "Toggle disabled"
-        return disabled_result
-
-    def _create_default_result(
             self,
             user: "User",
             toggle_key: str,
-            default_value: object,
-            warning: str) -> "EvaluationResult":
+            default_value: object) -> "EvaluationResult":
+        disabled_result = self._hit_value(
+            self._disabled_serve.eval_index(
+                user, toggle_key), default_value)
+        disabled_result.reason = 'Toggle disabled'
+        return disabled_result
+
+    def _create_default_result(self, user: "User", toggle_key: str,
+                               default_value: object,
+                               warning: str) -> "EvaluationResult":
         default_result = self._hit_value(
-            self._default_serve.eval_index(user, toggle_key), default_value
-        )
+            self._default_serve.eval_index(
+                user, toggle_key), default_value)
         # sourcery skip: replace-interpolation-with-fstring
-        default_result.reason = "Default rule hit. %s" % warning
+        default_result.reason = 'Default rule hit. %s' % warning
         return default_result
 
-    def _hit_value(
-        self,
-        hit_result: "HitResult",
-        default_value: object,
-        rule_index: Optional[int] = None,
-    ) -> "EvaluationResult":
+    def _hit_value(self, hit_result: "HitResult", default_value: object,
+                   rule_index: Optional[int] = None) -> "EvaluationResult":
         res = EvaluationResult(
             default_value,
             rule_index,
             hit_result.index,
             self._version,
-            hit_result.reason or "",
-        )
+            hit_result.reason or '')
         if hit_result.index is not None:
             variation = self._variations[hit_result.index]
             if isinstance(variation, int) and isinstance(default_value, float):
@@ -191,6 +184,6 @@ class Toggle:
             else:
                 res.value = variation
             if rule_index is not None:
-                res.reason = "Rule %d hit" % rule_index
+                res.reason = 'Rule %d hit' % rule_index
 
         return res

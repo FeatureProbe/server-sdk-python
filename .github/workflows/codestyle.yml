@@ -61,11 +61,11 @@ jobs:
     #! potential error: multiple PR may fix the same file thus cause conflict
     #! solution: 1. manually merge  2. prevent directly commit
 
-    - name: Check code format
+    - name: Check pep8 format
       if: github.event_name == 'pull_request_target'
-      run: |
-        pip install black
-        python3 -m black .
+      uses: peter-evans/autopep8@v1
+      with:
+        args: --recursive --in-place --aggressive --aggressive .
 
     - name: Commit formatted code
       if: github.event_name == 'pull_request_target'

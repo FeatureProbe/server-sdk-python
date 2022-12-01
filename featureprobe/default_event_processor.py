@@ -60,8 +60,8 @@ class EventRepository:
 
     def to_dict(self) -> dict:
         return {
-            "events": [e.to_dict() for e in self.events],
-            "access": self.access.to_dict(),
+            'events': [e.to_dict() for e in self.events],
+            'access': self.access.to_dict(),
         }
 
     def __bool__(self):
@@ -83,11 +83,11 @@ class EventRepository:
 
 
 class DefaultEventProcessor(EventProcessor):
-    _logger = logging.getLogger("FeatureProbe-Event")
+    _logger = logging.getLogger('FeatureProbe-Event')
     _EVENT_BATCH_HANDLE_SIZE = 50
     _CAPACITY = 10000
 
-    _LOG_BUSY_EVENT = "Event processing is busy, some will be dropped"
+    _LOG_BUSY_EVENT = 'Event processing is busy, some will be dropped'
 
     def __init__(self, context: Context):
         self._closed = False
@@ -95,32 +95,27 @@ class DefaultEventProcessor(EventProcessor):
 
         self._api_url = context.event_url
         self._session = Session()
-        self._session.mount("http://", context.http_config.adapter)
-        self._session.mount("https://", context.http_config.adapter)
+        self._session.mount('http://', context.http_config.adapter)
+        self._session.mount('https://', context.http_config.adapter)
         self._session.headers.update(context.headers)
         self._timeout = (
             context.http_config.conn_timeout,
-            context.http_config.read_timeout,
-        )
+            context.http_config.read_timeout)
 
         self._event_repository = EventRepository()
         self._handler_thread = threading.Thread(
-            target=self._handle_event,
-            args=(self._events, self._event_repository),
-            daemon=True,
-        )
+            target=self._handle_event, args=(
+                self._events, self._event_repository), daemon=True)
         self._handler_thread.start()
 
         self._executor = ThreadPoolExecutor(max_workers=5)
         self._scheduler = BackgroundScheduler(
-            timezone=tzlocal.get_localzone(), logger=self._logger
-        )
+            timezone=tzlocal.get_localzone(), logger=self._logger)
         self._scheduler.start()
-        self._scheduler.add_job(
-            self.flush,
-            trigger="interval",
-            seconds=5,
-            next_run_time=datetime.now())
+        self._scheduler.add_job(self.flush,
+                                trigger='interval',
+                                seconds=5,
+                                next_run_time=datetime.now())
 
     @classmethod
     def from_context(cls, context: Context) -> EventProcessor:
@@ -130,7 +125,8 @@ class DefaultEventProcessor(EventProcessor):
         if self._closed:
             return
         try:
-            self._events.put_nowait(EventAction(EventAction.Type.EVENT, event))
+            self._events.put_nowait(EventAction(
+                EventAction.Type.EVENT, event))
         except queue.Full:
             DefaultEventProcessor._logger.warning(
                 DefaultEventProcessor._LOG_BUSY_EVENT)
@@ -140,11 +136,7 @@ class DefaultEventProcessor(EventProcessor):
             return
         try:
             self._events.put(
-                EventAction(
-                    EventAction.Type.FLUSH,
-                    None),
-                block,
-                timeout)
+                EventAction(EventAction.Type.FLUSH, None), block, timeout)
         except queue.Full:
             DefaultEventProcessor._logger.warning(
                 DefaultEventProcessor._LOG_BUSY_EVENT)
@@ -159,9 +151,8 @@ class DefaultEventProcessor(EventProcessor):
             actions.append(events.get())
             with contextlib.suppress(queue.Empty):
                 actions.extend(
-                    events.get_nowait()
-                    for _ in range(1, DefaultEventProcessor._EVENT_BATCH_HANDLE_SIZE)
-                )
+                    events.get_nowait() for _ in range(
+                        1, DefaultEventProcessor._EVENT_BATCH_HANDLE_SIZE))
             try:
                 for action in actions:
                     if action.type == EventAction.Type.EVENT:
@@ -172,7 +163,7 @@ class DefaultEventProcessor(EventProcessor):
                         self._do_shutdown()
             except Exception as e:
                 self._logger.error(
-                    "FeatureProbe event handle error", exc_info=e)
+                    'FeatureProbe event handle error', exc_info=e)
 
     def _do_shutdown(self):
         if self._closed:
@@ -190,15 +181,16 @@ class DefaultEventProcessor(EventProcessor):
     def _send_events(self, repositories: List[EventRepository]):
         repositories = [repo.to_dict() for repo in repositories]
         resp = self._session.post(
-            self._api_url, json=repositories, timeout=self._timeout
-        )
+            self._api_url,
+            json=repositories,
+            timeout=self._timeout)
         # sourcery skip: replace-interpolation-with-fstring
-        self._logger.debug("Http response: %s" % resp.text)
+        self._logger.debug('Http response: %s' % resp.text)
         try:
             resp.raise_for_status()
         except HTTPError as e:
             self._logger.error(
-                "Unexpected error from event sender",
+                'Unexpected error from event sender',
                 exc_info=e)
 
     def _process_flush(self, event_repo: EventRepository):
