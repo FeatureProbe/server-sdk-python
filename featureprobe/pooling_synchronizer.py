@@ -121,8 +121,8 @@ class PoolingSynchronizer(Synchronizer):
 
     def _connect_socket(self, context: "Context"):
         if python_version < (3, 6):
-            self.__logger.info('python version {} does not support socketio, realtime toggle updating is disabled'
-                               .format(python_version))
+            self.__logger.info(
+                'python version {} does not support socketio, realtime toggle updating is disabled' .format(python_version))
             return
         if self._socket is not None:
             return

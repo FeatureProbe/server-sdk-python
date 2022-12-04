@@ -79,4 +79,3 @@ def test_realtime_toggle_update(session_get):
     sio.on_update(None)
 
     assert repo.get_all_toggle() and repo.get_all_segment()
-
