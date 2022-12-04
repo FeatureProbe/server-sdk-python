@@ -19,7 +19,8 @@ if python_version >= (3, 6):
     from socketio import ClientNamespace
 else:
     class ClientNamespace:
-        ...
+        def __init__(self, namespace=None):
+            ...
 
 from typing import TYPE_CHECKING
 
