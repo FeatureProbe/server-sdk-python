@@ -24,7 +24,11 @@ if TYPE_CHECKING:
 class RealtimeToggleUpdateNS(ClientNamespace):
     __logger = logging.getLogger("FeatureProbe-Socket")
 
-    def __init__(self, namespace, context: "Context", synchronizer: "Synchronizer"):
+    def __init__(
+            self,
+            namespace,
+            context: "Context",
+            synchronizer: "Synchronizer"):
         super(RealtimeToggleUpdateNS, self).__init__(namespace=namespace)
         self._synchronizer = synchronizer
         self._sdk_key = context.sdk_key

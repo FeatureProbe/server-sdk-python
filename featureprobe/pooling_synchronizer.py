@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import contextlib
 import logging
 import time
@@ -120,10 +121,14 @@ class PoolingSynchronizer(Synchronizer):
     def _connect_socket(self, context: "Context"):
         path = urlparse(context.realtime_url).path
         self._socket = socketio.Client()
-        self._socket.register_namespace(RealtimeToggleUpdateNS(path, context, self))
+        self._socket.register_namespace(
+            RealtimeToggleUpdateNS(
+                path, context, self))
 
         try:
-            self.__logger.info("connecting socket to {}, path={}".format(context.realtime_url, path))
+            self.__logger.info(
+                "connecting socket to {}, path={}".format(
+                    context.realtime_url, path))
             self._socket.connect(
                 context.realtime_url,
                 transports=["websocket"],
@@ -141,9 +146,6 @@ class PoolingSynchronizer(Synchronizer):
     def initialized(self) -> bool:
         return self._ready.is_set()
 
-
-
-import asyncio
 
 async def conn():
     # socket = socketio.Client()
