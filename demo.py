@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     config = fp.Config(remote_uri=FEATURE_PROBE_SERVER_URL,  # FeatureProbe server URL
                        sync_mode='pooling',
-                       refresh_interval=2,
+                       refresh_interval=30,
                        start_wait=5)
 
     # Server Side SDK Key for your project and environment

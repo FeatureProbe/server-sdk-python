@@ -34,6 +34,10 @@ class Synchronizer(ABC):
         pass
 
     @abstractmethod
+    def start(self):
+        pass
+
+    @abstractmethod
     def sync(self):
         pass
 

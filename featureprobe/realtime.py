@@ -13,7 +13,14 @@
 # limitations under the License.
 
 import logging
-from socketio import ClientNamespace
+
+from sys import version_info as python_version
+if python_version >= (3, 6):
+    from socketio import ClientNamespace
+else:
+    class ClientNamespace:
+        ...
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -35,7 +42,6 @@ class RealtimeToggleUpdateNS(ClientNamespace):
 
     def on_connect(self):
         self.__logger.info("connect socketio success")
-        print("connect socketio success")
         self.emit("register", {"key": self._sdk_key})
 
     def on_connect_error(self, error):
@@ -46,5 +52,4 @@ class RealtimeToggleUpdateNS(ClientNamespace):
 
     def on_update(self, data):
         self.__logger.info("socketio recv update event")
-        print("socketio recv update event")
         self._synchronizer.sync()

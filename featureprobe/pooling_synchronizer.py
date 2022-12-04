@@ -12,20 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
 import contextlib
 import logging
-import time
-
-import socketio
 import threading
-from datetime import datetime
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
 import tzlocal
 from apscheduler.schedulers.background import BackgroundScheduler
 from requests import Session
+
+from sys import version_info as python_version
+if python_version >= (3, 6):
+    import socketio
 
 from featureprobe.model import Repository
 from featureprobe.realtime import RealtimeToggleUpdateNS
@@ -44,6 +43,7 @@ class PoolingSynchronizer(Synchronizer):
             context: "Context",
             data_repo: "DataRepository",
             ready: "threading.Event"):
+        self._context = context
         self._refresh_interval = context.refresh_interval
         self._api_url = context.synchronizer_url
         self._data_repo = data_repo
@@ -56,9 +56,7 @@ class PoolingSynchronizer(Synchronizer):
             context.http_config.conn_timeout,
             context.http_config.read_timeout)
 
-        self._socket: socketio.Client
-        self._connect_socket(context)
-
+        self._socket = None
         self._scheduler = None
         self._lock = threading.RLock()
         self._ready = ready
@@ -83,10 +81,13 @@ class PoolingSynchronizer(Synchronizer):
             )
             self._scheduler.start()
             self._scheduler.add_job(
+                self._connect_socket,
+                args=(self._context,),
+            )
+            self._scheduler.add_job(
                 self.sync,
                 trigger="interval",
                 seconds=self._refresh_interval.total_seconds(),
-                next_run_time=datetime.now(),
             )
 
     def close(self):
@@ -119,6 +120,13 @@ class PoolingSynchronizer(Synchronizer):
                 exc_info=e)
 
     def _connect_socket(self, context: "Context"):
+        if python_version < (3, 6):
+            self.__logger.info('python version {} does not support socketio, realtime toggle updating is disabled'
+                               .format(python_version))
+            return
+        if self._socket is not None:
+            return
+
         path = urlparse(context.realtime_url).path
         self._socket = socketio.Client()
         self._socket.register_namespace(
@@ -145,19 +153,3 @@ class PoolingSynchronizer(Synchronizer):
 
     def initialized(self) -> bool:
         return self._ready.is_set()
-
-
-async def conn():
-    # socket = socketio.Client()
-    # # socket.on('connect', lambda: print('conn'))
-    # socket.connect('https://featureprobe.io/server/realtime')
-    print(1)
-    await asyncio.sleep(1)
-    print(1)
-
-
-if __name__ == '__main__':
-    asyncio.get_event_loop().run_until_complete(conn())
-    # asyncio.get_event_loop().run_until_complete(conn())
-    print('out')
-    time.sleep(10)
