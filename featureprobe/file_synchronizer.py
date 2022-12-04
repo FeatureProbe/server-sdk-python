@@ -59,7 +59,6 @@ class FileSynchronizer(Synchronizer):
                 'repository file resource not found in path: %s' %
                 self._location)
 
-    @property
     def initialized(self):
         return self._ready.is_set()
 

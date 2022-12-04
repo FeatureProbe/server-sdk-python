@@ -41,9 +41,8 @@ class Synchronizer(ABC):
     def close(self):
         pass
 
-    @property
     @abstractmethod
-    def initialized(self) -> bool:
+    def initialized(self):
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):

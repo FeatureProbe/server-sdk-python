@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import contextlib
 import logging
 import time
 from threading import Event
@@ -56,7 +55,7 @@ class Client:
                                  str(config.start_wait) +
                                  " seconds for FeatureProbe client to initialize...")
             synchronize_process_ready.wait(config.start_wait)
-        if self._synchronizer.initialized:
+        if self._synchronizer.initialized() is True:
             Client.__logger.info("Started FeatureProbe Client: Successfully")
         else:
             Client.__logger.warning(
@@ -77,9 +76,9 @@ class Client:
         """
         self.close()
 
-    def initialized(self) -> bool:
+    def initialized(self):
         """Tests whether the FeatureProbe client is ready to be used"""
-        return self._synchronizer.initialized
+        return self._synchronizer.initialized()
 
     def flush(self):
         """Manually push events"""

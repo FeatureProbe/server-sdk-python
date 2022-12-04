@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from featureprobe import User
-from featureprobe.model import Split
+import featureprobe as fp
 
 
 def setup_function():
     global split, user  # noqa
-    split = Split([
+    split = fp.model.Split([
         [[0, 5000]],
         [[5000, 10000]],
     ], None, None)  # noqa
-    user = User(stable_rollout_key='test_user_key')
+    user = fp.User(stable_rollout_key='test_user_key')
 
 
 def test_get_user_group():
@@ -37,7 +36,7 @@ def test_get_user_group():
 
 
 def test_user_has_no_key():
-    user = User()
+    user = fp.User()
     result1 = split.find_index(user, "test_toggle_key")
     key1 = user.key
     result2 = split.find_index(user, "test_toggle_key")

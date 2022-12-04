@@ -54,7 +54,6 @@ class Config:
                  start_wait: float = 5,
                  ):
         self._location = location
-        self._sync_mode = sync_mode
         self._synchronizer_creator = SyncMode(sync_mode).synchronizer_creator
         self._data_repository_creator = MemoryDataRepository.from_context
         self._event_processor_creator = DefaultEventProcessor.from_context
@@ -64,11 +63,9 @@ class Config:
         self._realtime_url = realtime_url
         self._start_wait = start_wait
         self._http_config = http_config or HttpConfig()
-        self._refresh_interval = (
-            refresh_interval
-            if isinstance(refresh_interval, timedelta)
+        self._refresh_interval = refresh_interval \
+            if isinstance(refresh_interval, timedelta) \
             else timedelta(seconds=refresh_interval)
-        )
 
     @property
     def location(self):

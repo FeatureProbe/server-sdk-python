@@ -14,6 +14,8 @@
 
 import contextlib
 import logging
+import time
+
 import socketio
 import threading
 from datetime import datetime
@@ -34,7 +36,7 @@ if TYPE_CHECKING:
 
 
 class PoolingSynchronizer(Synchronizer):
-    __logger = logging.getLogger("FeatureProbe-Synchronizer")
+    __logger = logging.getLogger('FeatureProbe-Synchronizer')
 
     def __init__(
             self,
@@ -46,16 +48,15 @@ class PoolingSynchronizer(Synchronizer):
         self._data_repo = data_repo
 
         self._session = Session()
-        self._session.mount("http://", context.http_config.adapter)
-        self._session.mount("https://", context.http_config.adapter)
+        self._session.mount('http://', context.http_config.adapter)
+        self._session.mount('https://', context.http_config.adapter)
         self._session.headers.update(context.headers)
         self._timeout = (
             context.http_config.conn_timeout,
-            context.http_config.read_timeout,
-        )
+            context.http_config.read_timeout)
 
         self._socket: socketio.Client
-        self._connect_socket(context.realtime_url)
+        self._connect_socket(context)
 
         self._scheduler = None
         self._lock = threading.RLock()
@@ -102,10 +103,10 @@ class PoolingSynchronizer(Synchronizer):
         try:
             resp = self._session.get(self._api_url, timeout=self._timeout)
             resp.raise_for_status()
-            self.__logger.debug("Http response: %d" % resp.status_code)
+            self.__logger.debug('Http response: %d' % resp.status_code)
             body = resp.json()
             # sourcery skip: replace-interpolation-with-fstring
-            self.__logger.debug("Http response body: %s" % body)
+            self.__logger.debug('Http response body: %s' % body)
             repo = Repository.from_json(body)
             self._data_repo.refresh(repo)
 
@@ -113,20 +114,18 @@ class PoolingSynchronizer(Synchronizer):
                 self._ready.set()
         except Exception as e:  # noqa
             self.__logger.error(
-                "Unexpected error from polling processor",
+                'Unexpected error from polling processor',
                 exc_info=e)
 
-    def _connect_socket(self, url):
-        path = urlparse(url).path
+    def _connect_socket(self, context: "Context"):
+        path = urlparse(context.realtime_url).path
         self._socket = socketio.Client()
-        self._socket.register_namespace(RealtimeToggleUpdateNS(path, self))
+        self._socket.register_namespace(RealtimeToggleUpdateNS(path, context, self))
 
         try:
-            self.__logger.info(
-                "connecting socket to {}, path={}".format(
-                    url, path))
+            self.__logger.info("connecting socket to {}, path={}".format(context.realtime_url, path))
             self._socket.connect(
-                url,
+                context.realtime_url,
                 transports=["websocket"],
                 socketio_path=path,
                 wait=True,
@@ -139,6 +138,24 @@ class PoolingSynchronizer(Synchronizer):
             )
             self._socket = None
 
-    @property
     def initialized(self) -> bool:
         return self._ready.is_set()
+
+
+
+import asyncio
+
+async def conn():
+    # socket = socketio.Client()
+    # # socket.on('connect', lambda: print('conn'))
+    # socket.connect('https://featureprobe.io/server/realtime')
+    print(1)
+    await asyncio.sleep(1)
+    print(1)
+
+
+if __name__ == '__main__':
+    asyncio.get_event_loop().run_until_complete(conn())
+    # asyncio.get_event_loop().run_until_complete(conn())
+    print('out')
+    time.sleep(10)

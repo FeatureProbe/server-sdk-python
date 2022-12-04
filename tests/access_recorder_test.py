@@ -14,7 +14,7 @@
 
 import time
 
-from featureprobe import User
+import featureprobe as fp
 from featureprobe.access_recorder import AccessRecorder
 from featureprobe.event import AccessEvent
 
@@ -26,7 +26,7 @@ def _timestamp():
 def setup_function():
     global recorder, event  # noqa
     recorder = AccessRecorder()
-    user = User().stable_rollout('test_user')
+    user = fp.User().stable_rollout('test_user')
     event = AccessEvent(_timestamp(), user,
                         key='test_toggle', value='true',
                         version=1, index=0)

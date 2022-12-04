@@ -23,6 +23,8 @@ __version__ = 'NO_MANUAL_MAINTENANCE_NEEDED'
 
 # --------------- API --------------- #
 
+import featureprobe.model
+
 from featureprobe.config import Config
 from featureprobe.detail import Detail
 from featureprobe.http_config import HttpConfig

@@ -17,21 +17,22 @@ from socketio import ClientNamespace
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from featureprobe.client import Client
+    from featureprobe.context import Context
+    from featureprobe.synchronizer import Synchronizer
 
 
 class RealtimeToggleUpdateNS(ClientNamespace):
     __logger = logging.getLogger("FeatureProbe-Socket")
 
-    def __init__(self, namespace, fp_client: "Client"):
+    def __init__(self, namespace, context: "Context", synchronizer: "Synchronizer"):
         super(RealtimeToggleUpdateNS, self).__init__(namespace=namespace)
-        self._fp_client = fp_client
+        self._synchronizer = synchronizer
+        self._sdk_key = context.sdk_key
 
     def on_connect(self):
         self.__logger.info("connect socketio success")
-        self.emit(
-            "register", {"key": self._fp_client._sdk_key}  # noqa: access protected member
-        )
+        print("connect socketio success")
+        self.emit("register", {"key": self._sdk_key})
 
     def on_connect_error(self, error):
         self.__logger.error("socketio error: {}".format(error))
@@ -41,4 +42,5 @@ class RealtimeToggleUpdateNS(ClientNamespace):
 
     def on_update(self, data):
         self.__logger.info("socketio recv update event")
-        self._fp_client._synchronizer.sync()  # noqa: access protected member
+        print("socketio recv update event")
+        self._synchronizer.sync()
