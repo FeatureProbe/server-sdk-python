@@ -36,8 +36,8 @@ class SyncMode(str, Enum):
         obj.synchronizer_creator = synchronizer_creator
         return obj
 
-    POOLING = "pooling", PoolingSynchronizer.from_context
-    FILE = "file", FileSynchronizer.from_context
+    POOLING = 'pooling', PoolingSynchronizer.from_context
+    FILE = 'file', FileSynchronizer.from_context
 
 
 @defaultable
@@ -113,7 +113,3 @@ class Config:
     @property
     def start_wait(self):
         return self._start_wait
-
-    @property
-    def socketio_available(self) -> bool:
-        return self._sync_mode == SyncMode.POOLING

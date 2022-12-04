@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import logging
+import socketio
 import threading
 from datetime import datetime
 from typing import TYPE_CHECKING
+from urllib.parse import urlparse
 
 import tzlocal
 from apscheduler.schedulers.background import BackgroundScheduler
 from requests import Session
 
 from featureprobe.model import Repository
+from featureprobe.realtime import RealtimeToggleUpdateNS
 from featureprobe.synchronizer import Synchronizer
 
 if TYPE_CHECKING:
@@ -49,6 +53,9 @@ class PoolingSynchronizer(Synchronizer):
             context.http_config.conn_timeout,
             context.http_config.read_timeout,
         )
+
+        self._socket: socketio.Client
+        self._connect_socket(context.realtime_url)
 
         self._scheduler = None
         self._lock = threading.RLock()
@@ -85,8 +92,11 @@ class PoolingSynchronizer(Synchronizer):
             "Closing FeatureProbe PollingSynchronizer")
         with self._lock:
             self._scheduler.shutdown()
-            del self._scheduler
+            self._scheduler = None
             self._ready.clear()
+            if self._socket is not None:
+                with contextlib.suppress(Exception):
+                    self._socket.disconnect()
 
     def sync(self):
         try:
@@ -105,6 +115,29 @@ class PoolingSynchronizer(Synchronizer):
             self.__logger.error(
                 "Unexpected error from polling processor",
                 exc_info=e)
+
+    def _connect_socket(self, url):
+        path = urlparse(url).path
+        self._socket = socketio.Client()
+        self._socket.register_namespace(RealtimeToggleUpdateNS(path, self))
+
+        try:
+            self.__logger.info(
+                "connecting socket to {}, path={}".format(
+                    url, path))
+            self._socket.connect(
+                url,
+                transports=["websocket"],
+                socketio_path=path,
+                wait=True,
+                wait_timeout=1,
+            )
+        except socketio.exceptions.ConnectionError as e:
+            self.__logger.error(
+                "failed to connect socket, realtime toggle updating is disabled",
+                exc_info=e,
+            )
+            self._socket = None
 
     @property
     def initialized(self) -> bool:
