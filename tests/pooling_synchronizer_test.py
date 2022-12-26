@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 from featureprobe.pooling_synchronizer import PoolingSynchronizer
 from featureprobe.memory_data_repository import MemoryDataRepository
-from featureprobe.realtime import RealtimeToggleUpdateNS
 from featureprobe.config import Config
 from featureprobe.context import Context
 from threading import Event
@@ -24,7 +21,30 @@ from requests import Session
 from unittest.mock import patch
 
 
-class MockHttpResponse:
+def test_init_synchronizer_failed():
+    realy = Event()
+    context = Context("test-sdk-key", Config())
+    synchroizer = PoolingSynchronizer.from_context(
+        context, MemoryDataRepository.from_context(context), realy)
+    realy.wait(2)
+
+    assert not synchroizer.initialized()
+
+
+@patch.object(Session, 'get')
+def test_init_synchronizer_wait_for_init_success(session_get):
+    realy = Event()
+    context = Context("test-sdk-key", Config())
+    session_get.return_value = MockHttpReponse(200, '{}')
+    synchroizer = PoolingSynchronizer.from_context(
+        context, MemoryDataRepository.from_context(context), realy)
+    synchroizer.sync()
+    realy.wait(5)
+
+    assert synchroizer.initialized()
+
+
+class MockHttpReponse:
     def __init__(self, status_code, json_response):
         self.status_code = status_code
         self.response = json_response
@@ -34,48 +54,3 @@ class MockHttpResponse:
 
     def json(self):
         return self.response
-
-
-def test_init_synchronizer_failed():
-    ready = Event()
-    context = Context("test-sdk-key", Config())
-    synchronizer = PoolingSynchronizer.from_context(
-        context, MemoryDataRepository.from_context(context), ready)
-    ready.wait(2)
-
-    assert not synchronizer.initialized()
-
-
-@patch.object(Session, 'get')
-def test_init_synchronizer_wait_for_init_success(session_get):
-    ready = Event()
-    context = Context("test-sdk-key", Config())
-    session_get.return_value = MockHttpResponse(200, '{}')
-    synchronizer = PoolingSynchronizer.from_context(
-        context, MemoryDataRepository.from_context(context), ready)
-    synchronizer.start()
-    ready.wait(5)
-
-    assert synchronizer.initialized()
-
-
-@patch.object(Session, 'get')
-def test_realtime_toggle_update(session_get):
-    ready = Event()
-    context = Context("test-sdk-key", Config(refresh_interval=10000))
-    repo = MemoryDataRepository.from_context(context)
-    synchronizer = PoolingSynchronizer.from_context(context, repo, ready)
-    sio = RealtimeToggleUpdateNS(None, context, synchronizer)
-
-    session_get.return_value = MockHttpResponse(200, '{}')
-    synchronizer.start()
-    ready.wait(5)
-
-    assert synchronizer.initialized()
-    assert not repo.get_all_toggle() and not repo.get_all_segment()
-
-    with open('tests/resources/datasource/repo.json') as f:
-        session_get.return_value = MockHttpResponse(200, f.read())
-    sio.on_update(None)
-
-    assert repo.get_all_toggle() and repo.get_all_segment()

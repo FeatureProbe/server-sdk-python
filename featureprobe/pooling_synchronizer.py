@@ -71,14 +71,13 @@ class PoolingSynchronizer(Synchronizer):
 
     def start(self):
         PoolingSynchronizer.__logger.info(
-            "Starting FeatureProbe polling repository with interval %d ms"
-            % (self._refresh_interval.total_seconds() * 1000)
-        )
+            'Starting FeatureProbe polling repository with interval %d ms'
+            % (self._refresh_interval.total_seconds() * 1000))
         self.sync()
         with self._lock:
             self._scheduler = BackgroundScheduler(
-                timezone=tzlocal.get_localzone(), logger=self.__logger
-            )
+                timezone=tzlocal.get_localzone(),
+                logger=self.__logger)
             self._scheduler.start()
             self._scheduler.add_job(
                 self._connect_socket,
@@ -92,7 +91,7 @@ class PoolingSynchronizer(Synchronizer):
 
     def close(self):
         PoolingSynchronizer.__logger.info(
-            "Closing FeatureProbe PollingSynchronizer")
+            'Closing FeatureProbe PollingSynchronizer')
         with self._lock:
             self._scheduler.shutdown()
             self._scheduler = None
@@ -120,11 +119,13 @@ class PoolingSynchronizer(Synchronizer):
                 exc_info=e)
 
     def _connect_socket(self, context: "Context"):
+        if self._socket is not None:
+            return
+
         if python_version < (3, 6):
             self.__logger.info(
-                'python version {} does not support socketio, realtime toggle updating is disabled' .format(python_version))
-            return
-        if self._socket is not None:
+                'python version %s does not support socketio, realtime toggle updating is disabled'
+                % ('.'.join(map(str, python_version))))
             return
 
         path = urlparse(context.realtime_url).path
@@ -141,8 +142,8 @@ class PoolingSynchronizer(Synchronizer):
                 context.realtime_url,
                 transports=["websocket"],
                 socketio_path=path,
-                wait=True,
-                wait_timeout=1,
+                wait=False,
+                wait_timeout=10,
             )
         except socketio.exceptions.ConnectionError as e:
             self.__logger.error(
@@ -151,5 +152,5 @@ class PoolingSynchronizer(Synchronizer):
             )
             self._socket = None
 
-    def initialized(self) -> bool:
+    def initialized(self):
         return self._ready.is_set()
