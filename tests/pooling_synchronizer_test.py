@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import time
+
+import pytest
+import featureprobe as fp
 
 from featureprobe.pooling_synchronizer import PoolingSynchronizer
 from featureprobe.memory_data_repository import MemoryDataRepository
@@ -54,3 +58,20 @@ class MockHttpReponse:
 
     def json(self):
         return self.response
+
+
+@pytest.mark.integration
+def test_socketio_realtime_toggle_update():
+    config = fp.Config(remote_uri='https://featureprobe.io/server')
+    client = fp.Client("server-61db54ecea79824cae3ac38d73f1961d698d0477", config)
+
+    update_cnt = 0
+
+    def record_update():
+        nonlocal update_cnt
+        update_cnt += 1
+
+    client._synchronizer._socket.on('update', record_update)
+    time.sleep(5)
+    assert client.initialized()
+    assert client._synchronizer._socket is not None

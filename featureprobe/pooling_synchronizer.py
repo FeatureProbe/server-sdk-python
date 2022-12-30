@@ -99,6 +99,7 @@ class PoolingSynchronizer(Synchronizer):
             if self._socket is not None:
                 with contextlib.suppress(Exception):
                     self._socket.disconnect()
+                    self._socket = None
 
     def sync(self):
         try:
