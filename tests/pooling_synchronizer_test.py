@@ -63,7 +63,9 @@ class MockHttpReponse:
 @pytest.mark.integration
 def test_socketio_realtime_toggle_update():
     config = fp.Config(remote_uri='https://featureprobe.io/server')
-    client = fp.Client("server-61db54ecea79824cae3ac38d73f1961d698d0477", config)
+    client = fp.Client(
+        "server-61db54ecea79824cae3ac38d73f1961d698d0477",
+        config)
 
     update_cnt = 0
 
