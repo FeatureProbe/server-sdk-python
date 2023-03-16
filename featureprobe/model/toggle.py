@@ -46,7 +46,7 @@ class Toggle:
         self._variations = variations
         self._for_client = for_client
         self._track_access_events = track_access_events
-        self._last_modified  = last_modified
+        self._last_modified = last_modified
 
     @classmethod
     @json_decoder
@@ -61,7 +61,7 @@ class Toggle:
         for_client = json.get('forClient', False)
         track_access_events = json.get('trackAccessEvents', False)
         last_modified = json.get('lastModified', version)
-        
+
         return cls(
             key,
             enabled,
@@ -133,10 +133,10 @@ class Toggle:
     @property
     def for_client(self) -> bool:
         return self._for_client
-    
+
     @property
     def track_access_events(self) -> bool:
-        return self._track_access_events 
+        return self._track_access_events
 
     @for_client.setter
     def for_client(self, value: bool):
