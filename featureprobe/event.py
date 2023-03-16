@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from featureprobe.user import User
 
+
 class Event:
     def __init__(self, kind: str, created_time: int, user: "User"):
         self._created_time = created_time
@@ -41,6 +42,7 @@ class Event:
     @property
     def kind(self) -> str:
         return self._kind
+
 
 class AccessEvent(Event):
     def __init__(
@@ -102,6 +104,7 @@ class AccessEvent(Event):
     @property
     def track_access_events(self):
         return self._track_access_events
+
 
 class CustomEvent(Event):
     def __init__(self, timestamp: int, user: "User", name: str, value: Optional[float] = None):

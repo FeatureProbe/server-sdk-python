@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional 
+from typing import Optional
 import logging
 import time
 from threading import Event
@@ -106,15 +106,17 @@ class Client:
             return default
 
         eval_result = toggle.eval(user, segments, default)
-        access_event = AccessEvent(timestamp=int(time.time() * 1000),
-                                   user=user,
-                                   key=toggle_key,
-                                   value=eval_result.value,
-                                   version=eval_result.version,
-                                   variation_index=eval_result.variation_index,
-                                   rule_index=eval_result.rule_index,
-                                   reason=eval_result.reason,
-                                   track_access_events=toggle.track_access_events)
+        access_event = AccessEvent(
+            timestamp=int(
+                time.time() * 1000),
+            user=user,
+            key=toggle_key,
+            value=eval_result.value,
+            version=eval_result.version,
+            variation_index=eval_result.variation_index,
+            rule_index=eval_result.rule_index,
+            reason=eval_result.reason,
+            track_access_events=toggle.track_access_events)
         self._event_processor.push(access_event)
         return eval_result.value
 
@@ -144,15 +146,17 @@ class Client:
                         reason=eval_result.reason,
                         rule_index=eval_result.rule_index,
                         version=eval_result.version)
-        access_event = AccessEvent(timestamp=int(time.time() * 1000),
-                                   user=user,
-                                   key=toggle_key,
-                                   value=eval_result.value,
-                                   version=eval_result.version,
-                                   variation_index=eval_result.variation_index,
-                                   rule_index=eval_result.rule_index,
-                                   reason=eval_result.reason,
-                                   track_access_events=toggle.track_access_events)
+        access_event = AccessEvent(
+            timestamp=int(
+                time.time() * 1000),
+            user=user,
+            key=toggle_key,
+            value=eval_result.value,
+            version=eval_result.version,
+            variation_index=eval_result.variation_index,
+            rule_index=eval_result.rule_index,
+            reason=eval_result.reason,
+            track_access_events=toggle.track_access_events)
         self._event_processor.push(access_event)
         return detail
 

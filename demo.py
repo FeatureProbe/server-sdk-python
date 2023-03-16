@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
         # Simulate conversion rate of 1000 users for a new feature
         #YOU_EVENT_NAME = "new_feature_conversion";
-        YOU_EVENT_NAME = "multi_feature";
+        YOU_EVENT_NAME = "multi_feature"
         for i in range(1000):
             event_user = fp.User().stable_rollout(str(time.time_ns() + i))
             new_feature = client.value(TOGGLE_KEY, event_user, '1')
