@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 class AccessCounter:
-    def __init__(self, value: str, version: int, index: int):
+    def __init__(self, value: object, version: int, index: int):
         self._VALUE = value
         self._VERSION = version
         self._INDEX = index
@@ -59,12 +59,11 @@ class AccessCounter:
         self._count += 1
 
     def is_group(self, event: "AccessEvent"):
-        return self._VALUE == event.value \
-            and self._VERSION == event.version \
-            and self._INDEX == event.index
+        return self._VERSION == event.version \
+            and self._INDEX == event.variation_index
 
 
-class AccessRecorder:
+class AccessSummaryRecorder:
     def __init__(self):
         self._counters = {}  # Dict[str, List[AccessCounter]]
         self._start_time = 0
@@ -102,13 +101,13 @@ class AccessRecorder:
                 AccessCounter(
                     _event.value,
                     _event.version,
-                    _event.index))
+                    _event.variation_index))
         else:
             groups = [
                 AccessCounter(
                     _event.value,
                     _event.version,
-                    _event.index)]
+                    _event.variation_index)]
             self._counters[_event.key] = groups
 
     def snapshot(self):

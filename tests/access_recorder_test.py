@@ -23,11 +23,15 @@ def _timestamp():
 
 def setup_function():
     global recorder, event  # noqa
-    recorder = fp.AccessRecorder()
+    recorder = fp.AccessSummaryRecorder()
     user = fp.User().stable_rollout('test_user')
     event = fp.AccessEvent(_timestamp(), user,
                            key='test_toggle', value='true',
-                           version=1, index=0)
+                           version=1,
+                           variation_index=1,
+                           rule_index=0,
+                           track_access_events=True,
+                           reason='')
 
 
 def test_add_event():
@@ -37,8 +41,7 @@ def test_add_event():
     assert recorder.counters.get('test_toggle')[0].value == 'true'
     assert recorder.counters.get('test_toggle')[0].count == 1
     assert recorder.counters.get('test_toggle')[0].version == 1
-    assert recorder.counters.get('test_toggle')[0].index == 0
-
+    assert recorder.counters.get('test_toggle')[0].index == 1
 
 def test_get_snapshot():
     recorder.add(event)

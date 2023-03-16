@@ -1,6 +1,8 @@
 import logging
 
 import featureprobe as fp
+import random
+import time
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -14,19 +16,17 @@ if __name__ == '__main__':
                        start_wait=5)
 
     # Server Side SDK Key for your project and environment
-    SDK_KEY = 'server-8ed48815ef044428826787e9a238b9c6a479f98c'
+    SDK_KEY = 'server-9e53c5db4fd75049a69df8881f3bc90edd58fb06'
     with fp.Client(SDK_KEY, config) as client:
-        if client.initialized():
-            print("SDK successfully initialized!")
-        else:
+        if not client.initialized():
             print("SDK failed to initialize!")
-            exit()
         # Create one user
         # "userId" is used in rules, should be filled in.
         user = fp.User().with_attr('userId', '00001')
 
         # Get toggle result for this user.
-        TOGGLE_KEY = 'campaign_allow_list'
+        #TOGGLE_KEY = 'campaign_allow_list'
+        TOGGLE_KEY = 'Event_Analysis'
 
         # Get toggle result for this user
         is_open = client.value(TOGGLE_KEY, user, default=False)
@@ -36,3 +36,21 @@ if __name__ == '__main__':
         is_open_detail = client.value_detail(TOGGLE_KEY, user, default=False)
         print('detail: ' + str(is_open_detail.reason))
         print('rule index: ' + str(is_open_detail.rule_index))
+
+        # Simulate conversion rate of 1000 users for a new feature
+        #YOU_EVENT_NAME = "new_feature_conversion";
+        YOU_EVENT_NAME = "multi_feature";
+        for i in range(1000):
+            event_user = fp.User().stable_rollout(str(time.time_ns()))
+            new_feature = client.value(TOGGLE_KEY, event_user, False)
+            random_rang = random.randint(0, 99)
+            if new_feature:
+                if random_rang <= 55:
+                    print("New feature conversion.")
+                    client.track(YOU_EVENT_NAME, event_user)
+            else:
+                if random_rang > 55:
+                    print("Old feature conversion.")
+                    client.track(YOU_EVENT_NAME, event_user)
+            time.sleep(0.2)
+        client.track('test_event', user)

@@ -34,7 +34,9 @@ class Toggle:
                  default_serve: "Serve",
                  rules: List["Rule"],
                  variations: list,
-                 for_client: bool):
+                 for_client: bool,
+                 track_access_events: bool,
+                 last_modified: int):
         self._key = key
         self._enabled = enabled
         self._version = version
@@ -43,6 +45,8 @@ class Toggle:
         self._rules = rules
         self._variations = variations
         self._for_client = for_client
+        self._track_access_events = track_access_events
+        self._last_modified  = last_modified
 
     @classmethod
     @json_decoder
@@ -55,6 +59,9 @@ class Toggle:
         rules = [Rule.from_json(r) for r in json.get('rules', [])]
         variations = json.get('variations', [])
         for_client = json.get('forClient', False)
+        track_access_events = json.get('trackAccessEvents', False)
+        last_modified = json.get('lastModified', version)
+        
         return cls(
             key,
             enabled,
@@ -63,7 +70,9 @@ class Toggle:
             default_serve,
             rules,
             variations,
-            for_client)
+            for_client,
+            track_access_events,
+            last_modified)
 
     @property
     def key(self) -> str:
@@ -124,6 +133,10 @@ class Toggle:
     @property
     def for_client(self) -> bool:
         return self._for_client
+    
+    @property
+    def track_access_events(self) -> bool:
+        return self._track_access_events 
 
     @for_client.setter
     def for_client(self, value: bool):

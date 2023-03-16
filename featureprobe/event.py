@@ -17,11 +17,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from featureprobe.user import User
 
-
 class Event:
-    def __init__(self, created_time: int, user: "User"):
+    def __init__(self, kind: str, created_time: int, user: "User"):
         self._created_time = created_time
         self._user = user
+        self._kind = kind
 
     def to_dict(self) -> dict:
         return {
@@ -37,6 +37,9 @@ class Event:
     def user(self) -> "User":
         return self._user
 
+    @property
+    def kind(self) -> str:
+        return self._kind
 
 class AccessEvent(Event):
     def __init__(
@@ -44,14 +47,20 @@ class AccessEvent(Event):
             timestamp: int,
             user: "User",
             key: str,
-            value: str,
+            value: object,
             version: int,
-            index: int):
-        super().__init__(timestamp, user)
+            variation_index: int,
+            rule_index: int,
+            reason: str,
+            track_access_events: bool):
+        super().__init__("access", timestamp, user)
         self._key = key
         self._value = value
         self._version = version
-        self._index = index
+        self._variation_index = variation_index
+        self._rule_index = rule_index
+        self._reason = reason
+        self._track_access_events = track_access_events
 
     @property
     def key(self):
@@ -66,5 +75,32 @@ class AccessEvent(Event):
         return self._version
 
     @property
-    def index(self):
-        return self._index
+    def variation_index(self):
+        return self._variation_index
+
+    @property
+    def rule_index(self):
+        return self._rule_index
+
+    @property
+    def reason(self):
+        return self._reason
+
+    @property
+    def track_access_events(self):
+        return self._track_access_events
+
+class CustomEvent(Event):
+    def __init__(self, timestamp: int, user: "User", name: str, value: float):
+        super().__init__("custom", timestamp, user)
+        self._name = name
+        self._value = value
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def value(self):
+        return self._value
+

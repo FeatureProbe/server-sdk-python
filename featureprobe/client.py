@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional 
 import logging
 import time
 from threading import Event
@@ -20,7 +21,7 @@ from typing import Any
 from featureprobe.config import Config
 from featureprobe.context import Context
 from featureprobe.detail import Detail
-from featureprobe.event import AccessEvent
+from featureprobe.event import AccessEvent, CustomEvent
 from featureprobe.internal.empty_str import empty_str
 from featureprobe.user import User
 
@@ -108,9 +109,12 @@ class Client:
         access_event = AccessEvent(timestamp=int(time.time() * 1000),
                                    user=user,
                                    key=toggle_key,
-                                   value=str(eval_result.value),
+                                   value=eval_result.value,
                                    version=eval_result.version,
-                                   index=eval_result.variation_index)
+                                   variation_index=eval_result.variation_index,
+                                   rule_index=eval_result.rule_index,
+                                   reason=eval_result.reason,
+                                   track_access_events=toggle.track_access_events)
         self._event_processor.push(access_event)
         return eval_result.value
 
@@ -145,6 +149,16 @@ class Client:
                                    key=toggle_key,
                                    value=eval_result.value,
                                    version=eval_result.version,
-                                   index=eval_result.variation_index)
+                                   variation_index=eval_result.variation_index,
+                                   rule_index=eval_result.rule_index,
+                                   reason=eval_result.reason,
+                                   track_access_events=toggle.track_access_events)
         self._event_processor.push(access_event)
         return detail
+
+    def track(self, event_name: str, user: User, value: Optional[float] = None):
+        custom_event = CustomEvent(timestamp=int(time.time() * 1000),
+                                   name = event_name, 
+                                   user = user, 
+                                   value = value)
+        self._event_processor.push(custom_event)

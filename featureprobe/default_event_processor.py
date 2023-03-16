@@ -26,7 +26,7 @@ import tzlocal
 from apscheduler.schedulers.background import BackgroundScheduler
 from requests import Session, HTTPError
 
-from featureprobe.access_recorder import AccessRecorder
+from featureprobe.access_recorder import AccessSummaryRecorder
 from featureprobe.context import Context
 from featureprobe.event import Event, AccessEvent
 from featureprobe.event_processor import EventProcessor
@@ -46,13 +46,13 @@ class EventAction:
 class EventRepository:
     def __init__(self):
         self.events = []
-        self.access = AccessRecorder()
+        self.access = AccessSummaryRecorder()
 
     @classmethod
     def _clone(
             cls,
             events: List[Event],
-            access: AccessRecorder) -> "EventRepository":
+            access: AccessSummaryRecorder) -> "EventRepository":
         repo = cls()
         repo.events = events.copy()
         repo.access = access.snapshot()
@@ -176,7 +176,8 @@ class DefaultEventProcessor(EventProcessor):
         self._executor.shutdown(wait=True)
 
     def _process_event(self, event: Event, event_repo: EventRepository):
-        event_repo.add(event)
+        if not isinstance(event, AccessEvent) or event.track_access_events:
+            event_repo.add(event)
 
     def _send_events(self, repositories: List[EventRepository]):
         repositories = [repo.to_dict() for repo in repositories]

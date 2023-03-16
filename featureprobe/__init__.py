@@ -27,7 +27,7 @@ from featureprobe.model import *
 
 from featureprobe.access_recorder import (
     AccessCounter,
-    AccessRecorder,
+    AccessSummaryRecorder,
 )
 
 from featureprobe.config import Config
@@ -64,7 +64,7 @@ __all__ = [
     # featureprobe
 
     'AccessCounter',
-    'AccessRecorder',
+    'AccessSummaryRecorder',
     'Client',
     'Config',
     'Context',
