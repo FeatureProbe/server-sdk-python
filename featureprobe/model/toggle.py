@@ -60,7 +60,7 @@ class Toggle:
         variations = json.get('variations', [])
         for_client = json.get('forClient', False)
         track_access_events = json.get('trackAccessEvents', False)
-        last_modified = json.get('lastModified', version)
+        last_modified = json.get('lastModified', None)
         
         return cls(
             key,

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from featureprobe.user import User
@@ -25,8 +25,9 @@ class Event:
 
     def to_dict(self) -> dict:
         return {
-            'createdTime': self._created_time,
-            'user': self._user.to_dict(),
+            'kind': self.kind,
+            'time': self._created_time,
+            'user': self._user.key
         }
 
     @property
@@ -62,6 +63,18 @@ class AccessEvent(Event):
         self._reason = reason
         self._track_access_events = track_access_events
 
+    def to_dict(self) -> dict:
+        values = super().to_dict()
+        values.update({
+            'key': self._key,
+            'value': self._value,
+            'version': self._version,
+            'variationIndex': self._variation_index,
+            'ruleIndex': self._rule_index,
+            'reason': self._reason
+        })
+        return values
+
     @property
     def key(self):
         return self._key
@@ -91,10 +104,17 @@ class AccessEvent(Event):
         return self._track_access_events
 
 class CustomEvent(Event):
-    def __init__(self, timestamp: int, user: "User", name: str, value: float):
+    def __init__(self, timestamp: int, user: "User", name: str, value: Optional[float] = None):
         super().__init__("custom", timestamp, user)
         self._name = name
         self._value = value
+
+    def to_dict(self) -> dict:
+        values = super().to_dict()
+        values['name'] = self._name
+        if self._value is not None:
+            values['value'] = self._value
+        return values
 
     @property
     def name(self):
@@ -103,4 +123,3 @@ class CustomEvent(Event):
     @property
     def value(self):
         return self._value
-

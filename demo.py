@@ -41,16 +41,8 @@ if __name__ == '__main__':
         #YOU_EVENT_NAME = "new_feature_conversion";
         YOU_EVENT_NAME = "multi_feature";
         for i in range(1000):
-            event_user = fp.User().stable_rollout(str(time.time_ns()))
-            new_feature = client.value(TOGGLE_KEY, event_user, False)
-            random_rang = random.randint(0, 99)
-            if new_feature:
-                if random_rang <= 55:
-                    print("New feature conversion.")
-                    client.track(YOU_EVENT_NAME, event_user)
-            else:
-                if random_rang > 55:
-                    print("Old feature conversion.")
-                    client.track(YOU_EVENT_NAME, event_user)
+            event_user = fp.User().stable_rollout(str(time.time_ns() + i))
+            new_feature = client.value(TOGGLE_KEY, event_user, '1')
+            client.track(YOU_EVENT_NAME, event_user, random.randint(0, 99))
+            print("New feature conversion.")
             time.sleep(0.2)
-        client.track('test_event', user)

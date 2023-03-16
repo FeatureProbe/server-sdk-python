@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import contextlib
+import json
 import logging
 import queue
 import threading
@@ -28,7 +29,7 @@ from requests import Session, HTTPError
 
 from featureprobe.access_recorder import AccessSummaryRecorder
 from featureprobe.context import Context
-from featureprobe.event import Event, AccessEvent
+from featureprobe.event import CustomEvent, Event, AccessEvent
 from featureprobe.event_processor import EventProcessor
 
 
@@ -73,6 +74,10 @@ class EventRepository:
     def add(self, event: Event):
         if isinstance(event, AccessEvent):
             self.access.add(event)
+            if event.track_access_events:
+                self.events.append(event)
+        elif isinstance(event, CustomEvent):
+            self.events.append(event)
 
     def snapshot(self):
         return EventRepository._clone(self.events, self.access)
@@ -176,8 +181,7 @@ class DefaultEventProcessor(EventProcessor):
         self._executor.shutdown(wait=True)
 
     def _process_event(self, event: Event, event_repo: EventRepository):
-        if not isinstance(event, AccessEvent) or event.track_access_events:
-            event_repo.add(event)
+        event_repo.add(event)
 
     def _send_events(self, repositories: List[EventRepository]):
         repositories = [repo.to_dict() for repo in repositories]
@@ -186,7 +190,7 @@ class DefaultEventProcessor(EventProcessor):
             json=repositories,
             timeout=self._timeout)
         # sourcery skip: replace-interpolation-with-fstring
-        self._logger.debug('Http response: %s' % resp.text)
+        self._logger.debug('Http request %s, response %s' % (repositories, resp))
         try:
             resp.raise_for_status()
         except HTTPError as e:
