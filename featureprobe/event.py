@@ -107,7 +107,12 @@ class AccessEvent(Event):
 
 
 class CustomEvent(Event):
-    def __init__(self, timestamp: int, user: "User", name: str, value: Optional[float] = None):
+    def __init__(
+            self,
+            timestamp: int,
+            user: "User",
+            name: str,
+            value: Optional[float] = None):
         super().__init__("custom", timestamp, user)
         self._name = name
         self._value = value

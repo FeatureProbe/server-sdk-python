@@ -190,7 +190,9 @@ class DefaultEventProcessor(EventProcessor):
             json=repositories,
             timeout=self._timeout)
         # sourcery skip: replace-interpolation-with-fstring
-        self._logger.debug('Http request %s, response %s' % (repositories, resp))
+        self._logger.debug(
+            'Http request %s, response %s' %
+            (repositories, resp))
         try:
             resp.raise_for_status()
         except HTTPError as e:

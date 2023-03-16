@@ -160,14 +160,21 @@ class Client:
         self._event_processor.push(access_event)
         return detail
 
-    def track(self, event_name: str, user: User, value: Optional[float] = None):
+    def track(
+            self,
+            event_name: str,
+            user: User,
+            value: Optional[float] = None):
         """Tracks that a custom defined event
 
         :param event_name: the name of the event.
         :param user: :obj:`~featureprobe.User` to be evaluated.
         :param value: a numeric value(Optional).
         """
-        self._event_processor.push(CustomEvent(timestamp=int(time.time() * 1000),
-                                               name = event_name,
-                                               user = user,
-                                               value = value))
+        self._event_processor.push(
+            CustomEvent(
+                timestamp=int(
+                    time.time() * 1000),
+                name=event_name,
+                user=user,
+                value=value))
