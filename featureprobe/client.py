@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
 import logging
 import time
 from threading import Event
@@ -20,7 +21,7 @@ from typing import Any
 from featureprobe.config import Config
 from featureprobe.context import Context
 from featureprobe.detail import Detail
-from featureprobe.event import AccessEvent
+from featureprobe.event import AccessEvent, CustomEvent
 from featureprobe.internal.empty_str import empty_str
 from featureprobe.user import User
 
@@ -105,12 +106,17 @@ class Client:
             return default
 
         eval_result = toggle.eval(user, segments, default)
-        access_event = AccessEvent(timestamp=int(time.time() * 1000),
-                                   user=user,
-                                   key=toggle_key,
-                                   value=str(eval_result.value),
-                                   version=eval_result.version,
-                                   index=eval_result.variation_index)
+        access_event = AccessEvent(
+            timestamp=int(
+                time.time() * 1000),
+            user=user,
+            key=toggle_key,
+            value=eval_result.value,
+            version=eval_result.version,
+            variation_index=eval_result.variation_index,
+            rule_index=eval_result.rule_index,
+            reason=eval_result.reason,
+            track_access_events=toggle.track_access_events)
         self._event_processor.push(access_event)
         return eval_result.value
 
@@ -140,11 +146,35 @@ class Client:
                         reason=eval_result.reason,
                         rule_index=eval_result.rule_index,
                         version=eval_result.version)
-        access_event = AccessEvent(timestamp=int(time.time() * 1000),
-                                   user=user,
-                                   key=toggle_key,
-                                   value=eval_result.value,
-                                   version=eval_result.version,
-                                   index=eval_result.variation_index)
+        access_event = AccessEvent(
+            timestamp=int(
+                time.time() * 1000),
+            user=user,
+            key=toggle_key,
+            value=eval_result.value,
+            version=eval_result.version,
+            variation_index=eval_result.variation_index,
+            rule_index=eval_result.rule_index,
+            reason=eval_result.reason,
+            track_access_events=toggle.track_access_events)
         self._event_processor.push(access_event)
         return detail
+
+    def track(
+            self,
+            event_name: str,
+            user: User,
+            value: Optional[float] = None):
+        """Tracks that a custom defined event
+
+        :param event_name: the name of the event.
+        :param user: :obj:`~featureprobe.User` to be evaluated.
+        :param value: a numeric value(Optional).
+        """
+        self._event_processor.push(
+            CustomEvent(
+                timestamp=int(
+                    time.time() * 1000),
+                name=event_name,
+                user=user,
+                value=value))
