@@ -67,7 +67,9 @@ class Toggle:
         for_client = json.get('forClient', False)
         track_access_events = json.get('trackAccessEvents', False)
         last_modified = json.get('lastModified', None)
-        prerequisites = [Prerequisite.from_json(r) for r in json.get('prerequisites', [])]
+        prerequisites = [
+            Prerequisite.from_json(r) for r in json.get(
+                'prerequisites', [])]
 
         return cls(
             key,
@@ -151,25 +153,26 @@ class Toggle:
         self._for_client = value
 
     def eval(self,
-         user: "User",
-         toggles: Dict[str, "Toggle"],
-         segments: Dict[str, "Segment"],
-         default_value: object,
-         deep: int) -> "EvaluationResult":
-
-         warning = ''
-         try:
-            return self.do_eval(user, toggles, segments, default_value, deep)
-         except PrerequisiteError as e:
-            warning = e
-         return self._create_default_result(user, self._key, default_value, warning)
-
-    def do_eval(self,
              user: "User",
              toggles: Dict[str, "Toggle"],
              segments: Dict[str, "Segment"],
              default_value: object,
              deep: int) -> "EvaluationResult":
+
+        warning = ''
+        try:
+            return self.do_eval(user, toggles, segments, default_value, deep)
+        except PrerequisiteError as e:
+            warning = e
+        return self._create_default_result(
+            user, self._key, default_value, warning)
+
+    def do_eval(self,
+                user: "User",
+                toggles: Dict[str, "Toggle"],
+                segments: Dict[str, "Segment"],
+                default_value: object,
+                deep: int) -> "EvaluationResult":
         if not self._enabled:
             return self._create_disabled_result(user, self._key, default_value)
 
@@ -187,22 +190,28 @@ class Toggle:
                 return self._hit_value(hit_result, default_value, index)
             warning = hit_result.reason
 
-        return self._create_default_result(user, self._key, default_value, warning)
+        return self._create_default_result(
+            user, self._key, default_value, warning)
 
     def prerequisite(self,
                      user: "User",
                      toggles: Dict[str, "Toggle"],
-                     segments: Dict[str, "Segment"], 
+                     segments: Dict[str, "Segment"],
                      max_deep: int) -> bool:
         if self._prerequisites is None or len(self._prerequisites) == 0:
             return True
         for prerequisite in self._prerequisites:
             toggle = toggles.get(prerequisite.key)
             if toggle is None:
-                raise PrerequisiteError('prerequisite not exist %s' % prerequisite.key) 
-            result = toggle.do_eval(user, toggles, segments, None, max_deep - 1)
-            if result.value is None or str(result.value) != str(prerequisite.value):
-                return False 
+                raise PrerequisiteError(
+                    'prerequisite not exist %s' %
+                    prerequisite.key)
+            result = toggle.do_eval(
+                user, toggles, segments, None, max_deep - 1)
+            if result.value is None or str(
+                    result.value) != str(
+                    prerequisite.value):
+                return False
         return True
 
     def _create_disabled_result(

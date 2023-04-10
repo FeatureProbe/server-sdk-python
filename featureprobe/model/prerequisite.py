@@ -13,9 +13,10 @@
 # limitations under the License.
 from featureprobe.internal.json_decoder import json_decoder
 
+
 class Prerequisite:
     def __init__(self, key: str, value):
-        self._key = key 
+        self._key = key
         self._value = value
 
     @classmethod
@@ -27,15 +28,13 @@ class Prerequisite:
 
     @property
     def key(self):
-        return self._key 
+        return self._key
 
     @property
     def value(self):
         return self._value
 
+
 class PrerequisiteError(RuntimeError):
     def __init__(self, message):
         super().__init__(message)
-    
-
-

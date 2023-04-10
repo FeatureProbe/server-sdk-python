@@ -107,7 +107,12 @@ class Client:
         if not toggle:
             return default
 
-        eval_result = toggle.eval(user, toggles, segments, default, self._config.max_prerequisites_deep)
+        eval_result = toggle.eval(
+            user,
+            toggles,
+            segments,
+            default,
+            self._config.max_prerequisites_deep)
         access_event = AccessEvent(
             timestamp=int(
                 time.time() * 1000),
@@ -144,7 +149,12 @@ class Client:
         if toggle is None:
             return Detail(value=default, reason='Toggle not exist')
 
-        eval_result = toggle.eval(user, toggles, segments, default, self._config.max_prerequisites_deep)
+        eval_result = toggle.eval(
+            user,
+            toggles,
+            segments,
+            default,
+            self._config.max_prerequisites_deep)
         detail = Detail(value=eval_result.value,
                         reason=eval_result.reason,
                         rule_index=eval_result.rule_index,

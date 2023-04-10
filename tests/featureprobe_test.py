@@ -55,7 +55,7 @@ def test_case():
         data_repo.refresh(repo)
 
         server = fp.Client('test_sdk_key', fp.Config(max_prerequisites_deep=5))
-        
+
         server._data_repo = data_repo
 
         cases = scenario['cases']
@@ -79,7 +79,8 @@ def test_case():
             expect_result = case['expectResult']
             default_value = func_case['default']
             expect_value = expect_result['value']
-            if expect_result.get("ignore") is not None and 'python' in expect_result.get("ignore"):
+            if expect_result.get(
+                    "ignore") is not None and 'python' in expect_result.get("ignore"):
                 continue
 
             if func_name.endswith('value'):
