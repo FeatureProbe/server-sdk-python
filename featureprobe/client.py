@@ -46,6 +46,7 @@ class Client:
         context = Context(server_sdk_key, config)
         self._event_processor = config.event_processor_creator(context)
         self._data_repo = config.data_repository_creator(context)
+        self._config = config
 
         synchronize_process_ready = Event()
         self._synchronizer = config.synchronizer_creator(
@@ -102,10 +103,11 @@ class Client:
         """
         toggle = self._data_repo.get_toggle(toggle_key)
         segments = self._data_repo.get_all_segment()
+        toggles = self._data_repo.get_all_toggle()
         if not toggle:
             return default
 
-        eval_result = toggle.eval(user, segments, default)
+        eval_result = toggle.eval(user, toggles, segments, default, self._config.max_prerequisites_deep)
         access_event = AccessEvent(
             timestamp=int(
                 time.time() * 1000),
@@ -137,11 +139,12 @@ class Client:
 
         toggle = self._data_repo.get_toggle(toggle_key)
         segments = self._data_repo.get_all_segment()
+        toggles = self._data_repo.get_all_toggle()
 
         if toggle is None:
             return Detail(value=default, reason='Toggle not exist')
 
-        eval_result = toggle.eval(user, segments, default)
+        eval_result = toggle.eval(user, toggles, segments, default, self._config.max_prerequisites_deep)
         detail = Detail(value=eval_result.value,
                         reason=eval_result.reason,
                         rule_index=eval_result.rule_index,

@@ -1,0 +1,3 @@
+[submodule "tests/resources/test"]
+	path = tests/resources/test
+	url = git@github.com:FeatureProbe/server-sdk-specification.git
