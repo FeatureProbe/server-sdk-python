@@ -52,6 +52,7 @@ class Config:
                  http_config: HttpConfig = HttpConfig(),
                  refresh_interval: Union[timedelta, float] = timedelta(seconds=2),
                  start_wait: float = 5,
+                 max_prerequisites_deep: int = 20
                  ):
         self._location = location
         self._synchronizer_creator = SyncMode(sync_mode).synchronizer_creator
@@ -65,6 +66,7 @@ class Config:
         self._refresh_interval = refresh_interval \
             if isinstance(refresh_interval, timedelta) \
             else timedelta(seconds=refresh_interval)
+        self._max_prerequisites_deep = max_prerequisites_deep
 
     @property
     def location(self):
@@ -105,3 +107,7 @@ class Config:
     @property
     def start_wait(self):
         return self._start_wait
+
+    @property
+    def max_prerequisites_deep(self):
+        return self._max_prerequisites_deep

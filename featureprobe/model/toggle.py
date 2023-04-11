@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cmath import log
 from typing import List, Optional, Dict, TYPE_CHECKING
 
 from featureprobe.evaluation_result import EvaluationResult
 from featureprobe.internal.json_decoder import json_decoder
 from featureprobe.model.rule import Rule
 from featureprobe.model.serve import Serve
+from featureprobe.model.prerequisite import Prerequisite, PrerequisiteError
+import json
+
 
 if TYPE_CHECKING:
     from featureprobe.hit_result import HitResult
@@ -36,7 +40,8 @@ class Toggle:
                  variations: list,
                  for_client: bool,
                  track_access_events: bool,
-                 last_modified: int):
+                 last_modified: int,
+                 prerequisites: List["Prerequisite"]):
         self._key = key
         self._enabled = enabled
         self._version = version
@@ -47,6 +52,7 @@ class Toggle:
         self._for_client = for_client
         self._track_access_events = track_access_events
         self._last_modified = last_modified
+        self._prerequisites = prerequisites
 
     @classmethod
     @json_decoder
@@ -61,6 +67,9 @@ class Toggle:
         for_client = json.get('forClient', False)
         track_access_events = json.get('trackAccessEvents', False)
         last_modified = json.get('lastModified', None)
+        prerequisites = [
+            Prerequisite.from_json(r) for r in json.get(
+                'prerequisites', [])]
 
         return cls(
             key,
@@ -72,7 +81,8 @@ class Toggle:
             variations,
             for_client,
             track_access_events,
-            last_modified)
+            last_modified,
+            prerequisites)
 
     @property
     def key(self) -> str:
@@ -144,13 +154,35 @@ class Toggle:
 
     def eval(self,
              user: "User",
-             segments: Dict[str,
-                            "Segment"],
-             default_value: object) -> "EvaluationResult":
+             toggles: Dict[str, "Toggle"],
+             segments: Dict[str, "Segment"],
+             default_value: object,
+             deep: int) -> "EvaluationResult":
+
+        warning = ''
+        try:
+            return self.do_eval(user, toggles, segments, default_value, deep)
+        except PrerequisiteError as e:
+            warning = e
+        return self._create_default_result(
+            user, self._key, default_value, warning)
+
+    def do_eval(self,
+                user: "User",
+                toggles: Dict[str, "Toggle"],
+                segments: Dict[str, "Segment"],
+                default_value: object,
+                deep: int) -> "EvaluationResult":
         if not self._enabled:
             return self._create_disabled_result(user, self._key, default_value)
 
+        if deep <= 0:
+            raise PrerequisiteError("prerequisite deep overflow")
         warning = None
+
+        if not self.prerequisite(user, toggles, segments, deep):
+            return self._create_default_result(
+                user, self._key, default_value, warning)
 
         for index, rule in enumerate(self._rules or []):
             hit_result = rule.hit(user, segments, self._key)
@@ -160,6 +192,27 @@ class Toggle:
 
         return self._create_default_result(
             user, self._key, default_value, warning)
+
+    def prerequisite(self,
+                     user: "User",
+                     toggles: Dict[str, "Toggle"],
+                     segments: Dict[str, "Segment"],
+                     max_deep: int) -> bool:
+        if self._prerequisites is None or len(self._prerequisites) == 0:
+            return True
+        for prerequisite in self._prerequisites:
+            toggle = toggles.get(prerequisite.key)
+            if toggle is None:
+                raise PrerequisiteError(
+                    'prerequisite not exist %s' %
+                    prerequisite.key)
+            result = toggle.do_eval(
+                user, toggles, segments, None, max_deep - 1)
+            if result.value is None or str(
+                    result.value) != str(
+                    prerequisite.value):
+                return False
+        return True
 
     def _create_disabled_result(
             self,

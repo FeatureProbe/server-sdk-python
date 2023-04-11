@@ -15,6 +15,9 @@ jobs:
     - name: Checkout commit
       if: github.event_name == 'push'
       uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+
 
     - name: Checkout pull request
       if: github.event_name == 'pull_request_target'
@@ -24,6 +27,7 @@ jobs:
       with:
         repository: ${{ github.event.pull_request.head.repo.full_name }}
         ref: ${{ github.event.pull_request.head.ref }}
+        submodules: 'recursive'
 
 
     - name: Check license headers
