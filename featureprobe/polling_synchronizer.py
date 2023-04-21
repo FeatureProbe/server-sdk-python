@@ -14,7 +14,6 @@
 
 import logging
 import threading
-from datetime import datetime
 from typing import TYPE_CHECKING
 
 import tzlocal
