@@ -36,14 +36,19 @@ class StreamingSynchronizer(Synchronizer):
             context: "Context",
             data_repo: "DataRepository",
             ready: "threading.Event"):
-        self.__polling_synchronizer = PollingSynchronizer.from_context(context, data_repo, ready)
+        self.__polling_synchronizer = PollingSynchronizer.from_context(
+            context, data_repo, ready)
         self._realtime_url = context.realtime_url
         self._socket = None
         self._context = context
         self._lock = threading.RLock()
 
     @classmethod
-    def from_context(cls, context: "Context", data_repo: "DataRepository", ready: "Event") -> "Synchronizer":
+    def from_context(
+            cls,
+            context: "Context",
+            data_repo: "DataRepository",
+            ready: "Event") -> "Synchronizer":
         return cls(context, data_repo, ready)
 
     def start(self):
