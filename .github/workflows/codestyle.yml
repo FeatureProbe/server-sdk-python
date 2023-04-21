@@ -1,81 +1,30 @@
 name: "Check license & format"
 
 on:
-  push:
-    branches: [ main ]
   pull_request_target:
 
 
 jobs:
   check:
     runs-on: ubuntu-latest
-
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Checkout commit
-      if: github.event_name == 'push'
-      uses: actions/checkout@v3
-      with:
-        submodules: 'recursive'
+      - name: Check license headers
+        uses: apache/skywalking-eyes@v0.3.0
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            config: .github/licenserc.yml
+            mode: check
 
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
 
-    - name: Checkout pull request
-      if: github.event_name == 'pull_request_target'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: actions/checkout@v3
-      with:
-        repository: ${{ github.event.pull_request.head.repo.full_name }}
-        ref: ${{ github.event.pull_request.head.ref }}
-        submodules: 'recursive'
-
-
-    - name: Check license headers
-      uses: apache/skywalking-eyes@v0.3.0
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          config: .github/licenserc.yml
-          mode: fix
-
-    - name: Commit licensed files
-      if: github.event_name == 'pull_request_target'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: EndBug/add-and-commit@v8.0.2
-      with:
-        default_author: github_actor
-        message: "chore: add license header(s)"
-
-    - name: Create pull request
-      if: github.event_name == 'push'
-      uses: peter-evans/create-pull-request@v3
-      with:
-        author: GitHub Actions <41898282+github-actions[bot]@users.noreply.github.com>
-        commit-message: "chore: add license header(s)"
-        title: "chore: add license header(s)"
-        body: Add missing license header(s) in source and test code.
-        branch: add-license
-
-
-    # only check code format for PR, single reformatting job doesn't deserve a PR
-    # main branch should always keep well formatted, unless directly pushed by maintainer
-    # in that case, the un-formatted part would be fixed by the next PR
-
-    #! potential error: multiple PR may fix the same file thus cause conflict
-    #! solution: 1. manually merge  2. prevent directly commit
-
-    - name: Check pep8 format
-      if: github.event_name == 'pull_request_target'
-      uses: peter-evans/autopep8@v1
-      with:
-        args: --recursive --in-place --aggressive --aggressive .
-
-    - name: Commit formatted code
-      if: github.event_name == 'pull_request_target'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: EndBug/add-and-commit@v8.0.2
-      with:
-        default_author: github_actor
-        message: "style: format python code (pep8)"
+      - name: Check code format
+        run: |
+          pip install black
+          python3 -m black --check .
