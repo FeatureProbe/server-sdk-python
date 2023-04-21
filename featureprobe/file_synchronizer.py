@@ -44,6 +44,9 @@ class FileSynchronizer(Synchronizer):
             ready: "Event") -> "Synchronizer":
         return cls(data_repo, context.location, ready)
 
+    def start(self):
+        self.sync()
+
     def sync(self):
         try:
             with open(self._location, 'r', encoding='utf-8') as f:
@@ -61,4 +64,3 @@ class FileSynchronizer(Synchronizer):
 
     def close(self):
         self._ready.clear()
-        return

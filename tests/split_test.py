@@ -17,7 +17,7 @@ import featureprobe as fp
 
 def setup_function():
     global split, user  # noqa
-    split = fp.Split([
+    split = fp.model.Split([
         [[0, 5000]],
         [[5000, 10000]],
     ], None, None)  # noqa

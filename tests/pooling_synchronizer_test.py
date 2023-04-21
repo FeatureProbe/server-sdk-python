@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from featureprobe.pooling_synchronizer import PoolingSynchronizer
+from featureprobe.polling_synchronizer import PollingSynchronizer
 from featureprobe.memory_data_repository import MemoryDataRepository
 from featureprobe.config import Config
 from featureprobe.context import Context
@@ -24,7 +24,7 @@ from unittest.mock import patch
 def test_init_synchronizer_failed():
     realy = Event()
     context = Context("test-sdk-key", Config())
-    synchroizer = PoolingSynchronizer.from_context(
+    synchroizer = PollingSynchronizer.from_context(
         context, MemoryDataRepository.from_context(context), realy)
     realy.wait(2)
 
@@ -36,7 +36,7 @@ def test_init_synchronizer_wait_for_init_success(session_get):
     realy = Event()
     context = Context("test-sdk-key", Config())
     session_get.return_value = MockHttpReponse(200, '{}')
-    synchroizer = PoolingSynchronizer.from_context(
+    synchroizer = PollingSynchronizer.from_context(
         context, MemoryDataRepository.from_context(context), realy)
     synchroizer.sync()
     realy.wait(5)

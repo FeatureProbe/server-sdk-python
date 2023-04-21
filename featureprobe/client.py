@@ -51,7 +51,7 @@ class Client:
         synchronize_process_ready = Event()
         self._synchronizer = config.synchronizer_creator(
             context, self._data_repo, synchronize_process_ready)
-        self._synchronizer.sync()
+        self._synchronizer.start()
         if config.start_wait > 0:
             Client.__logger.info("Waiting up to " +
                                  str(config.start_wait) +
