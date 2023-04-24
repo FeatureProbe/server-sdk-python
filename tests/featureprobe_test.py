@@ -21,7 +21,7 @@ import pytest
 import featureprobe as fp
 from featureprobe.memory_data_repository import MemoryDataRepository
 
-# DON'T CARE: warnings about http connection error (pool syncer)
+# DON'T CARE: warnings about http connection error (poll syncer)
 logging.basicConfig(level=logging.CRITICAL)
 
 
@@ -50,7 +50,7 @@ def test_case():
         name = scenario['scenario']
         fixture = scenario['fixture']
 
-        repo = fp.Repository.from_json(fixture)
+        repo = fp.model.Repository.from_json(fixture)
         data_repo = MemoryDataRepository(None, False, 0)  # noqa
         data_repo.refresh(repo)
 

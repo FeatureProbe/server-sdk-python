@@ -21,7 +21,8 @@ from featureprobe.file_synchronizer import FileSynchronizer
 from featureprobe.http_config import HttpConfig
 from featureprobe.internal.defaultable import defaultable
 from featureprobe.memory_data_repository import MemoryDataRepository
-from featureprobe.pooling_synchronizer import PoolingSynchronizer
+from featureprobe.polling_synchronizer import PollingSynchronizer
+from featureprobe.streaming_synchronizer import StreamingSynchronizer
 
 
 class SyncMode(str, Enum):
@@ -36,19 +37,20 @@ class SyncMode(str, Enum):
         obj.synchronizer_creator = synchronizer_creator
         return obj
 
-    POOLING = 'pooling', PoolingSynchronizer.from_context
+    POLLING = 'polling', PollingSynchronizer.from_context
+    STREAMING = 'streaming', StreamingSynchronizer.from_context
     FILE = 'file', FileSynchronizer.from_context
 
 
 @defaultable
 class Config:
-
     def __init__(self,
                  location: str = None,
-                 sync_mode: Union[str, SyncMode] = SyncMode.POOLING,
+                 sync_mode: Union[str, SyncMode] = SyncMode.POLLING,
+                 remote_uri: str = "http://127.0.0.1:4007",
                  synchronizer_url: str = None,
                  event_url: str = None,
-                 remote_uri: str = 'http://127.0.0.1:4007',
+                 realtime_url: str = None,
                  http_config: HttpConfig = HttpConfig(),
                  refresh_interval: Union[timedelta, float] = timedelta(seconds=2),
                  start_wait: float = 5,
@@ -58,9 +60,10 @@ class Config:
         self._synchronizer_creator = SyncMode(sync_mode).synchronizer_creator
         self._data_repository_creator = MemoryDataRepository.from_context
         self._event_processor_creator = DefaultEventProcessor.from_context
+        self._remote_uri = remote_uri
         self._synchronizer_url = synchronizer_url
         self._event_url = event_url
-        self._remote_uri = remote_uri
+        self._realtime_url = realtime_url
         self._start_wait = start_wait
         self._http_config = http_config or HttpConfig()
         self._refresh_interval = refresh_interval \
@@ -95,6 +98,10 @@ class Config:
     @property
     def remote_uri(self):
         return self._remote_uri
+
+    @property
+    def realtime_url(self):
+        return self._realtime_url
 
     @property
     def http_config(self):

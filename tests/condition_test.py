@@ -19,19 +19,19 @@ import featureprobe as fp
 
 def setup_function():
     global condition, user, segments  # noqa
-    condition = fp.Condition(subject='userId',
-                             type_='string',
-                             predicate=None,
-                             objects=None)
+    condition = fp.model.Condition(subject='userId',
+                                   type_='string',
+                                   predicate=None,
+                                   objects=None)
     user = fp.User(stable_rollout_key='test_user')
-    segments = {'test_project$test_segment': fp.Segment(
+    segments = {'test_project$test_segment': fp.model.Segment(
         uid='test_project$test_segment',
         version=1,
-        rules=[fp.SegmentRule(conditions=[
-            fp.Condition(
+        rules=[fp.model.SegmentRule(conditions=[
+            fp.model.Condition(
                 subject='userId',
                 type_='string',
-                predicate=fp.StringPredicate.IS_ONE_OF,
+                predicate=fp.model.StringPredicate.IS_ONE_OF,
                 objects=['1', '2']
             )]
         )]
@@ -40,7 +40,7 @@ def setup_function():
 
 def test_string_is_one_of():
     condition.objects = ['12345', '987654', '665544', '13797347245']
-    condition.predicate = fp.StringPredicate.IS_ONE_OF
+    condition.predicate = fp.model.StringPredicate.IS_ONE_OF
 
     user['userId'] = '12345'
     assert condition.match_objects(user, segments)
@@ -54,7 +54,7 @@ def test_string_is_one_of():
 
 def test_string_ends_with():
     condition.objects = ['123', '888']
-    condition.predicate = fp.StringPredicate.ENDS_WITH
+    condition.predicate = fp.model.StringPredicate.ENDS_WITH
 
     user['userId'] = '123123'
     assert condition.match_objects(user, segments)
@@ -68,7 +68,7 @@ def test_string_ends_with():
 
 def test_string_starts_with():
     condition.objects = ['123']
-    condition.predicate = fp.StringPredicate.STARTS_WITH
+    condition.predicate = fp.model.StringPredicate.STARTS_WITH
 
     user['userId'] = '123321'
     assert condition.match_objects(user, segments)
@@ -79,7 +79,7 @@ def test_string_starts_with():
 
 def test_string_contains():
     condition.objects = ['123', '456']
-    condition.predicate = fp.StringPredicate.CONTAINS
+    condition.predicate = fp.model.StringPredicate.CONTAINS
 
     user['userId'] = '456433'
     assert condition.match_objects(user, segments)
@@ -90,7 +90,7 @@ def test_string_contains():
 
 def test_string_matches_regex():
     condition.objects = ['0?(13|14|15|18)[0-9]{9}']
-    condition.predicate = fp.StringPredicate.MATCHES_REGEX
+    condition.predicate = fp.model.StringPredicate.MATCHES_REGEX
 
     user['userId'] = '13797347245'
     assert condition.match_objects(user, segments)
@@ -103,16 +103,16 @@ def test_string_invalid_regex():
     condition.objects = ['\\\\\\']
     user['userId'] = '13797347245'
 
-    condition.predicate = fp.StringPredicate.MATCHES_REGEX
+    condition.predicate = fp.model.StringPredicate.MATCHES_REGEX
     assert not condition.match_objects(user, segments)
 
-    condition.predicate = fp.StringPredicate.DOES_NOT_MATCH_REGEX
+    condition.predicate = fp.model.StringPredicate.DOES_NOT_MATCH_REGEX
     assert not condition.match_objects(user, segments)
 
 
 def test_string_is_not_any_of():
     condition.objects = ['12345', '987654', '665544']
-    condition.predicate = fp.StringPredicate.IS_NOT_ANY_OF
+    condition.predicate = fp.model.StringPredicate.IS_NOT_ANY_OF
 
     user['userId'] = '999999999'
     assert condition.match_objects(user, segments)
@@ -123,7 +123,7 @@ def test_string_is_not_any_of():
 
 def test_string_does_not_end_with():
     condition.objects = ['123', '456']
-    condition.predicate = fp.StringPredicate.DOES_NOT_END_WITH
+    condition.predicate = fp.model.StringPredicate.DOES_NOT_END_WITH
 
     user['userId'] = '3333333'
     assert condition.match_objects(user, segments)
@@ -134,7 +134,7 @@ def test_string_does_not_end_with():
 
 def test_string_does_not_start_with():
     condition.objects = ['123', '456']
-    condition.predicate = fp.StringPredicate.DOES_NOT_START_WITH
+    condition.predicate = fp.model.StringPredicate.DOES_NOT_START_WITH
 
     user['userId'] = '3333333'
     assert condition.match_objects(user, segments)
@@ -145,7 +145,7 @@ def test_string_does_not_start_with():
 
 def test_string_does_not_contain():
     condition.objects = ['12345', '987654', '665544']
-    condition.predicate = fp.StringPredicate.DOES_NOT_CONTAIN
+    condition.predicate = fp.model.StringPredicate.DOES_NOT_CONTAIN
 
     user['userId'] = '3333333'
     assert condition.match_objects(user, segments)
@@ -156,7 +156,7 @@ def test_string_does_not_contain():
 
 def test_string_does_not_match_regex():
     condition.objects = ['0?(13|14|15|18)[0-9]{9}']
-    condition.predicate = fp.StringPredicate.DOES_NOT_MATCH_REGEX
+    condition.predicate = fp.model.StringPredicate.DOES_NOT_MATCH_REGEX
 
     user['userId'] = '2122121'
     assert condition.match_objects(user, segments)
@@ -166,9 +166,9 @@ def test_string_does_not_match_regex():
 
 
 def test_segmenting_is_in():
-    condition.type = fp.ConditionType.SEGMENT
+    condition.type = fp.model.ConditionType.SEGMENT
     condition.objects = ['test_project$test_segment']
-    condition.predicate = fp.SegmentPredicate.IS_IN
+    condition.predicate = fp.model.SegmentPredicate.IS_IN
 
     user['userId'] = '1'
     assert condition.match_objects(user, segments)
@@ -178,9 +178,9 @@ def test_segmenting_is_in():
 
 
 def test_segmenting_is_not_in():
-    condition.type = fp.ConditionType.SEGMENT
+    condition.type = fp.model.ConditionType.SEGMENT
     condition.objects = ['test_project$test_segment']
-    condition.predicate = fp.SegmentPredicate.IS_NOT_IN
+    condition.predicate = fp.model.SegmentPredicate.IS_NOT_IN
 
     user['userId'] = '3'
     assert condition.match_objects(user, segments)
@@ -190,9 +190,9 @@ def test_segmenting_is_not_in():
 
 
 def test_datetime_after():
-    condition.type = fp.ConditionType.DATETIME
+    condition.type = fp.model.ConditionType.DATETIME
     condition.objects = [str(int(time.time() * 1000))]
-    condition.predicate = fp.DatetimePredicate.AFTER
+    condition.predicate = fp.model.DatetimePredicate.AFTER
 
     user['userId'] = str(int(time.time() * 1000))
     assert condition.match_objects(user, segments)
@@ -208,9 +208,9 @@ def test_datetime_after():
 
 
 def test_datetime_before():
-    condition.type = fp.ConditionType.DATETIME
+    condition.type = fp.model.ConditionType.DATETIME
     condition.objects = [str(int(time.time() * 1000))]
-    condition.predicate = fp.DatetimePredicate.BEFORE
+    condition.predicate = fp.model.DatetimePredicate.BEFORE
 
     user['userId'] = str(int(time.time() * 1000) - 2)
     assert condition.match_objects(user, segments)
@@ -223,9 +223,9 @@ def test_datetime_before():
 
 
 def test_number_equal():
-    condition.type = fp.ConditionType.NUMBER
+    condition.type = fp.model.ConditionType.NUMBER
     condition.objects = ['12', '10.1']
-    condition.predicate = fp.NumberPredicate.EQUAL
+    condition.predicate = fp.model.NumberPredicate.EQUAL
 
     user['userId'] = '  12.00000000 \n '
     assert condition.match_objects(user, segments)
@@ -241,9 +241,9 @@ def test_number_equal():
 
 
 def test_number_not_equal():
-    condition.type = fp.ConditionType.NUMBER
+    condition.type = fp.model.ConditionType.NUMBER
     condition.objects = ['12', '16']
-    condition.predicate = fp.NumberPredicate.NOT_EQUAL
+    condition.predicate = fp.model.NumberPredicate.NOT_EQUAL
 
     user['userId'] = '  13.00000000 \n '
     assert condition.match_objects(user, segments)
@@ -260,9 +260,9 @@ def test_number_not_equal():
 
 
 def test_number_greater_than():
-    condition.type = fp.ConditionType.NUMBER
+    condition.type = fp.model.ConditionType.NUMBER
     condition.objects = ['12']
-    condition.predicate = fp.NumberPredicate.GREATER_THAN
+    condition.predicate = fp.model.NumberPredicate.GREATER_THAN
 
     user['userId'] = '  13 \n '
     assert condition.match_objects(user, segments)
@@ -275,9 +275,9 @@ def test_number_greater_than():
 
 
 def test_number_greater_or_equal():
-    condition.type = fp.ConditionType.NUMBER
+    condition.type = fp.model.ConditionType.NUMBER
     condition.objects = ['12']
-    condition.predicate = fp.NumberPredicate.GREATER_OR_EQUAL
+    condition.predicate = fp.model.NumberPredicate.GREATER_OR_EQUAL
 
     user['userId'] = '  13 \n '
     assert condition.match_objects(user, segments)
@@ -290,9 +290,9 @@ def test_number_greater_or_equal():
 
 
 def test_number_less_than():
-    condition.type = fp.ConditionType.NUMBER
+    condition.type = fp.model.ConditionType.NUMBER
     condition.objects = ['17']
-    condition.predicate = fp.NumberPredicate.LESS_THAN
+    condition.predicate = fp.model.NumberPredicate.LESS_THAN
 
     user['userId'] = '  13 \n '
     assert condition.match_objects(user, segments)
@@ -305,9 +305,9 @@ def test_number_less_than():
 
 
 def test_number_less_or_equal():
-    condition.type = fp.ConditionType.NUMBER
+    condition.type = fp.model.ConditionType.NUMBER
     condition.objects = ['17']
-    condition.predicate = fp.NumberPredicate.LESS_OR_EQUAL
+    condition.predicate = fp.model.NumberPredicate.LESS_OR_EQUAL
 
     user['userId'] = '  13 \n '
     assert condition.match_objects(user, segments)
@@ -320,9 +320,9 @@ def test_number_less_or_equal():
 
 
 def test_semver_equal():
-    condition.type = fp.ConditionType.SEMVER
+    condition.type = fp.model.ConditionType.SEMVER
     condition.objects = ['1.1.3', '1.1.5']
-    condition.predicate = fp.SemverPredicate.EQUAL
+    condition.predicate = fp.model.SemverPredicate.EQUAL
 
     user['userId'] = '1.1.3'
     assert condition.match_objects(user, segments)
@@ -344,9 +344,9 @@ def test_semver_equal():
 
 
 def test_semver_not_equal():
-    condition.type = fp.ConditionType.SEMVER
+    condition.type = fp.model.ConditionType.SEMVER
     condition.objects = ['1.1.0', '1.2.0']
-    condition.predicate = fp.SemverPredicate.NOT_EQUAL
+    condition.predicate = fp.model.SemverPredicate.NOT_EQUAL
 
     user['userId'] = '1.3.0'
     assert condition.match_objects(user, segments)
@@ -359,9 +359,9 @@ def test_semver_not_equal():
 
 
 def test_semver_greater_than():
-    condition.type = fp.ConditionType.SEMVER
+    condition.type = fp.model.ConditionType.SEMVER
     condition.objects = ['1.1.0', '1.2.0']
-    condition.predicate = fp.SemverPredicate.GREATER_THAN
+    condition.predicate = fp.model.SemverPredicate.GREATER_THAN
 
     user['userId'] = '1.1.1-rc1'
     assert condition.match_objects(user, segments)
@@ -374,9 +374,9 @@ def test_semver_greater_than():
 
 
 def test_semver_greater_or_equal():
-    condition.type = fp.ConditionType.SEMVER
+    condition.type = fp.model.ConditionType.SEMVER
     condition.objects = ['1.1.0', '1.2.0']
-    condition.predicate = fp.SemverPredicate.GREATER_OR_EQUAL
+    condition.predicate = fp.model.SemverPredicate.GREATER_OR_EQUAL
 
     user['userId'] = '1.1.1'
     assert condition.match_objects(user, segments)
@@ -389,9 +389,9 @@ def test_semver_greater_or_equal():
 
 
 def test_semver_less_than():
-    condition.type = fp.ConditionType.SEMVER
+    condition.type = fp.model.ConditionType.SEMVER
     condition.objects = ['1.1.0', '1.2.0']
-    condition.predicate = fp.SemverPredicate.LESS_THAN
+    condition.predicate = fp.model.SemverPredicate.LESS_THAN
 
     user['userId'] = '0.1.0'
     assert condition.match_objects(user, segments)
@@ -404,9 +404,9 @@ def test_semver_less_than():
 
 
 def test_semver_less_or_equal():
-    condition.type = fp.ConditionType.SEMVER
+    condition.type = fp.model.ConditionType.SEMVER
     condition.objects = ['1.1.0', '1.2.0']
-    condition.predicate = fp.SemverPredicate.LESS_OR_EQUAL
+    condition.predicate = fp.model.SemverPredicate.LESS_OR_EQUAL
 
     user['userId'] = '1.0.1'
     assert condition.match_objects(user, segments)

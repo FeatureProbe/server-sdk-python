@@ -1,8 +1,8 @@
 import logging
-
-import featureprobe as fp
 import random
 import time
+
+import featureprobe as fp
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -10,9 +10,10 @@ if __name__ == '__main__':
     # FEATURE_PROBE_SERVER_URL = 'http://localhost:4007'  # for local docker
     FEATURE_PROBE_SERVER_URL = 'https://featureprobe.io/server'  # for featureprobe.io
 
-    config = fp.Config(remote_uri=FEATURE_PROBE_SERVER_URL,  # FeatureProbe server URL
-                       sync_mode='pooling',
-                       refresh_interval=2,
+    config = fp.Config(remote_uri=FEATURE_PROBE_SERVER_URL,
+                       sync_mode='streaming',
+                       realtime_url="https://featureprobe.io/server/realtime",
+                       refresh_interval=180,
                        start_wait=5)
 
     # Server Side SDK Key for your project and environment

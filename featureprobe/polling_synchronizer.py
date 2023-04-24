@@ -14,7 +14,6 @@
 
 import logging
 import threading
-from datetime import datetime
 from typing import TYPE_CHECKING
 
 import tzlocal
@@ -29,7 +28,8 @@ if TYPE_CHECKING:
     from featureprobe.data_repository import DataRepository
 
 
-class PoolingSynchronizer(Synchronizer):
+class PollingSynchronizer(Synchronizer):
+
     __logger = logging.getLogger('FeatureProbe-Synchronizer')
 
     def __init__(
@@ -42,6 +42,7 @@ class PoolingSynchronizer(Synchronizer):
         self._data_repo = data_repo
 
         self._session = Session()
+        self._session.keep_alive = False
         self._session.mount('http://', context.http_config.adapter)
         self._session.mount('https://', context.http_config.adapter)
         self._session.headers.update(context.headers)
@@ -61,31 +62,23 @@ class PoolingSynchronizer(Synchronizer):
             ready: "threading.Event") -> "Synchronizer":
         return cls(context, data_repo, ready)
 
-    def sync(self):
-        PoolingSynchronizer.__logger.info(
+    def start(self):
+        PollingSynchronizer.__logger.info(
             'Starting FeatureProbe polling repository with interval %d ms'
             % (self._refresh_interval.total_seconds() * 1000))
-        self._poll()
+        self.sync()
         with self._lock:
             self._scheduler = BackgroundScheduler(
                 timezone=tzlocal.get_localzone(),
                 logger=self.__logger)
             self._scheduler.start()
             self._scheduler.add_job(
-                self._poll,
-                trigger='interval',
+                self.sync,
+                trigger="interval",
                 seconds=self._refresh_interval.total_seconds(),
-                next_run_time=datetime.now())
+            )
 
-    def close(self):
-        PoolingSynchronizer.__logger.info(
-            'Closing FeatureProbe PollingSynchronizer')
-        with self._lock:
-            self._scheduler.shutdown()
-            del self._scheduler
-            self._ready.clear()
-
-    def _poll(self):
+    def sync(self):
         try:
             resp = self._session.get(self._api_url, timeout=self._timeout)
             resp.raise_for_status()
@@ -102,6 +95,14 @@ class PoolingSynchronizer(Synchronizer):
             self.__logger.error(
                 'Unexpected error from polling processor',
                 exc_info=e)
+
+    def close(self):
+        PollingSynchronizer.__logger.info(
+            'Closing FeatureProbe PollingSynchronizer')
+        with self._lock:
+            self._scheduler.shutdown()
+            del self._scheduler
+            self._ready.clear()
 
     def initialized(self):
         return self._ready.is_set()
