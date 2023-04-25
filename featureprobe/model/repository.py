@@ -22,18 +22,22 @@ from featureprobe.model.toggle import Toggle
 class Repository:
     def __init__(self,
                  toggles: Dict[str, "Toggle"] = None,
-                 segments: Dict[str, "Segment"] = None):
+                 segments: Dict[str, "Segment"] = None,
+                 debug_until_time: int = None):
         self._toggles = toggles or {}
         self._segments = segments or {}
+        self._debug_until_time = debug_until_time
 
     @classmethod
     @json_decoder
     def from_json(cls, json: dict) -> "Repository":
         toggles = json.get('toggles', {})
         segments = json.get('segments', {})
+        debug_until_time = json.get('debugUntilTime', None)
         return cls(
             toggles={k: Toggle.from_json(v) for k, v in toggles.items()},
-            segments={k: Segment.from_json(v) for k, v in segments.items()}
+            segments={k: Segment.from_json(v) for k, v in segments.items()},
+            debug_until_time=debug_until_time
         )
 
     @property
@@ -51,3 +55,7 @@ class Repository:
     @segments.setter
     def segments(self, value: Dict[str, "Segment"]):
         self._segments = value or {}
+
+    @property
+    def debug_until_time(self) -> int:
+        return self._debug_until_time

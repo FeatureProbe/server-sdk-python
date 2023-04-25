@@ -29,7 +29,7 @@ from requests import Session, HTTPError
 
 from featureprobe.access_recorder import AccessSummaryRecorder
 from featureprobe.context import Context
-from featureprobe.event import CustomEvent, Event, AccessEvent
+from featureprobe.event import CustomEvent, DebugEvent, Event, AccessEvent
 from featureprobe.event_processor import EventProcessor
 
 
@@ -76,6 +76,8 @@ class EventRepository:
             self.access.add(event)
             if event.track_access_events:
                 self.events.append(event)
+        if isinstance(event, DebugEvent):
+            self.events.append(event)
         elif isinstance(event, CustomEvent):
             self.events.append(event)
 

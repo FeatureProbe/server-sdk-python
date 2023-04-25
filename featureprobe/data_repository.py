@@ -48,6 +48,10 @@ class DataRepository(metaclass=ABCMeta):
     def get_all_segment(self) -> Dict[str, "Toggle"]:
         pass
 
+    @abstractmethod
+    def get_debug_until_time(self, key: str) -> "int":
+        pass
+
     @property
     @abstractmethod
     def initialized(self) -> bool:

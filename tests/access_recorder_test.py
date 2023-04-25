@@ -29,9 +29,7 @@ def setup_function():
                            key='test_toggle', value='true',
                            version=1,
                            variation_index=1,
-                           rule_index=0,
-                           track_access_events=True,
-                           reason='')
+                           track_access_events=True)
 
 
 def test_add_event():

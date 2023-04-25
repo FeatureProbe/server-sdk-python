@@ -43,39 +43,32 @@ class Event:
     def kind(self) -> str:
         return self._kind
 
-
-class AccessEvent(Event):
+class ToggleEvent(Event):
     def __init__(
-            self,
-            timestamp: int,
-            user: "User",
-            key: str,
-            value: object,
-            version: int,
-            variation_index: int,
-            rule_index: int,
-            reason: str,
-            track_access_events: bool):
-        super().__init__("access", timestamp, user)
-        self._key = key
-        self._value = value
-        self._version = version
-        self._variation_index = variation_index
-        self._rule_index = rule_index
-        self._reason = reason
-        self._track_access_events = track_access_events
+             self,
+             kind: str,
+             created_time: int,
+             user: "User", 
+             key: str,
+             value: object,
+             version: int,
+             variation_index: int):
+         super().__init__(kind, created_time, user)
+         self._key = key
+         self._value = value
+         self._version = version
+         self._variation_index = variation_index
 
     def to_dict(self) -> dict:
-        values = super().to_dict()
-        values.update({
-            'key': self._key,
-            'value': self._value,
-            'version': self._version,
-            'variationIndex': self._variation_index,
-            'ruleIndex': self._rule_index,
-            'reason': self._reason
-        })
-        return values
+         values = super().to_dict()
+         values.update({
+             'key': self._key,
+             'value': self._value,
+             'user': self._user.key,
+             'version': self._version,
+             'variationIndex': self._variation_index,
+         })
+         return values
 
     @property
     def key(self):
@@ -101,11 +94,62 @@ class AccessEvent(Event):
     def reason(self):
         return self._reason
 
+
+class AccessEvent(ToggleEvent):
+    def __init__(
+            self,
+            timestamp: int,
+            user: "User",
+            key: str,
+            value: object,
+            version: int,
+            variation_index: int,
+            track_access_events: bool):
+        super().__init__("access", timestamp, user, key, value, version, variation_index)
+        self._track_access_events = track_access_events
+
     @property
     def track_access_events(self):
         return self._track_access_events
 
 
+class DebugEvent(ToggleEvent):
+    def __init__(
+            self,
+            timestamp: int,
+            user: "User",
+            key: str,
+            value: object,
+            version: int,
+            variation_index: int,
+            rule_index: int,
+            reason: str):
+        super().__init__("debug", timestamp, user, key, value, version, variation_index)
+        self._rule_index = rule_index
+        self._reason = reason
+        self._user_detail = user
+
+    def to_dict(self) -> dict:
+        values = super().to_dict()
+        values.update({
+            'ruleIndex': self._rule_index,
+            'userDetail': self._user_detail.to_dict(),
+            'reason': self._reason
+        })
+        return values
+
+    @property
+    def rule_index(self):
+        return self._rule_index
+
+    @property
+    def reason(self):
+        return self._reason
+
+    @property
+    def user_detail(self):
+        return self._user_detail
+    
 class CustomEvent(Event):
     def __init__(
             self,
