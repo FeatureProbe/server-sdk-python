@@ -41,7 +41,7 @@ class MemoryDataRepository(DataRepository):
         if repo is not None \
                 and repo.toggles is not None \
                 and repo.segments is not None:
-            self._data = Repository(repo.toggles.copy(), repo.segments.copy())
+            self._data = Repository(repo.toggles.copy(), repo.segments.copy(), repo.debug_until_time)
             self._initialized = True
             self._updated_timestamp = int(time.time() * 1000)
 
@@ -53,6 +53,9 @@ class MemoryDataRepository(DataRepository):
 
     def get_segment(self, key: str) -> Optional["Segment"]:
         return self._data.segments.get(key) if self._initialized else None
+
+    def get_debug_until_time(self) -> Optional["int"]: 
+        return self._data.debug_until_time if self._initialized else None
 
     def get_all_segment(self) -> Dict[str, "Toggle"]:
         return self._data.segments if self._initialized else {}

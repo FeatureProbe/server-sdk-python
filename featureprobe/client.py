@@ -21,7 +21,7 @@ from typing import Any
 from featureprobe.config import Config
 from featureprobe.context import Context
 from featureprobe.detail import Detail
-from featureprobe.event import AccessEvent, CustomEvent
+from featureprobe.event import AccessEvent, CustomEvent, DebugEvent
 from featureprobe.internal.empty_str import empty_str
 from featureprobe.user import User
 
@@ -113,20 +113,36 @@ class Client:
             segments,
             default,
             self._config.max_prerequisites_deep)
+        self._track_event(user, toggle, eval_result)
+        return eval_result.value
+
+    def _track_event(self, user, toggle, eval_result):
+        current_time_millis = int(time.time() * 1000)
         access_event = AccessEvent(
-            timestamp=int(
-                time.time() * 1000),
+            timestamp=current_time_millis,
             user=user,
-            key=toggle_key,
+            key=toggle.key,
             value=eval_result.value,
             version=eval_result.version,
             variation_index=eval_result.variation_index,
-            rule_index=eval_result.rule_index,
-            reason=eval_result.reason,
             track_access_events=toggle.track_access_events)
         self._event_processor.push(access_event)
-        return eval_result.value
+        if self._should_debug_event(current_time_millis):
+            debug_event = DebugEvent(
+                timestamp=current_time_millis,
+                user=user,
+                key=toggle.key,
+                value=eval_result.value,
+                version=eval_result.version,
+                variation_index=eval_result.variation_index,
+                rule_index=eval_result.rule_index,
+                reason=eval_result.reason)
+            self._event_processor.push(debug_event)
 
+    def _should_debug_event(self, current_time_millis):
+        debug_until_time = self._data_repo.get_debug_until_time()
+        return debug_until_time is not None and debug_until_time > current_time_millis
+        
     def value_detail(self, toggle_key: str, user: User, default) -> Detail:
         """Gets the detailed evaluated results of a toggle.
 
@@ -159,18 +175,8 @@ class Client:
                         reason=eval_result.reason,
                         rule_index=eval_result.rule_index,
                         version=eval_result.version)
-        access_event = AccessEvent(
-            timestamp=int(
-                time.time() * 1000),
-            user=user,
-            key=toggle_key,
-            value=eval_result.value,
-            version=eval_result.version,
-            variation_index=eval_result.variation_index,
-            rule_index=eval_result.rule_index,
-            reason=eval_result.reason,
-            track_access_events=toggle.track_access_events)
-        self._event_processor.push(access_event)
+        self._track_event(user, toggle, eval_result)
+
         return detail
 
     def track(
