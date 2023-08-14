@@ -21,7 +21,7 @@ FeatureProbe Server Side SDK for Python
   :target: https://github.com/FeatureProbe/server-sdk-python/blob/main/LICENSE
   :alt: License
 
-Feature Probe is an open source feature management service. This SDK is used to control features in Python programs.
+`FeatureProbe <https://featureprobe.com/>`_ is an open source feature management service. This SDK is used to control features in Python programs.
 This SDK is designed primarily for use in multi-user systems such as web servers and applications.
 
 
