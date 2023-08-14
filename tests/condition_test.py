@@ -42,7 +42,7 @@ def test_string_is_one_of():
     condition.objects = ['12345', '987654', '665544', '13797347245']
     condition.predicate = fp.model.StringPredicate.IS_ONE_OF
 
-    user['userId'] = '12345'
+    user['userId'] = 12345  # should auto convert to string
     assert condition.match_objects(user, segments)
 
     user['userId'] = '999999'

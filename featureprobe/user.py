@@ -22,7 +22,7 @@ class User:
     Usually corresponding to a user of your application.
     """
 
-    def __init__(self, attrs: Dict[str, str] = None,
+    def __init__(self, attrs: Dict[str, any] = None,
                  stable_rollout_key: str = None):
         """Creates a new FeatureProbe User.
 
@@ -33,9 +33,9 @@ class User:
             self._key = stable_rollout_key
         else:
             self._key = str(int(time.time() * 10**6))
-        self._attrs = attrs or {}
+        self._attrs = {k: str(v) for k, v in (attrs or {}).items()}
 
-    def __setitem__(self, key: str, value: str):
+    def __setitem__(self, key: str, value: any):
         """Alias for :func:`~featureprobe.User.with_attr`.
 
         Usage::
@@ -45,7 +45,7 @@ class User:
           >>> user.with_attr('key1', 'value1')
           >>> user['key2'] = 'value2'
         """
-        self._attrs[key] = value
+        self._attrs[key] = str(value)
 
     def __getitem__(self, attr: str):
         """Gets the value of specified attribute.
@@ -92,7 +92,7 @@ class User:
         """Sets (replace the original attributes) multiple attributes to a FeatureProbe User"""
         self._attrs = attrs
 
-    def with_attr(self, key: str, value: str) -> "User":
+    def with_attr(self, key: str, value: any) -> "User":
         """Adds an attribute to the user.
 
         :param key: Attribute key / name.
@@ -104,7 +104,7 @@ class User:
           >>> import featureprobe as fp
           >>> user = fp.User('unique id').with_attr('key1', 'value1').with_attr('key2', 'value2')
         """
-        self._attrs[key] = value
+        self._attrs[key] = str(value)
         return self
 
     def has_attr(self, attr: str) -> bool:
